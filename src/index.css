@@ -80,6 +80,9 @@
     transition:
       background-color 0.2s ease,
       color 0.2s ease;
+    /* Sombra sólida e blocos girados podem passar da borda em telas estreitas
+       e criar rolagem lateral. `clip` corta sem virar container de rolagem. */
+    overflow-x: clip;
   }
 
   h1,
@@ -150,13 +153,35 @@
       box-shadow 0.12s ease,
       background-color 0.15s ease;
   }
-  .apertar:hover {
-    transform: translate(-1px, -1px);
-    box-shadow: 5px 5px 0 var(--sombra-cor);
+  /* O realce de hover fica só onde existe ponteiro: no celular ele grudaria
+     no elemento depois do toque. */
+  @media (hover: hover) and (pointer: fine) {
+    .apertar:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0 var(--sombra-cor);
+    }
   }
   .apertar:active {
     transform: translate(3px, 3px);
     box-shadow: 1px 1px 0 var(--sombra-cor);
+  }
+
+  /*
+   * Ações de linha (editar, remover). Em telas de toque não há hover, então
+   * escondê-las atrás dele as tornaria inalcançáveis — no celular ficam sempre
+   * visíveis, e só somem quando o aparelho tem ponteiro de verdade.
+   */
+  .acoes-linha {
+    opacity: 1;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .acoes-linha {
+      opacity: 0;
+    }
+    .group:hover .acoes-linha,
+    .acoes-linha:focus-within {
+      opacity: 1;
+    }
   }
 
   /* Etiqueta em caixa alta, o rótulo padrão do sistema */
@@ -190,12 +215,20 @@
     );
   }
 
-  .girar-1 {
-    transform: rotate(-1.5deg);
-  }
-  .girar-2 {
-    transform: rotate(2deg);
-  }
+}
+
+/* Definidas com @utility para aceitarem variantes (`sm:girar-2`, por exemplo). */
+@utility girar-1 {
+  transform: rotate(-1.5deg);
+}
+@utility girar-2 {
+  transform: rotate(2deg);
+}
+@utility girar-0 {
+  transform: none;
+}
+
+@layer utilities {
 
   .scrollbar-fina {
     scrollbar-width: thin;

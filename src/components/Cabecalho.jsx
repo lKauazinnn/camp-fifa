@@ -60,7 +60,9 @@ export function Cabecalho({ totalParticipantes, totalGols, torneio, tema, aoAlte
             <BotaoTema tema={tema} aoAlternar={aoAlternarTema} />
           </div>
 
-          <h1 className="mt-4 text-[3rem] leading-[0.86] sm:text-[5.5rem]">
+          {/* Passo intermediário em 380px: em telas de 320px o corpo útil tem
+              288px, e "Campeonato" em Archivo Black 48px não cabe. */}
+          <h1 className="mt-4 text-[2.4rem] leading-[0.86] min-[380px]:text-[3rem] sm:text-[5.5rem]">
             Campeonato
             <br />
             <span className="marcado">FIFA</span>
@@ -72,7 +74,9 @@ export function Cabecalho({ totalParticipantes, totalGols, torneio, tema, aoAlte
         </div>
 
         {/* Premiação */}
-        <div className="girar-2 contorno sombra-g relative w-full rounded-xl bg-laranja px-5 py-4 text-white lg:w-64">
+        {/* Sem rotação no celular: girar um bloco de largura total só faz ele
+            passar da borda da tela. */}
+        <div className="girar-0 contorno sombra-g relative w-full rounded-xl bg-laranja px-5 py-4 text-white sm:girar-2 lg:w-64">
           <div className="listrado absolute inset-0 rounded-[10px]" aria-hidden="true" />
           <div className="relative">
             <p className="rotulo text-[10px] text-white/80">Prêmio do campeão</p>

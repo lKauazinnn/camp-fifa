@@ -4,11 +4,11 @@ import { useTimes } from '../contexto/TimesContexto.jsx'
 import { RESULTADO_VAZIO, normalizarResultado, resultadoEhValido } from '../lib/torneio.js'
 import { Botao, EscudoTime } from './ui.jsx'
 
-function CampoNumero({ rotulo, valor, aoMudar, maximo = 99, destaque = false }) {
+function CampoNumero({ rotulo, valor, aoMudar, maximo = 99, destaque = false, className = '' }) {
   const ajustar = (delta) => aoMudar(Math.min(maximo, Math.max(0, valor + delta)))
 
   return (
-    <div>
+    <div className={className}>
       {/* text-current: o rótulo acompanha a cor do bloco em volta — cinza sobre
           papel, branco quando o campo está dentro da caixa azul dos pênaltis. */}
       <p className="rotulo mb-1.5 text-center text-[9px] text-current opacity-70">{rotulo}</p>
@@ -65,10 +65,13 @@ function Lado({ participante, prefixo, formulario, atualizar, vencedor }) {
         ) : null}
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      {/* No celular o campo de gols ocupa a linha inteira: três colunas de
+          stepper em 320px deixariam o número sem espaço. */}
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <CampoNumero
           rotulo="Gols"
           destaque
+          className="col-span-2 sm:col-span-1"
           valor={formulario[`gols${prefixo}`]}
           aoMudar={(valor) => atualizar(`gols${prefixo}`, valor)}
         />

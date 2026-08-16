@@ -100,7 +100,7 @@ function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover }) {
         <p className="truncate text-[14px] font-medium">{participante.nome}</p>
         <p className="truncate text-[11px] text-tinta-fraca">{buscarTime(participante.timeId).nome}</p>
       </div>
-      <div className="flex shrink-0 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+      <div className="acoes-linha flex shrink-0 gap-0.5 transition-opacity">
         <button
           type="button"
           onClick={() => setEditando(true)}

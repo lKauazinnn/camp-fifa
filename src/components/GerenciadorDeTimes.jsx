@@ -267,7 +267,9 @@ export function GerenciadorDeTimes({ acoes, totalDeAjustes }) {
         />
       ) : null}
 
-      <ul className="scrollbar-fina max-h-[26rem] space-y-1 overflow-y-auto pr-1">
+      {/* A altura fixa só entra a partir do tablet: no celular, uma lista com
+          rolagem própria dentro da página que já rola é um inferno de usar. */}
+      <ul className="scrollbar-fina space-y-1 sm:max-h-[26rem] sm:overflow-y-auto sm:pr-1">
         {visiveis.map((time) => (
           <LinhaTime
             key={time.id}

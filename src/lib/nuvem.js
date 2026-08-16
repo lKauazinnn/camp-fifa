@@ -12,11 +12,31 @@ import { createClient } from '@supabase/supabase-js'
  * continua funcionando só com o localStorage.
  */
 
-const ENDERECO = import.meta.env.VITE_SUPABASE_URL
+/**
+ * Limpa o que costuma vir junto de variável de ambiente colada à mão: espaços,
+ * aspas, quebras de linha e o BOM (U+FEFF) que alguns terminais inserem.
+ *
+ * O BOM é traiçoeiro: a chave vai no cabeçalho `apikey`, e o navegador recusa
+ * cabeçalho com caractere fora do Latin-1 com um "TypeError: Failed to execute
+ * 'set' on 'Headers'" que não diz nada sobre a causa.
+ */
+function limparVariavel(valor) {
+  if (typeof valor !== 'string') return undefined
+  const limpo = valor
+    .replace(/^﻿/, '')
+    .trim()
+    .replace(/^['"]|['"]$/g, '')
+    // eslint-disable-next-line no-control-regex -- qualquer coisa fora do Latin-1 quebra o header
+    .replace(/[^\x20-\xFF]/g, '')
+  return limpo || undefined
+}
+
+const ENDERECO = limparVariavel(import.meta.env.VITE_SUPABASE_URL)
 // Aceita a chave publishable (sb_publishable_…, atual) ou a anônima legada.
 const CHAVE_PUBLICA =
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY
-export const ID_CAMPEONATO = import.meta.env.VITE_CAMPEONATO_ID ?? 'unidos-acamp'
+  limparVariavel(import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY) ||
+  limparVariavel(import.meta.env.VITE_SUPABASE_ANON_KEY)
+export const ID_CAMPEONATO = limparVariavel(import.meta.env.VITE_CAMPEONATO_ID) ?? 'unidos-acamp'
 
 export const nuvemConfigurada = Boolean(ENDERECO && CHAVE_PUBLICA)
 
