@@ -1,6 +1,24 @@
 import { Moon, Sun } from 'lucide-react'
 import { BarraProgresso } from './ui.jsx'
 
+/** Mostra que o placar está chegando do servidor, e não só deste aparelho. */
+function SeloAoVivo({ nuvem }) {
+  if (!nuvem?.configurada) return null
+
+  const conectado = nuvem.conectado && !nuvem.erro
+  return (
+    <span
+      className={`contorno rotulo inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[10px] ${
+        conectado ? 'bg-rosa text-white' : 'bg-papel-escuro text-tinta-media'
+      }`}
+      title={nuvem.erro ?? (conectado ? 'Recebendo atualizações em tempo real' : 'Reconectando ao servidor')}
+    >
+      <span className={`size-1.5 rounded-full ${conectado ? 'animar-piscar bg-white' : 'bg-tinta-fraca'}`} />
+      {conectado ? 'Ao vivo' : 'Conectando'}
+    </span>
+  )
+}
+
 function Caixa({ valor, rotulo, cor = 'papel' }) {
   const fundos = { papel: 'bg-papel-claro', lima: 'bg-lima text-carvao', cobalto: 'bg-cobalto text-white' }
   return (
@@ -29,7 +47,7 @@ function BotaoTema({ tema, aoAlternar }) {
   )
 }
 
-export function Cabecalho({ totalParticipantes, totalGols, torneio, tema, aoAlternarTema }) {
+export function Cabecalho({ totalParticipantes, totalGols, torneio, tema, aoAlternarTema, nuvem }) {
   return (
     <header className="mx-auto max-w-6xl px-4 pt-7 pb-5 sm:px-6 sm:pt-10">
       <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
@@ -38,7 +56,7 @@ export function Cabecalho({ totalParticipantes, totalGols, torneio, tema, aoAlte
             <span className="contorno rotulo rounded-md bg-tinta px-2 py-1 text-[10px] text-papel-claro">
               Unidos Acamp
             </span>
-            <span className="rotulo text-[10px] text-tinta-media">Acampamento da galera</span>
+            <SeloAoVivo nuvem={nuvem} />
             <BotaoTema tema={tema} aoAlternar={aoAlternarTema} />
           </div>
 

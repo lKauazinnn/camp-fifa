@@ -42,13 +42,26 @@ function FaixaSomenteLeitura({ acoes }) {
 }
 
 export default function App() {
-  const { participantes, timesDoUsuario, torneio, estatisticas, resumo, salvamento, somenteLeitura, acoes } =
-    useTorneio()
+  const {
+    participantes,
+    timesDoUsuario,
+    torneio,
+    estatisticas,
+    resumo,
+    salvamento,
+    nuvem,
+    destravado,
+    somenteLeitura,
+    modoVisualizacao,
+    acoes,
+  } = useTorneio()
   const { tema, alternarTema } = useTema()
   const [abaAtiva, setAbaAtiva] = useState('chaveamento')
   const [partidaEmEdicao, setPartidaEmEdicao] = useState(null)
 
-  const abas = somenteLeitura ? ABAS.filter((aba) => aba.id !== 'admin') : ABAS
+  // A aba Admin some no modo visualização (link compartilhado), mas continua
+  // acessível quando a nuvem está ligada — é por ela que se informa o PIN.
+  const abas = modoVisualizacao ? ABAS.filter((aba) => aba.id !== 'admin') : ABAS
 
   // A partida vem sempre do torneio recalculado, para o modal refletir edições recentes.
   const partidaAberta = partidaEmEdicao ? (torneio.porId.get(partidaEmEdicao) ?? null) : null
@@ -57,7 +70,7 @@ export default function App() {
   return (
     <ProvedorDeTimes timesDoUsuario={timesDoUsuario}>
       <div className="min-h-dvh">
-        {somenteLeitura ? <FaixaSomenteLeitura acoes={acoes} /> : null}
+        {modoVisualizacao ? <FaixaSomenteLeitura acoes={acoes} /> : null}
 
         <Cabecalho
           totalParticipantes={participantes.length}
@@ -65,6 +78,7 @@ export default function App() {
           torneio={torneio}
           tema={tema}
           aoAlternarTema={alternarTema}
+          nuvem={nuvem}
         />
 
         <Navegacao abas={abas} abaAtiva={abaAtiva} aoTrocar={setAbaAtiva} />
@@ -88,7 +102,7 @@ export default function App() {
 
             {abaAtiva === 'regras' ? <Regras /> : null}
 
-            {abaAtiva === 'admin' && !somenteLeitura ? (
+            {abaAtiva === 'admin' && !modoVisualizacao ? (
               <PainelAdmin
                 participantes={participantes}
                 timesDoUsuario={timesDoUsuario}
@@ -96,6 +110,8 @@ export default function App() {
                 acoes={acoes}
                 aoEditarPartida={abrirResultado}
                 salvamento={salvamento}
+                nuvem={nuvem}
+                destravado={destravado}
               />
             ) : null}
           </div>

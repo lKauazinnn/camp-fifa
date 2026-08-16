@@ -11,6 +11,7 @@
     "verificar": "vite build --ssr scripts/verificar.jsx --outDir .verificacao --logLevel error && node .verificacao/verificar.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
     "lucide-react": "^1.31.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

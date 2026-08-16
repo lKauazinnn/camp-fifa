@@ -44,6 +44,62 @@ vercel --prod   # produção
 
 Não há variáveis de ambiente a configurar.
 
+## Placar ao vivo (Supabase)
+
+Com as variáveis de ambiente configuradas, o campeonato passa a viver no Supabase: o organizador lança um
+placar e **todos os celulares atualizam sozinhos em menos de um segundo**, sem ninguém recarregar a página.
+
+### Como o acesso é protegido
+
+O site é estático, então a chave anônima fica visível para qualquer visitante — o desenho parte desse
+princípio (tudo em `supabase/schema.sql`):
+
+| Quem | Pode |
+|---|---|
+| Qualquer visitante (chave anônima) | **só ler** o placar |
+| Organizador (com o PIN) | ler e gravar, através da função `salvar_campeonato` |
+
+- A tabela `campeonatos` tem apenas política de `SELECT`. Não existe política de escrita, então nem a chave
+  anônima nem um usuário logado conseguem alterar a tabela direto.
+- Toda gravação passa por uma função `SECURITY DEFINER` que confere o PIN **dentro do Postgres**.
+- O hash do PIN mora em `segredos`, tabela sem nenhuma permissão para as chaves públicas e fora da
+  publicação de tempo real — assim ele não vaza nem no payload de um evento.
+- Tentativa com PIN errado tem atraso proposital, para encarecer a força bruta.
+
+O PIN fica no `sessionStorage`, então some ao fechar a aba. Para trocá-lo, use *Trocar PIN* no painel — ou,
+pelo SQL Editor do Supabase:
+
+```sql
+update public.segredos
+   set pin_hash = extensions.crypt('SEU-PIN-NOVO', extensions.gen_salt('bf', 10))
+ where id = 'unidos-acamp';
+```
+
+### Configuração
+
+```bash
+cp .env.example .env   # preencha com a URL e a chave anônima do seu projeto
+```
+
+Na Vercel, cadastre as mesmas variáveis em **Settings → Environment Variables** e refaça o deploy. Sem elas
+o site continua funcionando, só que cada aparelho guarda a própria cópia.
+
+Rode o `supabase/schema.sql` uma vez no SQL Editor do projeto e crie a linha do campeonato:
+
+```sql
+insert into public.campeonatos (id, estado) values ('unidos-acamp', '{}');
+insert into public.segredos (id, pin_hash)
+values ('unidos-acamp', extensions.crypt('SEU-PIN', extensions.gen_salt('bf', 10)));
+```
+
+### Como os dois lados conversam
+
+- O evento de tempo real é só um **aviso**: o cliente relê a linha pelo REST. Isso evita depender do
+  tamanho do payload, que cresce quando há escudos enviados.
+- As alterações do organizador sobem agrupadas depois de 700 ms parado, para uma sequência de cliques não
+  virar uma sequência de gravações.
+- Cada gravação incrementa `versao`; o cliente ignora o eco da própria escrita comparando esse número.
+
 ## Onde os dados ficam guardados
 
 Três camadas, da mais automática para a mais manual — todas em `src/lib/persistencia.js`:

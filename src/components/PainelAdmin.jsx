@@ -5,6 +5,7 @@ import { formatarHorario } from '../lib/persistencia.js'
 import { Botao, BotaoTexto, Cartao, EscudoTime, Etiqueta, TituloSecao } from './ui.jsx'
 import { ModalConfirmacao } from './ModalConfirmacao.jsx'
 import { GerenciadorDeTimes } from './GerenciadorDeTimes.jsx'
+import { BarraDoOrganizador, Destravar } from './Destravar.jsx'
 
 const CAMPO =
   'contorno w-full rounded-lg bg-papel-claro px-3 py-2.5 text-[14px] font-medium placeholder:text-tinta-fraca focus:bg-lima/20 focus:outline-none'
@@ -297,14 +298,31 @@ function BlocoDados({ acoes, salvamento, temDados }) {
 /* Painel                                                                     */
 /* -------------------------------------------------------------------------- */
 
-export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, salvamento, timesDoUsuario = [] }) {
+export function PainelAdmin({
+  participantes,
+  torneio,
+  acoes,
+  aoEditarPartida,
+  salvamento,
+  timesDoUsuario = [],
+  nuvem,
+  destravado,
+}) {
   const [confirmacao, setConfirmacao] = useState(null)
   const podeSortear = participantes.length >= 4
 
   const pedir = (config) => setConfirmacao(config)
 
+  // Com a nuvem ligada, o painel só abre para quem tem o PIN.
+  if (nuvem?.configurada && !destravado) {
+    return <Destravar aoDestravar={acoes.destravar} />
+  }
+
   return (
     <div className="space-y-5">
+      {nuvem?.configurada ? (
+        <BarraDoOrganizador nuvem={nuvem} aoTravar={acoes.travar} aoTrocarPin={acoes.alterarPin} />
+      ) : null}
       <ModalConfirmacao
         aberto={Boolean(confirmacao)}
         titulo={confirmacao?.titulo ?? ''}
