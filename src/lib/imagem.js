@@ -57,6 +57,48 @@ export async function prepararEscudo(arquivo, lado = LADO_PADRAO) {
   }
 }
 
+/**
+ * Baixa um escudo de endereço externo e devolve como data URL.
+ *
+ * Serve para "fixar" o escudo dentro do campeonato: uma vez baixado, ele passa
+ * a viajar junto com os dados — funciona offline, entra no backup e aparece
+ * igual para todo mundo, sem depender do servidor de imagens continuar de pé.
+ *
+ * Depende de CORS liberado na origem; se não estiver, devolve null em vez de
+ * quebrar, e o time segue exibindo as iniciais.
+ */
+export async function baixarEscudo(endereco, lado = LADO_PADRAO) {
+  if (!endereco || endereco.startsWith('data:')) return null
+
+  try {
+    const imagem = await new Promise((resolver, rejeitar) => {
+      const elemento = new Image()
+      elemento.crossOrigin = 'anonymous'
+      elemento.onload = () => resolver(elemento)
+      elemento.onerror = () => rejeitar(new Error('sem acesso à imagem'))
+      elemento.src = endereco
+    })
+
+    const larguraOriginal = imagem.naturalWidth || lado
+    const alturaOriginal = imagem.naturalHeight || lado
+    const escala = Math.min(lado / larguraOriginal, lado / alturaOriginal)
+    const largura = Math.max(1, Math.round(larguraOriginal * escala))
+    const altura = Math.max(1, Math.round(alturaOriginal * escala))
+
+    const tela = document.createElement('canvas')
+    tela.width = lado
+    tela.height = lado
+    const contexto = tela.getContext('2d')
+    contexto.imageSmoothingQuality = 'high'
+    contexto.drawImage(imagem, (lado - largura) / 2, (lado - altura) / 2, largura, altura)
+
+    const webp = tela.toDataURL('image/webp', 0.9)
+    return webp.startsWith('data:image/webp') ? webp : tela.toDataURL('image/png')
+  } catch {
+    return null
+  }
+}
+
 /** Aceita apenas endereços de imagem plausíveis, para não guardar lixo. */
 export function validarEnderecoDeEscudo(endereco) {
   const limpo = endereco.trim()

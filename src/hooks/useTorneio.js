@@ -22,6 +22,8 @@ import {
   nuvemConfigurada,
   trocarPin,
 } from '../lib/nuvem.js'
+import { baixarEscudo } from '../lib/imagem.js'
+import { criarCatalogo } from '../contexto/TimesContexto.jsx'
 
 const CHAVE_PIN = 'unidos-acamp-pin'
 const ATRASO_ENVIO = 700
@@ -160,6 +162,57 @@ export function useTorneio() {
 
     return () => window.clearTimeout(agendado)
   }, [revisaoLocal, pin, snapshot])
+
+  /* --------------------- escudos guardados junto aos dados ------------------ */
+
+  /**
+   * Baixa o escudo dos times em uso e guarda dentro do campeonato.
+   *
+   * Enquanto o escudo é só um endereço, ele depende de internet e do servidor
+   * de imagens; guardado como data URL, viaja junto com os dados e aparece
+   * igual para todo mundo — inclusive para quem se inscreveu pelo QR e escolheu
+   * um time que ninguém tinha usado ainda.
+   *
+   * Só o organizador faz isso, porque é quem tem permissão de gravar.
+   */
+  useEffect(() => {
+    if (snapshot || (nuvemConfigurada && !pin)) return undefined
+    let ativo = true
+
+    const catalogo = criarCatalogo(estado.timesDoUsuario ?? [])
+    const guardados = new Set((estado.timesDoUsuario ?? []).filter((time) => time.escudo).map((time) => time.id))
+    const pendentes = [...new Set(estado.participantes.map((participante) => participante.timeId))]
+      .filter((timeId) => !guardados.has(timeId))
+      .map((timeId) => catalogo.buscarTime(timeId))
+      .filter((time) => time?.escudo && !time.escudo.startsWith('data:'))
+
+    if (!pendentes.length) return undefined
+
+    // Um por vez e sem pressa: é tarefa de fundo, não pode atrapalhar o uso.
+    const agendado = window.setTimeout(async () => {
+      for (const time of pendentes) {
+        if (!ativo) return
+        const dataUrl = (await baixarEscudo(time.escudo)) ?? (await baixarEscudo(time.escudoReserva))
+        if (!ativo || !dataUrl) continue
+        alterar((anterior) => {
+          const lista = anterior.timesDoUsuario ?? []
+          const existente = lista.find((item) => item.id === time.id)
+          if (existente?.escudo) return anterior
+          return {
+            ...anterior,
+            timesDoUsuario: existente
+              ? lista.map((item) => (item.id === time.id ? { ...item, escudo: dataUrl } : item))
+              : [...lista, { id: time.id, escudo: dataUrl }],
+          }
+        })
+      }
+    }, 1500)
+
+    return () => {
+      ativo = false
+      window.clearTimeout(agendado)
+    }
+  }, [estado.participantes, estado.timesDoUsuario, pin, snapshot, alterar])
 
   /* ------------------------------- destravar ------------------------------- */
 

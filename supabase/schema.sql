@@ -128,7 +128,72 @@ begin
 end;
 $$;
 
+-- Inscrição pública (o QR code do acampamento).
+--
+-- É a única gravação que dispensa o PIN, então tem trava própria: só funciona
+-- antes do sorteio, limita o total de inscritos, exige nome utilizável e
+-- recusa nome repetido. Nada além de acrescentar um participante.
+create or replace function public.inscrever(p_id text, p_nome text, p_time text)
+returns table (posicao int, total int)
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  v_estado      jsonb;
+  v_nome        text := btrim(coalesce(p_nome, ''));
+  v_time        text := coalesce(nullif(btrim(coalesce(p_time, '')), ''), 'sem-time');
+  v_inscritos   jsonb;
+  v_total       int;
+begin
+  if length(v_nome) < 2 or length(v_nome) > 40 then
+    raise exception 'nome precisa ter de 2 a 40 caracteres' using errcode = '22023';
+  end if;
+
+  select estado into v_estado from public.campeonatos where id = p_id for update;
+  if v_estado is null then
+    raise exception 'campeonato % nao existe', p_id using errcode = 'P0002';
+  end if;
+
+  if jsonb_array_length(coalesce(v_estado->'seeds', '[]'::jsonb)) > 0 then
+    raise exception 'as chaves ja foram sorteadas' using errcode = '22023';
+  end if;
+
+  v_inscritos := coalesce(v_estado->'participantes', '[]'::jsonb);
+  v_total := jsonb_array_length(v_inscritos);
+
+  if v_total >= 64 then
+    raise exception 'o campeonato ja esta lotado' using errcode = '22023';
+  end if;
+
+  if exists (
+    select 1 from jsonb_array_elements(v_inscritos) as inscrito
+     where lower(btrim(inscrito->>'nome')) = lower(v_nome)
+  ) then
+    raise exception 'ja existe alguem inscrito com esse nome' using errcode = '23505';
+  end if;
+
+  update public.campeonatos
+     set estado = jsonb_set(
+           v_estado,
+           '{participantes}',
+           v_inscritos || jsonb_build_object(
+             'id', 'qr' || substr(md5(random()::text || clock_timestamp()::text), 1, 7),
+             'nome', v_nome,
+             'timeId', v_time
+           )
+         ),
+         versao = versao + 1,
+         atualizado_em = now()
+   where id = p_id;
+
+  return query select v_total + 1, v_total + 1;
+end;
+$$;
+
 revoke all on function public.conferir_pin(text, text) from public;
+revoke all on function public.inscrever(text, text, text) from public;
+grant execute on function public.inscrever(text, text, text) to anon, authenticated;
 revoke all on function public.salvar_campeonato(text, jsonb, text) from public;
 revoke all on function public.trocar_pin(text, text, text) from public;
 grant execute on function public.conferir_pin(text, text) to anon, authenticated;

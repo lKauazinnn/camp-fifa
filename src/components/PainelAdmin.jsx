@@ -6,6 +6,7 @@ import { Botao, BotaoTexto, Cartao, EscudoTime, Etiqueta, TituloSecao } from './
 import { ModalConfirmacao } from './ModalConfirmacao.jsx'
 import { GerenciadorDeTimes } from './GerenciadorDeTimes.jsx'
 import { BarraDoOrganizador, Destravar } from './Destravar.jsx'
+import { QrInscricao } from './QrInscricao.jsx'
 
 const CAMPO =
   'contorno w-full rounded-lg bg-papel-claro px-3 py-2.5 text-[14px] font-medium placeholder:text-tinta-fraca focus:bg-lima/20 focus:outline-none'
@@ -376,6 +377,8 @@ export function PainelAdmin({
           </p>
         )}
       </Cartao>
+
+      {nuvem?.configurada ? <QrInscricao torneio={torneio} /> : null}
 
       <GerenciadorDeTimes acoes={acoes} totalDeAjustes={timesDoUsuario.length} />
 

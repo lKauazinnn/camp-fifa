@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ProvedorDeTimes } from './contexto/TimesContexto.jsx'
 import { useTema } from './hooks/useTema.js'
 import { useTorneio } from './hooks/useTorneio.js'
@@ -10,7 +10,9 @@ import { Estatisticas } from './components/Estatisticas.jsx'
 import { Regras } from './components/Regras.jsx'
 import { PainelAdmin } from './components/PainelAdmin.jsx'
 import { ModalResultado } from './components/ModalResultado.jsx'
+import { Inscricao } from './components/Inscricao.jsx'
 import { Botao } from './components/ui.jsx'
+import { nuvemConfigurada } from './lib/nuvem.js'
 
 const ABAS = [
   { id: 'chaveamento', rotulo: 'Chaveamento', rotuloCurto: 'Chaves' },
@@ -59,6 +61,16 @@ export default function App() {
   const [abaAtiva, setAbaAtiva] = useState('chaveamento')
   const [partidaEmEdicao, setPartidaEmEdicao] = useState(null)
 
+  // Tela que o QR code abre. Fica no hash para não exigir rota no servidor.
+  const [inscrevendo, setInscrevendo] = useState(
+    () => typeof window !== 'undefined' && window.location.hash === '#inscricao',
+  )
+  useEffect(() => {
+    const aoTrocarHash = () => setInscrevendo(window.location.hash === '#inscricao')
+    window.addEventListener('hashchange', aoTrocarHash)
+    return () => window.removeEventListener('hashchange', aoTrocarHash)
+  }, [])
+
   // A aba Admin some no modo visualização (link compartilhado), mas continua
   // acessível quando a nuvem está ligada — é por ela que se informa o PIN.
   const abas = modoVisualizacao ? ABAS.filter((aba) => aba.id !== 'admin') : ABAS
@@ -66,6 +78,21 @@ export default function App() {
   // A partida vem sempre do torneio recalculado, para o modal refletir edições recentes.
   const partidaAberta = partidaEmEdicao ? (torneio.porId.get(partidaEmEdicao) ?? null) : null
   const abrirResultado = somenteLeitura ? undefined : (partida) => setPartidaEmEdicao(partida.id)
+
+  const sairDaInscricao = () => {
+    window.history.replaceState(null, '', window.location.pathname + window.location.search)
+    setInscrevendo(false)
+  }
+
+  if (inscrevendo && nuvemConfigurada) {
+    return (
+      <ProvedorDeTimes timesDoUsuario={timesDoUsuario}>
+        <div className="min-h-dvh">
+          <Inscricao aoSair={sairDaInscricao} />
+        </div>
+      </ProvedorDeTimes>
+    )
+  }
 
   return (
     <ProvedorDeTimes timesDoUsuario={timesDoUsuario}>

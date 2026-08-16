@@ -81,6 +81,42 @@ export async function gravarNaNuvem(estado, pin) {
   return { versao: Number(linha.versao), atualizadoEm: linha.atualizado_em }
 }
 
+/**
+ * Inscrição pública — é o que o QR code do acampamento abre.
+ * Não usa PIN: as travas (só antes do sorteio, sem nome repetido, limite de
+ * inscritos) ficam na função do banco.
+ * @returns {Promise<number>} a posição do inscrito na lista
+ */
+export async function inscrever({ nome, timeId }) {
+  if (!cliente) throw new Error('Inscrição online não está configurada.')
+  const { data, error } = await cliente.rpc('inscrever', {
+    p_id: ID_CAMPEONATO,
+    p_nome: nome,
+    p_time: timeId,
+  })
+  if (error) throw new Error(traduzir(error))
+  const linha = Array.isArray(data) ? data[0] : data
+  return Number(linha?.total ?? 0)
+}
+
+/** Situação da inscrição, para a tela do QR saber o que mostrar. */
+export async function lerSituacaoDaInscricao() {
+  if (!cliente) return null
+  const { data, error } = await cliente
+    .from('campeonatos')
+    .select('estado')
+    .eq('id', ID_CAMPEONATO)
+    .maybeSingle()
+
+  if (error) throw new Error(traduzir(error))
+  const estado = data?.estado ?? {}
+  return {
+    inscritos: estado.participantes?.length ?? 0,
+    sorteado: Boolean(estado.seeds?.length),
+    nomes: (estado.participantes ?? []).map((participante) => participante.nome),
+  }
+}
+
 export async function trocarPin(pinAtual, pinNovo) {
   if (!cliente) throw new Error('Nuvem não configurada.')
   const { data, error } = await cliente.rpc('trocar_pin', {
@@ -125,5 +161,9 @@ function traduzir(erro) {
   if (/PIN incorreto/i.test(mensagem)) return 'PIN incorreto.'
   if (/nao existe|não existe/i.test(mensagem)) return 'Campeonato não encontrado no servidor.'
   if (/Failed to fetch|NetworkError/i.test(mensagem)) return 'Sem conexão com o servidor.'
+  if (/ja existe alguem inscrito/i.test(mensagem)) return 'Já tem alguém inscrito com esse nome. Coloca o sobrenome.'
+  if (/de 2 a 40 caracteres/i.test(mensagem)) return 'Escreve seu nome (de 2 a 40 letras).'
+  if (/ja foram sorteadas/i.test(mensagem)) return 'As inscrições fecharam: as chaves já foram sorteadas.'
+  if (/ja esta lotado/i.test(mensagem)) return 'O campeonato já está lotado.'
   return mensagem
 }
