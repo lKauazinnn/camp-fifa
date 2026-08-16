@@ -27,7 +27,7 @@ export function Repescagem({ torneio, aoEditarPartida, somenteLeitura }) {
 
   return (
     <div className="space-y-5">
-      <div className="grid gap-5 lg:grid-cols-[1fr_300px] lg:items-start">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
         <Cartao className="p-5 sm:p-6">
           <h2 className="text-3xl">
             Ninguém sai fora
@@ -45,8 +45,10 @@ export function Repescagem({ torneio, aoEditarPartida, somenteLeitura }) {
             Terceiro lugar
           </p>
           {torneio.terceiro ? (
-            <div className="mt-3 flex items-center gap-3">
-              <EscudoTime timeId={torneio.terceiro.timeId} tamanho="md" />
+            <div className="animar-carimbo mt-3 flex items-center gap-3">
+              <span className="animar-tremer">
+                <EscudoTime timeId={torneio.terceiro.timeId} tamanho="md" />
+              </span>
               <div className="min-w-0">
                 <p className="truncate font-display text-xl leading-tight text-white uppercase">
                   {torneio.terceiro.nome}

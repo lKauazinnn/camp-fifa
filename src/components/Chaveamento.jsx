@@ -11,9 +11,19 @@ const MEDALHAS = [
 function Posicao({ indice, participante }) {
   const { buscarTime } = useTimes()
   const medalha = MEDALHAS[indice]
+  const definido = Boolean(participante)
+
   return (
-    <div className="flex items-center gap-3 px-4 py-3">
-      <span className={`contorno grid size-9 shrink-0 place-items-center rounded-lg font-display text-lg ${medalha.cor}`}>
+    <div
+      className="animar-degrau flex items-center gap-3 px-4 py-3"
+      // Cascata do primeiro ao terceiro degrau.
+      style={{ animationDelay: `${indice * 120}ms` }}
+    >
+      <span
+        className={`contorno grid size-9 shrink-0 place-items-center rounded-lg font-display text-lg ${medalha.cor} ${
+          indice === 0 && definido ? 'animar-medalha' : ''
+        }`}
+      >
         {medalha.numero}
       </span>
       {participante ? (
@@ -35,16 +45,21 @@ function Posicao({ indice, participante }) {
 function Campeao({ campeao }) {
   const { buscarTime } = useTimes()
   return (
-    <div className="contorno sombra-g relative overflow-hidden rounded-xl bg-cobalto px-6 py-8 text-white sm:px-10">
+    <div className="animar-carimbo contorno sombra-g relative overflow-hidden rounded-xl bg-cobalto px-5 py-7 text-white sm:px-10 sm:py-8">
       <div className="listrado absolute inset-0" aria-hidden="true" />
+      <span className="brilho-passando" aria-hidden="true" />
       <div className="relative flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
-        <EscudoTime timeId={campeao.timeId} tamanho="lg" />
-        <div className="min-w-0">
+        <span className="animar-tremer">
+          <EscudoTime timeId={campeao.timeId} tamanho="lg" />
+        </span>
+        {/* max-w-full: em coluna o item é medido pelo conteúdo, e sem esse
+            limite o `truncate` do nome nunca entra em ação. */}
+        <div className="min-w-0 max-w-full">
           <span className="contorno rotulo inline-block rounded-md bg-lima px-2 py-1 text-[10px] text-carvao">
             Campeão 🏆
           </span>
-          <h2 className="mt-3 truncate text-4xl text-white sm:text-5xl">{campeao.nome}</h2>
-          <p className="mt-2 text-[14px] font-medium text-white/80">
+          <h2 className="mt-3 truncate text-2xl text-white min-[380px]:text-3xl sm:text-5xl">{campeao.nome}</h2>
+          <p className="mt-2 truncate text-[14px] font-medium text-white/80">
             {buscarTime(campeao.timeId).nome} · levou os R$ 100
           </p>
         </div>
@@ -72,7 +87,12 @@ export function Chaveamento({ torneio, aoEditarPartida, aoIrParaAdmin, somenteLe
     <div className="space-y-5">
       {torneio.campeao ? <Campeao campeao={torneio.campeao} /> : null}
 
-      <div className="grid gap-5 lg:grid-cols-[300px_1fr] lg:items-start">
+      {/*
+        `minmax(0,1fr)` em vez de `1fr`: por padrão o item de um grid tem
+        min-width automático, então a largura mínima do conteúdo (a régua de
+        fases, que já rola sozinha) esticaria a coluna e vazaria a tela.
+      */}
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start">
         <Cartao className="overflow-hidden">
           <div className="border-b-2 border-tinta bg-papel-escuro px-4 py-3">
             <h3 className="text-xl">Pódio</h3>

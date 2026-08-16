@@ -279,4 +279,118 @@
   .animar-piscar {
     animation: piscar 1.4s ease-in-out infinite;
   }
+
+  /* ---------------------------------------------------------------- pódio ---
+   * O campeão entra como um carimbo batendo no papel; o escudo balança logo
+   * depois; e uma faixa de luz cruza o cartão de tempos em tempos.
+   */
+  @keyframes carimbo {
+    0% {
+      opacity: 0;
+      transform: scale(1.35) rotate(-8deg);
+    }
+    55% {
+      opacity: 1;
+      transform: scale(0.94) rotate(1.5deg);
+    }
+    75% {
+      transform: scale(1.03) rotate(-0.8deg);
+    }
+    100% {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .animar-carimbo {
+    animation: carimbo 0.65s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  }
+
+  @keyframes tremer {
+    0%,
+    72%,
+    100% {
+      transform: rotate(0deg);
+    }
+    78% {
+      transform: rotate(-9deg);
+    }
+    84% {
+      transform: rotate(7deg);
+    }
+    90% {
+      transform: rotate(-4deg);
+    }
+    95% {
+      transform: rotate(2deg);
+    }
+  }
+  .animar-tremer {
+    display: inline-block;
+    animation: tremer 3.2s ease-in-out 0.6s infinite;
+  }
+
+  @keyframes passar-luz {
+    0% {
+      transform: translateX(-120%) skewX(-20deg);
+    }
+    100% {
+      transform: translateX(320%) skewX(-20deg);
+    }
+  }
+  .brilho-passando {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 28%;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    animation: passar-luz 3.6s ease-in-out 0.9s infinite;
+  }
+
+  /* As linhas do pódio entram em cascata, do primeiro ao terceiro. */
+  @keyframes subir-degrau {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .animar-degrau {
+    animation: subir-degrau 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+
+  /* Medalha do primeiro colocado pulsando de leve. */
+  @keyframes pulsar-medalha {
+    0%,
+    70%,
+    100% {
+      transform: scale(1);
+    }
+    80% {
+      transform: scale(1.14);
+    }
+    90% {
+      transform: scale(0.97);
+    }
+  }
+  .animar-medalha {
+    animation: pulsar-medalha 2.8s ease-in-out infinite;
+  }
+
+  /* Quem prefere menos movimento não vê nada disso. */
+  @media (prefers-reduced-motion: reduce) {
+    .animar-carimbo,
+    .animar-tremer,
+    .brilho-passando,
+    .animar-degrau,
+    .animar-medalha,
+    .animar-piscar,
+    .animar-entrar {
+      animation: none !important;
+    }
+  }
 }
