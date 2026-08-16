@@ -1,63 +1,56 @@
-import { Banknote, Clock, Gamepad2, HeartHandshake, RotateCcw, ScrollText, ShieldAlert, Swords } from 'lucide-react'
 import { LIMITE_AMARELOS } from '../lib/estatisticas.js'
-import { Cartao, Etiqueta } from './ui.jsx'
+import { Cartao } from './ui.jsx'
 
 const BLOCOS = [
   {
-    icone: Swords,
-    titulo: 'Formato do campeonato',
+    titulo: 'Formato',
     itens: [
       'Mata-mata direto: quem perde na chave principal está fora dela.',
-      'As fases seguem a ordem Oitavas → Quartas → Semifinal → Grande Final.',
-      'O chaveamento inicial é definido por sorteio, sem cabeças de chave.',
-      'Se o número de inscritos não fechar uma potência de 2, algumas chaves recebem “bye” (classificação direta).',
+      'Fases na ordem Oitavas, Quartas, Semifinal e Final.',
+      'O chaveamento inicial sai por sorteio, sem cabeças de chave.',
+      'Se os inscritos não fecharem uma potência de 2, algumas chaves recebem classificação direta.',
     ],
   },
   {
-    icone: RotateCcw,
-    titulo: 'Repescagem e 3º lugar',
+    titulo: 'Repescagem',
     itens: [
-      'Todos os eliminados da primeira fase entram automaticamente na chave de repescagem.',
-      'A repescagem também é em mata-mata, mantendo a ordem dos confrontos originais.',
-      'O vencedor da repescagem conquista o 3º lugar do campeonato.',
+      'Todos os eliminados da primeira fase entram na chave de repescagem.',
+      'A repescagem também é mata-mata e mantém a ordem dos confrontos originais.',
+      'O vencedor da repescagem fica com o terceiro lugar.',
     ],
   },
   {
-    icone: Clock,
-    titulo: 'Duração e configuração dos jogos',
+    titulo: 'Configuração das partidas',
     itens: [
-      'Partidas de 6 minutos por tempo, nível Profissional.',
-      'Lesões e desgaste desativados; velocidade de jogo normal.',
-      'Cada participante escolhe seu time no cadastro e mantém o mesmo até o fim.',
-      'Times repetidos são permitidos — vale a habilidade, não a escalação.',
+      'Seis minutos por tempo, nível Profissional.',
+      'Lesões e desgaste desativados, velocidade normal.',
+      'Cada participante escolhe um time no cadastro e mantém até o fim.',
+      'Times repetidos são permitidos.',
     ],
   },
   {
-    icone: Gamepad2,
     titulo: 'Empates',
     itens: [
-      'Não existe empate no mata-mata: empatou no tempo normal, vai direto para os pênaltis.',
+      'Não existe empate no mata-mata: empatou, vai direto para os pênaltis.',
       'A prorrogação é dispensada para manter a programação do acampamento.',
-      'O placar dos pênaltis é registrado à parte e não conta na artilharia.',
+      'O placar dos pênaltis não conta na artilharia.',
     ],
   },
   {
-    icone: ShieldAlert,
-    titulo: 'Cartões e disciplina',
+    titulo: 'Disciplina',
     itens: [
-      `${LIMITE_AMARELOS} cartões amarelos acumulados = suspensão automática no jogo seguinte.`,
-      'Cartão vermelho = suspensão imediata no próximo jogo do participante.',
-      'Controle remoto arremessado, grito com palavrão ou desrespeito ao adversário = cartão da organização.',
-      'A organização pode aplicar W.O. em caso de reincidência.',
+      `${LIMITE_AMARELOS} amarelos acumulados geram suspensão no jogo seguinte.`,
+      'Cartão vermelho suspende automaticamente o próximo jogo.',
+      'Controle arremessado, palavrão ou desrespeito ao adversário rende cartão da organização.',
+      'Reincidência pode resultar em W.O.',
     ],
   },
   {
-    icone: HeartHandshake,
-    titulo: 'Espírito do Unidos Acamp',
+    titulo: 'Convivência',
     itens: [
-      'Aqui é competição saudável: joga para ganhar, torce para todos.',
+      'Competição saudável: joga para ganhar, torce para todos.',
       'Cumprimente o adversário antes e depois da partida.',
-      'Atraso de mais de 10 minutos no horário do jogo caracteriza W.O.',
+      'Mais de 10 minutos de atraso caracteriza W.O.',
       'Quem estiver na programação espiritual tem o jogo remarcado, sem prejuízo.',
     ],
   },
@@ -65,32 +58,26 @@ const BLOCOS = [
 
 export function Regras() {
   return (
-    <div className="space-y-5">
-      <Cartao className="brilho-ouro relative overflow-hidden border-gold-400/40 bg-gradient-to-r from-gold-400/15 to-transparent p-5">
-        <Banknote className="absolute -top-3 -right-3 size-24 text-gold-400/10" />
-        <div className="relative">
-          <Etiqueta tom="ouro">Premiação oficial</Etiqueta>
-          <h2 className="mt-2 font-display text-2xl font-black text-white">R$ 100,00 para o campeão</h2>
-          <p className="mt-1 max-w-xl text-sm text-slate-300">
-            O prêmio é entregue na noite de encerramento do acampamento, direto para o vencedor da Grande Final.
-            Vice-campeão e 3º lugar recebem a medalha simbólica do <strong>Unidos Acamp</strong>.
-          </p>
+    <div className="space-y-4">
+      <Cartao className="flex flex-wrap items-center justify-between gap-4 p-5">
+        <div>
+          <p className="rotulo">Premiação</p>
+          <h2 className="num mt-1 text-2xl font-semibold text-zinc-50">R$ 100,00</h2>
+          <p className="mt-1 text-[13px] text-zinc-500">Entregues ao campeão na noite de encerramento.</p>
         </div>
+        <p className="max-w-xs text-[13px] leading-relaxed text-zinc-500">
+          Vice-campeão e terceiro colocado recebem a medalha simbólica do Unidos Acamp.
+        </p>
       </Cartao>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {BLOCOS.map(({ icone: Icone, titulo, itens }) => (
-          <Cartao key={titulo} className="p-4 sm:p-5">
-            <div className="mb-3 flex items-center gap-3">
-              <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-royal-500/40 bg-royal-600/20 text-neon-400">
-                <Icone className="size-4" />
-              </span>
-              <h3 className="text-sm font-bold text-white uppercase">{titulo}</h3>
-            </div>
-            <ul className="space-y-2">
+        {BLOCOS.map(({ titulo, itens }) => (
+          <Cartao key={titulo} className="p-5">
+            <h3 className="text-[13px] font-medium text-zinc-200">{titulo}</h3>
+            <ul className="mt-3 space-y-2.5">
               {itens.map((item) => (
-                <li key={item} className="flex gap-2 text-sm text-slate-300">
-                  <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-neon-400" />
+                <li key={item} className="flex gap-2.5 text-[13px] leading-relaxed text-zinc-400">
+                  <span className="mt-[7px] size-1 shrink-0 rounded-full bg-zinc-700" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -99,13 +86,9 @@ export function Regras() {
         ))}
       </div>
 
-      <Cartao className="flex items-start gap-3 p-4 text-sm text-slate-400">
-        <ScrollText className="mt-0.5 size-4 shrink-0 text-royal-300" />
-        <p>
-          Casos omissos são resolvidos pela organização do <strong className="text-slate-200">Unidos Acamp</strong>. A
-          decisão da mesa é final — e vale mais a amizade do que o troféu.
-        </p>
-      </Cartao>
+      <p className="px-1 text-[12px] leading-relaxed text-zinc-600">
+        Casos omissos são resolvidos pela organização do Unidos Acamp. A decisão da mesa é final.
+      </p>
     </div>
   )
 }

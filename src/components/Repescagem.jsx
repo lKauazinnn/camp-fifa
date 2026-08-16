@@ -1,15 +1,15 @@
-import { Award, Info, RotateCcw } from 'lucide-react'
+import { RotateCcw } from 'lucide-react'
 import { buscarTime } from '../data/times.js'
 import { ChaveVisual } from './ChaveVisual.jsx'
-import { Cartao, EscudoTime, EstadoVazio, Etiqueta, TituloSecao } from './ui.jsx'
+import { Cartao, EscudoTime, EstadoVazio, TituloSecao } from './ui.jsx'
 
-export function Repescagem({ torneio, aoEditarPartida }) {
+export function Repescagem({ torneio, aoEditarPartida, somenteLeitura }) {
   if (!torneio.ativo || !torneio.repescagem.length) {
     return (
       <EstadoVazio
         icone={RotateCcw}
         titulo="Repescagem indisponível"
-        descricao="A chave de repescagem é criada junto com o sorteio da primeira fase — ela recebe automaticamente todos os eliminados das oitavas."
+        descricao="A chave dos eliminados é criada junto com o sorteio da primeira fase."
       />
     )
   }
@@ -17,46 +17,55 @@ export function Repescagem({ torneio, aoEditarPartida }) {
   const decisao = torneio.repescagem.at(-1)?.partidas[0] ?? null
 
   return (
-    <div className="space-y-5">
-      <Cartao className="border-royal-500/30 bg-gradient-to-r from-royal-600/20 to-transparent p-4 sm:p-5">
-        <div className="flex gap-3">
-          <Info className="mt-0.5 size-5 shrink-0 text-royal-300" />
-          <div className="space-y-1">
-            <h3 className="text-sm font-bold text-white uppercase">Como funciona a repescagem</h3>
-            <p className="text-sm text-slate-300">
-              Ninguém sai do acampamento depois de um jogo só. Todos os eliminados da <strong>primeira fase</strong> caem
-              automaticamente nesta chave e seguem jogando entre si. Quem vencer todos os confrontos aqui fica com o{' '}
-              <strong className="text-gold-300">3º lugar</strong> do campeonato.
+    <div className="space-y-4">
+      <Cartao className="p-4 sm:p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-xl">
+            <h2 className="text-[15px] font-semibold text-zinc-100">Chave dos eliminados</h2>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-zinc-500">
+              Ninguém joga uma partida só. Todos os eliminados da primeira fase caem automaticamente nesta chave e
+              seguem se enfrentando — quem vencer tudo aqui fica com o terceiro lugar.
             </p>
+          </div>
+
+          <div className="shrink-0 rounded-lg border border-borda bg-elevado px-4 py-3">
+            <p className="rotulo">Terceiro lugar</p>
+            {torneio.terceiro ? (
+              <div className="mt-1.5 flex items-center gap-2.5">
+                <EscudoTime timeId={torneio.terceiro.timeId} tamanho="sm" />
+                <div className="min-w-0">
+                  <p className="truncate text-[13px] font-medium text-zinc-100">{torneio.terceiro.nome}</p>
+                  <p className="truncate text-[11px] text-zinc-600">{buscarTime(torneio.terceiro.timeId).nome}</p>
+                </div>
+              </div>
+            ) : (
+              <p className="mt-1.5 text-[13px] text-zinc-600">
+                {decisao ? 'Definido na última rodada da repescagem' : 'A definir'}
+              </p>
+            )}
           </div>
         </div>
       </Cartao>
 
-      {torneio.terceiro ? (
-        <Cartao className="border-amber-600/40 bg-amber-700/10 p-4">
-          <div className="flex items-center gap-3">
-            <Award className="size-6 shrink-0 text-amber-500" />
-            <EscudoTime timeId={torneio.terceiro.timeId} tamanho="md" />
-            <div className="min-w-0">
-              <Etiqueta tom="amarelo">3º lugar garantido</Etiqueta>
-              <p className="mt-1 truncate text-base font-bold text-white">{torneio.terceiro.nome}</p>
-              <p className="truncate text-xs text-slate-400">{buscarTime(torneio.terceiro.timeId).nome}</p>
-            </div>
-          </div>
-        </Cartao>
-      ) : decisao ? (
-        <Cartao className="p-4">
-          <p className="text-sm text-slate-400">
-            A <strong className="text-white">{decisao.fase}</strong> ainda não foi disputada — o 3º lugar segue em aberto.
-          </p>
-        </Cartao>
-      ) : null}
-
       <Cartao className="p-4 sm:p-5">
         <TituloSecao
-          icone={RotateCcw}
-          titulo="Chave da repescagem"
-          descricao="Eliminados da primeira fase disputando o pódio."
+          className="mb-5"
+          titulo="Repescagem"
+          descricao={somenteLeitura ? null : 'Toque em um jogo para lançar o resultado.'}
+          acao={
+            <span className="num shrink-0 text-[13px] text-zinc-500">
+              {torneio.repescagem.reduce(
+                (total, rodada) => total + rodada.partidas.filter((p) => p.status === 'finalizada').length,
+                0,
+              )}{' '}
+              de{' '}
+              {torneio.repescagem.reduce(
+                (total, rodada) => total + rodada.partidas.filter((p) => p.status !== 'vazia' && p.status !== 'bye').length,
+                0,
+              )}{' '}
+              jogos
+            </span>
+          }
         />
         <ChaveVisual rodadas={torneio.repescagem} aoEditar={aoEditarPartida} />
       </Cartao>

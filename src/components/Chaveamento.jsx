@@ -1,104 +1,90 @@
-import { Award, Crown, Medal, Shuffle, Swords, Trophy } from 'lucide-react'
+import { Swords } from 'lucide-react'
 import { buscarTime } from '../data/times.js'
 import { ChaveVisual } from './ChaveVisual.jsx'
-import { BarraProgresso, Cartao, EscudoTime, EstadoVazio, Etiqueta, TituloSecao } from './ui.jsx'
+import { Botao, Cartao, EscudoTime, EstadoVazio, TituloSecao } from './ui.jsx'
 
-function Podio({ campeao, vice, terceiro }) {
-  if (!campeao && !vice && !terceiro) return null
-
-  const posicoes = [
-    { rotulo: 'Campeão', participante: campeao, icone: Trophy, cor: 'text-gold-400', borda: 'border-gold-400/40 bg-gold-400/10' },
-    { rotulo: 'Vice-campeão', participante: vice, icone: Medal, cor: 'text-slate-300', borda: 'border-white/15 bg-white/5' },
-    { rotulo: '3º lugar', participante: terceiro, icone: Award, cor: 'text-amber-600', borda: 'border-amber-700/40 bg-amber-700/10' },
-  ]
-
+function Posicao({ rotulo, participante, primeiro = false }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-3">
-      {posicoes.map(({ rotulo, participante, icone: Icone, cor, borda }) => (
-        <div key={rotulo} className={`flex items-center gap-3 rounded-2xl border p-3 ${borda}`}>
-          <Icone className={`size-6 shrink-0 ${cor}`} />
-          <div className="min-w-0">
-            <p className="font-display text-[10px] font-bold tracking-widest text-slate-400 uppercase">{rotulo}</p>
-            {participante ? (
-              <>
-                <p className="truncate text-sm font-bold text-white">{participante.nome}</p>
-                <p className="truncate text-[11px] text-slate-400">{buscarTime(participante.timeId).nome}</p>
-              </>
-            ) : (
-              <p className="text-sm text-slate-500 italic">a definir</p>
-            )}
+    <div className="flex items-center gap-3 px-4 py-3.5">
+      <span className={`num w-4 shrink-0 text-[13px] ${primeiro ? 'text-realce' : 'text-zinc-600'}`}>{rotulo}</span>
+      {participante ? (
+        <>
+          <EscudoTime timeId={participante.timeId} tamanho="sm" />
+          <div className="min-w-0 flex-1">
+            <p className={`truncate text-[13px] ${primeiro ? 'font-medium text-zinc-100' : 'text-zinc-300'}`}>
+              {participante.nome}
+            </p>
+            <p className="truncate text-[11px] text-zinc-600">{buscarTime(participante.timeId).nome}</p>
           </div>
-        </div>
-      ))}
+        </>
+      ) : (
+        <p className="text-[13px] text-zinc-600">A definir</p>
+      )}
     </div>
   )
 }
 
-function FaixaCampeao({ campeao }) {
-  return (
-    <Cartao className="brilho-ouro relative overflow-hidden border-gold-400/40 bg-gradient-to-r from-gold-400/15 via-royal-600/10 to-transparent p-5">
-      <Crown className="absolute -top-4 -right-4 size-28 text-gold-400/10" />
-      <div className="relative flex items-center gap-4">
-        <EscudoTime timeId={campeao.timeId} tamanho="lg" />
-        <div className="min-w-0">
-          <Etiqueta tom="ouro">Campeão Unidos Acamp</Etiqueta>
-          <h3 className="mt-1 truncate font-display text-xl font-black text-white sm:text-2xl">{campeao.nome}</h3>
-          <p className="truncate text-sm text-gold-300">
-            {buscarTime(campeao.timeId).nome} · leva os R$ 100,00
-          </p>
-        </div>
-      </div>
-    </Cartao>
-  )
-}
-
-export function Chaveamento({ torneio, aoEditarPartida, aoIrParaAdmin }) {
+export function Chaveamento({ torneio, aoEditarPartida, aoIrParaAdmin, somenteLeitura }) {
   if (!torneio.ativo) {
     return (
       <EstadoVazio
         icone={Swords}
         titulo="Chaveamento ainda não sorteado"
-        descricao="Cadastre os participantes no Painel Admin e clique em “Sortear confrontos” para gerar as chaves do mata-mata."
+        descricao="Cadastre os participantes no Painel Admin e faça o sorteio para gerar as chaves."
         acao={
-          <button
-            type="button"
-            onClick={aoIrParaAdmin}
-            className="mt-2 inline-flex items-center gap-2 rounded-xl bg-neon-400 px-4 py-2.5 text-sm font-bold text-navy-950 transition hover:bg-neon-300"
-          >
-            <Shuffle className="size-4" />
-            Ir para o Painel Admin
-          </button>
+          somenteLeitura ? null : (
+            <Botao variante="contorno" onClick={aoIrParaAdmin}>
+              Abrir Painel Admin
+            </Botao>
+          )
         }
       />
     )
   }
 
   return (
-    <div className="space-y-5">
-      {torneio.campeao ? <FaixaCampeao campeao={torneio.campeao} /> : null}
+    <div className="space-y-6">
+      {torneio.campeao ? (
+        <Cartao className="flex items-center gap-4 border-realce/25 p-5">
+          <EscudoTime timeId={torneio.campeao.timeId} tamanho="lg" />
+          <div className="min-w-0">
+            <p className="rotulo text-realce">Campeão</p>
+            <h2 className="mt-1 truncate text-xl font-semibold text-zinc-50">{torneio.campeao.nome}</h2>
+            <p className="truncate text-[13px] text-zinc-500">
+              {buscarTime(torneio.campeao.timeId).nome} · prêmio de R$ 100,00
+            </p>
+          </div>
+        </Cartao>
+      ) : null}
 
-      <Podio campeao={torneio.campeao} vice={torneio.vice} terceiro={torneio.terceiro} />
+      <div className="grid gap-4 lg:grid-cols-[280px_1fr] lg:items-start">
+        <Cartao className="divide-y divide-borda overflow-hidden">
+          <div className="px-4 py-3">
+            <h3 className="text-[13px] font-medium text-zinc-300">Classificação final</h3>
+          </div>
+          <Posicao rotulo="1" participante={torneio.campeao} primeiro />
+          <Posicao rotulo="2" participante={torneio.vice} />
+          <Posicao rotulo="3" participante={torneio.terceiro} />
+        </Cartao>
 
-      <Cartao className="p-4 sm:p-5">
-        <TituloSecao
-          icone={Swords}
-          titulo="Chave principal · mata-mata"
-          descricao="Quem perde cai para a repescagem. Toque em um jogo para lançar o resultado."
-          acao={
-            <div className="w-full sm:w-56">
-              <div className="mb-1 flex items-center justify-between text-[11px] text-slate-400">
-                <span>Progresso do torneio</span>
-                <span className="font-bold text-neon-300">
-                  {torneio.partidasFinalizadas}/{torneio.totalPartidas}
-                </span>
-              </div>
-              <BarraProgresso valor={torneio.progresso} />
-            </div>
-          }
-        />
-
-        <ChaveVisual rodadas={torneio.principal} aoEditar={aoEditarPartida} />
-      </Cartao>
+        <Cartao className="p-4 sm:p-5">
+          <TituloSecao
+            className="mb-5"
+            titulo="Chave principal"
+            descricao={
+              somenteLeitura
+                ? 'Quem perde na primeira fase cai para a repescagem.'
+                : 'Quem perde na primeira fase cai para a repescagem. Toque em um jogo para lançar o resultado.'
+            }
+            acao={
+              <span className="num shrink-0 text-[13px] text-zinc-500">
+                {torneio.partidasFinalizadas} de {torneio.totalPartidas} jogos
+              </span>
+            }
+          />
+          <ChaveVisual rodadas={torneio.principal} aoEditar={aoEditarPartida} />
+        </Cartao>
+      </div>
     </div>
   )
 }

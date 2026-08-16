@@ -1,23 +1,23 @@
 import { useEffect, useState } from 'react'
-import { Minus, Plus, Save, Trash2, TriangleAlert, X } from 'lucide-react'
+import { Minus, Plus, X } from 'lucide-react'
 import { buscarTime } from '../data/times.js'
 import { RESULTADO_VAZIO, normalizarResultado, resultadoEhValido } from '../lib/torneio.js'
-import { Botao, EscudoTime, Etiqueta } from './ui.jsx'
+import { Botao, EscudoTime } from './ui.jsx'
 
-function CampoNumero({ rotulo, valor, aoMudar, cor = 'text-white', maximo = 99 }) {
+function CampoNumero({ rotulo, valor, aoMudar, maximo = 99, destaque = false }) {
   const ajustar = (delta) => aoMudar(Math.min(maximo, Math.max(0, valor + delta)))
 
   return (
     <div>
-      <p className="mb-1 text-center text-[10px] font-semibold tracking-wider text-slate-400 uppercase">{rotulo}</p>
-      <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-navy-950/60 p-1">
+      <p className="rotulo mb-1.5 text-center">{rotulo}</p>
+      <div className="flex items-center rounded-lg border border-borda bg-fundo">
         <button
           type="button"
           onClick={() => ajustar(-1)}
-          className="grid size-8 shrink-0 place-items-center rounded-lg bg-white/5 text-slate-300 transition hover:bg-white/10 active:scale-95"
+          className="grid size-9 shrink-0 place-items-center rounded-l-lg text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
           aria-label={`Diminuir ${rotulo}`}
         >
-          <Minus className="size-3.5" />
+          <Minus className="size-3.5" strokeWidth={2} />
         </button>
         <input
           type="number"
@@ -29,57 +29,53 @@ function CampoNumero({ rotulo, valor, aoMudar, cor = 'text-white', maximo = 99 }
             const numero = Number.parseInt(evento.target.value, 10)
             aoMudar(Number.isFinite(numero) ? Math.min(maximo, Math.max(0, numero)) : 0)
           }}
-          className={`w-full min-w-0 bg-transparent text-center font-display text-lg font-black outline-none ${cor}`}
+          className={`num w-full min-w-0 bg-transparent py-1.5 text-center text-[15px] outline-none ${
+            destaque ? 'font-medium text-zinc-50' : 'text-zinc-300'
+          }`}
         />
         <button
           type="button"
           onClick={() => ajustar(1)}
-          className="grid size-8 shrink-0 place-items-center rounded-lg bg-white/5 text-slate-300 transition hover:bg-white/10 active:scale-95"
+          className="grid size-9 shrink-0 place-items-center rounded-r-lg text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
           aria-label={`Aumentar ${rotulo}`}
         >
-          <Plus className="size-3.5" />
+          <Plus className="size-3.5" strokeWidth={2} />
         </button>
       </div>
     </div>
   )
 }
 
-function BlocoParticipante({ participante, prefixo, formulario, atualizar, vencedor }) {
+function Lado({ participante, prefixo, formulario, atualizar, vencedor }) {
   return (
-    <div
-      className={`rounded-2xl border p-3 transition ${
-        vencedor ? 'border-neon-400/40 bg-neon-400/[0.07]' : 'border-white/10 bg-white/[0.02]'
-      }`}
-    >
+    <div className="rounded-lg border border-borda p-3">
       <div className="mb-3 flex items-center gap-2.5">
         <EscudoTime timeId={participante.timeId} tamanho="md" />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-bold text-white">{participante.nome}</p>
-          <p className="truncate text-[11px] text-slate-400">{buscarTime(participante.timeId).nome}</p>
+          <p className="truncate text-[13px] font-medium text-zinc-100">{participante.nome}</p>
+          <p className="truncate text-[11px] text-zinc-500">{buscarTime(participante.timeId).nome}</p>
         </div>
-        {vencedor ? <Etiqueta tom="neon">Vence</Etiqueta> : null}
+        {vencedor ? <span className="shrink-0 text-[11px] text-realce">Vence</span> : null}
       </div>
 
       <div className="grid grid-cols-3 gap-2">
         <CampoNumero
           rotulo="Gols"
+          destaque
           valor={formulario[`gols${prefixo}`]}
           aoMudar={(valor) => atualizar(`gols${prefixo}`, valor)}
-          cor="text-neon-300"
         />
         <CampoNumero
-          rotulo="Amarelos"
+          rotulo="Amarelo"
+          maximo={9}
           valor={formulario[`amarelos${prefixo}`]}
           aoMudar={(valor) => atualizar(`amarelos${prefixo}`, valor)}
-          cor="text-amber-300"
-          maximo={9}
         />
         <CampoNumero
-          rotulo="Vermelhos"
+          rotulo="Vermelho"
+          maximo={9}
           valor={formulario[`vermelhos${prefixo}`]}
           aoMudar={(valor) => atualizar(`vermelhos${prefixo}`, valor)}
-          cor="text-rose-300"
-          maximo={9}
         />
       </div>
     </div>
@@ -123,7 +119,7 @@ export function ModalResultado({ partida, aoSalvar, aoLimpar, aoFechar }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-void/80 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-label={`Resultado do jogo ${partida.numero}`}
@@ -131,38 +127,31 @@ export function ModalResultado({ partida, aoSalvar, aoLimpar, aoFechar }) {
         if (evento.target === evento.currentTarget) aoFechar()
       }}
     >
-      <div className="animar-surgir max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl border border-white/10 bg-navy-900 shadow-2xl sm:rounded-3xl">
-        <header className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-white/10 bg-navy-900/95 px-4 py-3 backdrop-blur">
+      <div className="animar-surgir max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-borda bg-superficie sm:rounded-xl">
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-borda bg-superficie px-4 py-3">
           <div className="min-w-0">
-            <p className="font-display text-[10px] font-bold tracking-widest text-royal-300 uppercase">{partida.fase}</p>
-            <h2 className="truncate text-base font-bold text-white">Jogo {partida.numero} · lançar resultado</h2>
+            <p className="rotulo">{partida.fase}</p>
+            <h2 className="mt-0.5 truncate text-[15px] font-medium text-zinc-100">Jogo {partida.numero}</h2>
           </div>
           <button
             type="button"
             onClick={aoFechar}
-            className="grid size-9 shrink-0 place-items-center rounded-lg text-slate-400 transition hover:bg-white/10 hover:text-white"
+            className="grid size-8 shrink-0 place-items-center rounded-lg text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
             aria-label="Fechar"
           >
-            <X className="size-5" />
+            <X className="size-4" strokeWidth={1.75} />
           </button>
         </header>
 
-        <div className="space-y-3 p-4">
-          <BlocoParticipante
+        <div className="space-y-2.5 p-4">
+          <Lado
             participante={partida.a}
             prefixo="A"
             formulario={formulario}
             atualizar={atualizar}
             vencedor={vencedorA}
           />
-
-          <div className="flex items-center gap-3">
-            <span className="h-px flex-1 bg-white/10" />
-            <span className="font-display text-[10px] font-bold tracking-[0.2em] text-slate-500 uppercase">Versus</span>
-            <span className="h-px flex-1 bg-white/10" />
-          </div>
-
-          <BlocoParticipante
+          <Lado
             participante={partida.b}
             prefixo="B"
             formulario={formulario}
@@ -171,46 +160,39 @@ export function ModalResultado({ partida, aoSalvar, aoLimpar, aoFechar }) {
           />
 
           {empate ? (
-            <div className="rounded-2xl border border-royal-500/40 bg-royal-600/15 p-3">
-              <p className="mb-2 text-center text-[11px] font-bold tracking-wider text-royal-200 uppercase">
-                Empate no tempo normal · decisão por pênaltis
-              </p>
+            <div className="rounded-lg border border-borda p-3">
+              <p className="rotulo mb-2.5 text-center">Empate · decisão por pênaltis</p>
               <div className="grid grid-cols-2 gap-2">
                 <CampoNumero
-                  rotulo={`Pênaltis · ${partida.a?.nome.split(' ')[0] ?? 'A'}`}
+                  rotulo={partida.a.nome.split(' ')[0]}
+                  maximo={20}
                   valor={formulario.penaltisA}
                   aoMudar={(valor) => atualizar('penaltisA', valor)}
-                  cor="text-royal-200"
-                  maximo={20}
                 />
                 <CampoNumero
-                  rotulo={`Pênaltis · ${partida.b?.nome.split(' ')[0] ?? 'B'}`}
+                  rotulo={partida.b.nome.split(' ')[0]}
+                  maximo={20}
                   valor={formulario.penaltisB}
                   aoMudar={(valor) => atualizar('penaltisB', valor)}
-                  cor="text-royal-200"
-                  maximo={20}
                 />
               </div>
+              {!valido ? (
+                <p className="mt-2.5 text-center text-[12px] text-amber-400">
+                  Informe placares diferentes nos pênaltis para definir quem avança.
+                </p>
+              ) : null}
             </div>
           ) : null}
 
-          {!valido ? (
-            <p className="flex items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs text-amber-200">
-              <TriangleAlert className="size-4 shrink-0" />
-              Placar empatado: informe a decisão nos pênaltis para definir quem avança.
-            </p>
-          ) : null}
-
-          <p className="text-center text-[11px] text-slate-500">
-            Ao salvar, o vencedor avança automaticamente e o perdedor da 1ª fase cai na repescagem.
+          <p className="pt-1 text-center text-[12px] leading-relaxed text-zinc-600">
+            Ao salvar, o vencedor avança e o perdedor da primeira fase cai na repescagem.
           </p>
         </div>
 
-        <footer className="sticky bottom-0 flex flex-wrap items-center gap-2 border-t border-white/10 bg-navy-900/95 px-4 py-3 backdrop-blur">
+        <footer className="sticky bottom-0 flex items-center gap-2 border-t border-borda bg-superficie px-4 py-3">
           {partida.resultado ? (
             <Botao
-              variante="perigo"
-              icone={Trash2}
+              variante="fantasma"
               onClick={() => {
                 aoLimpar(partida.id)
                 aoFechar()
@@ -219,12 +201,12 @@ export function ModalResultado({ partida, aoSalvar, aoLimpar, aoFechar }) {
               Apagar
             </Botao>
           ) : null}
-          <div className="flex flex-1 justify-end gap-2">
+          <div className="ml-auto flex gap-2">
             <Botao variante="contorno" onClick={aoFechar}>
               Cancelar
             </Botao>
-            <Botao variante="primario" icone={Save} onClick={salvar} disabled={!valido}>
-              Salvar resultado
+            <Botao variante="primario" onClick={salvar} disabled={!valido}>
+              Salvar
             </Botao>
           </div>
         </footer>

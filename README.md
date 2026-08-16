@@ -10,7 +10,9 @@ Prêmio em destaque: **R$ 100,00 para o campeão**.
 - React 19 + Vite 8
 - Tailwind CSS 4 (plugin oficial do Vite, tema customizado em `src/index.css`)
 - Lucide React (ícones)
-- Persistência local via `localStorage` — sem backend
+- Persistência local via `localStorage`, backup em arquivo e link compartilhável — sem backend
+
+Visual escuro e minimalista: fundo quase preto, divisórias de 1px, tipografia Inter e um único acento verde.
 
 ## Rodando localmente
 
@@ -42,11 +44,24 @@ vercel --prod   # produção
 
 Não há variáveis de ambiente a configurar.
 
-> ⚠️ **Importante sobre os dados em produção:** o campeonato é salvo no `localStorage` do navegador de quem
-> acessa. Isso significa que cada celular vê a sua própria cópia — os resultados lançados no Painel Admin
-> **não** aparecem automaticamente para os jovens. Para um placar compartilhado em tempo real é preciso
-> plugar um banco (Vercel KV, Supabase, Firebase) no lugar do `localStorage`, trocando apenas as funções de
-> leitura/escrita do hook `src/hooks/useTorneio.js`.
+## Onde os dados ficam guardados
+
+Três camadas, da mais automática para a mais manual — todas em `src/lib/persistencia.js`:
+
+1. **`localStorage`** — grava a cada alteração. Sobrevive a atualizar a página, fechar o navegador e desligar
+   o computador. É o que responde à pergunta "perco tudo se der refresh?": não.
+2. **Backup em arquivo `.json`** — botão *Baixar backup* no Painel Admin. Protege contra limpar o cache,
+   trocar de celular ou usar janela anônima. *Restaurar backup* lê o arquivo de volta.
+3. **Link do placar** — botão *Copiar link do placar*. O estado do campeonato viaja compactado dentro da
+   própria URL (~1,5 KB), então dá para mandar no grupo do WhatsApp e todo mundo abrir o chaveamento como
+   está agora, em modo somente leitura, sem backend nenhum. Gere um link novo depois de lançar mais jogos.
+
+Se o navegador bloquear o armazenamento (janela anônima), o Painel Admin avisa em vermelho e pede um backup.
+
+> **Limite conhecido:** o placar não é compartilhado em tempo real. Cada aparelho tem sua própria cópia, e o
+> link é uma foto do momento em que foi gerado. Para um placar ao vivo, basta trocar as funções de leitura e
+> escrita de `src/lib/persistencia.js` por um banco (Vercel KV, Supabase ou Firebase) — o resto do código não
+> muda.
 
 ## Estrutura
 
@@ -59,7 +74,8 @@ src/
 │   └── mock.js                 # 16 participantes e resultados de exemplo
 ├── lib/
 │   ├── torneio.js              # motor do torneio (sorteio, chaves, byes, pênaltis)
-│   └── estatisticas.js         # artilharia, cartões e resumo
+│   ├── estatisticas.js         # artilharia, cartões e resumo
+│   └── persistencia.js         # localStorage, backup em arquivo e link do placar
 ├── hooks/
 │   └── useTorneio.js           # estado único + persistência + ações
 └── components/
