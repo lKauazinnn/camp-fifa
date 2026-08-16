@@ -31,6 +31,10 @@
   --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Variante `escuro:` para os poucos casos que precisam de ajuste manual —
+   blocos que são escuros de propósito no tema claro e sumiriam no preto. */
+@custom-variant escuro ([data-tema='escuro'] &);
+
 @layer base {
   /*
    * Tema claro (padrão) e tema preto. O preto inverte papel e tinta e escurece
@@ -40,6 +44,7 @@
     color-scheme: light;
     --sombra-cor: #14131a;
     --pontos: rgba(20, 19, 26, 0.09);
+    --escudo-opacidade: 0.28;
   }
 
   :root[data-tema='escuro'] {
@@ -48,14 +53,18 @@
     --color-papel-claro: #1e1d2a;
     --color-papel-escuro: #2b2a3a;
 
+    /* Tons secundários mais claros que no tema papel: sobre preto, cinza médio
+       perde legibilidade rápido. */
     --color-tinta: #f2eee4;
-    --color-tinta-media: #a8a4b6;
-    --color-tinta-fraca: #6e6b7d;
+    --color-tinta-media: #b3afc1;
+    --color-tinta-fraca: #8b8798;
 
     --color-cobalto: #5470ff;
 
     --sombra-cor: #000000;
     --pontos: rgba(242, 238, 228, 0.09);
+    /* Sobre preto a cor do clube precisa de mais presença para não sumir. */
+    --escudo-opacidade: 0.5;
   }
 
   html {
@@ -96,6 +105,16 @@
   }
   input[type='number'] {
     -moz-appearance: textfield;
+  }
+
+  /* O preenchimento automático do navegador força fundo branco e texto escuro,
+     o que quebra o campo no tema preto. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--color-tinta);
+    -webkit-box-shadow: 0 0 0 1000px var(--color-papel-claro) inset;
+    caret-color: var(--color-tinta);
   }
 
   ::selection {

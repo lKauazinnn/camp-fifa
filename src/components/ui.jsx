@@ -122,7 +122,10 @@ export function EscudoTime({ timeId, tamanho = 'md' }) {
     >
       <span
         className="absolute inset-0"
-        style={{ background: `linear-gradient(135deg, ${time.cores[0]} 0 50%, ${time.cores[1]} 50% 100%)`, opacity: 0.28 }}
+        style={{
+          background: `linear-gradient(135deg, ${time.cores[0]} 0 50%, ${time.cores[1]} 50% 100%)`,
+          opacity: 'var(--escudo-opacidade)',
+        }}
       />
       <span className="relative">{iniciais}</span>
     </span>

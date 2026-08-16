@@ -19,6 +19,29 @@
   </head>
   <body>
     <div id="root"></div>
+    <!--
+      Aplica o tema antes da primeira pintura. Sem isto a página aparece clara
+      por um instante e só depois vira preta, piscando a cada carregamento.
+    -->
+    <script>
+      ;(function () {
+        try {
+          var salvo = localStorage.getItem('unidos-acamp-tema')
+          var tema =
+            salvo === 'claro' || salvo === 'escuro'
+              ? salvo
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'escuro'
+                : 'claro'
+          document.documentElement.dataset.tema = tema
+          document
+            .querySelector('meta[name="theme-color"]')
+            .setAttribute('content', tema === 'escuro' ? '#14131c' : '#f0ece1')
+        } catch (erro) {
+          document.documentElement.dataset.tema = 'claro'
+        }
+      })()
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

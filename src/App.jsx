@@ -97,12 +97,13 @@ export default function App() {
         </div>
       </main>
 
-      <footer className="mt-8 border-t-2 border-tinta bg-carvao text-creme">
+      {/* No tema preto o carvão se confunde com o fundo — vira papel-escuro. */}
+      <footer className="mt-8 border-t-2 border-tinta bg-carvao text-creme escuro:bg-papel-escuro escuro:text-tinta">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-6">
-          <p className="font-display text-lg text-creme uppercase">
+          <p className="font-display text-lg text-current uppercase">
             Unidos Acamp <span className="text-lima">· FIFA</span>
           </p>
-          <p className="rotulo text-[9px] text-creme/60">
+          <p className="rotulo text-[9px] opacity-60">
             {somenteLeitura ? 'Modo visualização' : 'Salvo automático neste navegador'}
           </p>
         </div>
