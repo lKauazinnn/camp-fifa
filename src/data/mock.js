@@ -8,21 +8,21 @@ import { RESULTADO_VAZIO } from '../lib/torneio.js'
 
 export const PARTICIPANTES_EXEMPLO = [
   { id: 'p01', nome: 'Kauã Larsson', timeId: 'real-madrid' },
-  { id: 'p02', nome: 'Pedro Henrique', timeId: 'flamengo' },
+  { id: 'p02', nome: 'Pedro Henrique', timeId: 'atletico-madrid' },
   { id: 'p03', nome: 'João Victor', timeId: 'barcelona' },
   { id: 'p04', nome: 'Lucas Andrade', timeId: 'man-city' },
   { id: 'p05', nome: 'Gabriel Souza', timeId: 'psg' },
   { id: 'p06', nome: 'Matheus Lima', timeId: 'liverpool' },
   { id: 'p07', nome: 'Rafael Nogueira', timeId: 'bayern' },
   { id: 'p08', nome: 'Thiago Barbosa', timeId: 'juventus' },
-  { id: 'p09', nome: 'Enzo Martins', timeId: 'palmeiras' },
+  { id: 'p09', nome: 'Enzo Martins', timeId: 'tottenham' },
   { id: 'p10', nome: 'Davi Ribeiro', timeId: 'arsenal' },
   { id: 'p11', nome: 'Samuel Costa', timeId: 'milan' },
   { id: 'p12', nome: 'Isaque Ferreira', timeId: 'dortmund' },
   { id: 'p13', nome: 'Vinícius Rocha', timeId: 'chelsea' },
   { id: 'p14', nome: 'Ana Beatriz Moura', timeId: 'napoli' },
   { id: 'p15', nome: 'Letícia Prado', timeId: 'inter' },
-  { id: 'p16', nome: 'Miguel Tavares', timeId: 'corinthians' },
+  { id: 'p16', nome: 'Miguel Tavares', timeId: 'benfica' },
 ]
 
 /** Ordem fixa da 1ª fase (nos torneios reais isso vem do sorteio). */
