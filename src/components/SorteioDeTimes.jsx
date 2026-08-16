@@ -19,7 +19,9 @@ export function SorteioDeTimes({ participantes, acoes, aoPedirConfirmacao }) {
   const [ligaAberta, setLigaAberta] = useState(null)
 
   const jaSorteado = participantes.some((participante) => participante.timeId !== 'sem-time')
-  const faltam = participantes.length - selecionados.size
+  // Mais gente que time não impede o sorteio: o elenco repete, distribuído por igual.
+  const repeticoes = selecionados.size ? Math.ceil(participantes.length / selecionados.size) : 0
+  const vaiRepetir = repeticoes > 1
 
   const porLiga = useMemo(() => {
     const termo = busca.trim().toLowerCase()
@@ -68,7 +70,7 @@ export function SorteioDeTimes({ participantes, acoes, aoPedirConfirmacao }) {
         acao={
           <div
             className={`contorno shrink-0 rounded-lg px-3 py-2 text-center ${
-              faltam > 0 ? 'bg-rosa text-white' : 'bg-lima text-carvao'
+              selecionados.size ? 'bg-lima text-carvao' : 'bg-rosa text-white'
             }`}
           >
             <p className="num font-display text-2xl leading-none">
@@ -80,11 +82,20 @@ export function SorteioDeTimes({ participantes, acoes, aoPedirConfirmacao }) {
         }
       />
 
-      {faltam > 0 ? (
+      {!selecionados.size ? (
         <p className="contorno mb-4 rounded-lg bg-rosa px-3 py-2 text-[12px] font-bold text-white">
-          Faltam {faltam} time{faltam === 1 ? '' : 's'} para dar um por jogador. Marque mais alguns.
+          Marque pelo menos um time para poder sortear.
         </p>
-      ) : null}
+      ) : vaiRepetir ? (
+        <p className="contorno mb-4 rounded-lg bg-cobalto px-3 py-2 text-[12px] font-bold text-white">
+          São {participantes.length} jogadores para {selecionados.size} times, então cada time sai para até{' '}
+          {repeticoes} pessoas — distribuído por igual. Marque mais times se quiser reduzir a repetição.
+        </p>
+      ) : (
+        <p className="contorno mb-4 rounded-lg bg-lima px-3 py-2 text-[12px] font-bold text-carvao">
+          Dá um time para cada jogador, sem repetir ninguém.
+        </p>
+      )}
 
       <div className="mb-3 flex flex-wrap gap-2">
         <div className="relative min-w-44 flex-1">
@@ -150,7 +161,7 @@ export function SorteioDeTimes({ participantes, acoes, aoPedirConfirmacao }) {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2.5">
-        <Botao icone={Dices} onClick={sortear} disabled={participantes.length < 1 || faltam > 0}>
+        <Botao icone={Dices} onClick={sortear} disabled={participantes.length < 1 || !selecionados.size}>
           {jaSorteado ? 'Sortear de novo' : 'Sortear os times'}
         </Botao>
         {jaSorteado ? (

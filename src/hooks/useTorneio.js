@@ -328,13 +328,21 @@ export function useTorneio() {
   }, [alterar])
 
   /**
-   * Distribui os times entre os inscritos, um para cada, sem repetir.
-   * Feito depois das inscrições, quando já se sabe quanta gente entrou.
+   * Distribui os times entre os inscritos. Feito depois das inscrições, quando
+   * já se sabe quanta gente entrou.
+   *
+   * Havendo time para todos, ninguém repete. Havendo mais gente que time, o
+   * elenco é reembaralhado e repetido — assim cada time sai no máximo uma vez
+   * a mais que os outros, e ninguém precisa pegar time ruim só para não haver
+   * repetição.
    */
   const sortearTimes = useCallback(
     (idsDisponiveis) => {
+      if (!idsDisponiveis?.length) return
       alterar((anterior) => {
-        const sorteados = embaralhar(idsDisponiveis)
+        const bolo = []
+        while (bolo.length < anterior.participantes.length) bolo.push(...embaralhar(idsDisponiveis))
+        const sorteados = embaralhar(bolo.slice(0, anterior.participantes.length))
         return {
           ...anterior,
           participantes: anterior.participantes.map((participante, indice) => ({
