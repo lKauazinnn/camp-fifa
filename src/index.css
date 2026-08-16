@@ -1,0 +1,125 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Fundo / superfícies (azul marinho profundo) */
+  --color-void: #04060f;
+  --color-navy-950: #060a18;
+  --color-navy-900: #0a1024;
+  --color-navy-800: #101833;
+  --color-navy-700: #1a2450;
+  --color-navy-600: #263268;
+
+  /* Roxo */
+  --color-royal-700: #4c1d95;
+  --color-royal-600: #6d28d9;
+  --color-royal-500: #8b5cf6;
+  --color-royal-400: #a78bfa;
+
+  /* Verde neon (destaque principal) */
+  --color-neon-500: #00e08a;
+  --color-neon-400: #22f5a0;
+  --color-neon-300: #5effc0;
+
+  /* Dourado (premiação / campeão) */
+  --color-gold-500: #e6a700;
+  --color-gold-400: #ffc531;
+  --color-gold-300: #ffd86b;
+
+  --font-display: 'Orbitron', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-void font-sans text-slate-200 antialiased;
+    background-image:
+      radial-gradient(90rem 45rem at 12% -10%, rgba(109, 40, 217, 0.28), transparent 60%),
+      radial-gradient(70rem 40rem at 95% 0%, rgba(0, 224, 138, 0.12), transparent 55%),
+      radial-gradient(60rem 40rem at 50% 110%, rgba(26, 36, 80, 0.6), transparent 60%);
+    background-attachment: fixed;
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display tracking-wide;
+  }
+
+  /* Remove as setinhas dos inputs numéricos (placar/cartões) */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+
+  ::selection {
+    @apply bg-neon-400/30 text-white;
+  }
+}
+
+@layer utilities {
+  .scrollbar-fina {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(139, 92, 246, 0.5) transparent;
+  }
+  .scrollbar-fina::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+  .scrollbar-fina::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.45);
+    border-radius: 9999px;
+  }
+  .scrollbar-fina::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .brilho-neon {
+    box-shadow:
+      0 0 0 1px rgba(34, 245, 160, 0.35),
+      0 0 24px -6px rgba(34, 245, 160, 0.55);
+  }
+  .brilho-ouro {
+    box-shadow:
+      0 0 0 1px rgba(255, 197, 49, 0.45),
+      0 0 28px -6px rgba(255, 197, 49, 0.6);
+  }
+  .texto-neon {
+    text-shadow: 0 0 18px rgba(34, 245, 160, 0.55);
+  }
+
+  @keyframes pulso-suave {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.45;
+    }
+  }
+  .animar-pulso {
+    animation: pulso-suave 2s ease-in-out infinite;
+  }
+
+  @keyframes surgir {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .animar-surgir {
+    animation: surgir 0.25s ease-out both;
+  }
+}
