@@ -23,6 +23,8 @@ npm run build    # gera dist/
 npm run preview  # serve o build
 ```
 
+**No ar:** https://camp-fifa.vercel.app
+
 ## Deploy na Vercel
 
 O projeto já vem com `vercel.json` (framework `vite`, saída em `dist`, rewrite de SPA e cache dos assets).
