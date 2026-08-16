@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, Download, Link2, Pencil, Trash2, Upload } from 'lucide-react'
 import { useTimes } from '../contexto/TimesContexto.jsx'
 import { formatarHorario } from '../lib/persistencia.js'
@@ -15,14 +15,20 @@ const CAMPO =
 /* Cadastro                                                                   */
 /* -------------------------------------------------------------------------- */
 
-function FormularioParticipante({ aoCadastrar }) {
+function FormularioParticipante({ aoCadastrar, ocupados }) {
   const { times, ligas } = useTimes()
+  const livres = times.filter((time) => !ocupados.has(time.id))
   const [nome, setNome] = useState('')
-  const [timeId, setTimeId] = useState(times[0].id)
+  const [timeId, setTimeId] = useState(livres[0]?.id ?? times[0].id)
+
+  // Se o time selecionado for tomado (pelo QR, por exemplo), pula para outro livre.
+  useEffect(() => {
+    if (ocupados.has(timeId)) setTimeId(livres[0]?.id ?? '')
+  }, [ocupados, timeId, livres])
 
   const enviar = (evento) => {
     evento.preventDefault()
-    if (!nome.trim()) return
+    if (!nome.trim() || !timeId) return
     aoCadastrar({ nome, timeId })
     setNome('')
   }
@@ -39,27 +45,29 @@ function FormularioParticipante({ aoCadastrar }) {
       <div className="flex items-center gap-2.5">
         <EscudoTime timeId={timeId} tamanho="md" />
         <select value={timeId} onChange={(evento) => setTimeId(evento.target.value)} className={CAMPO}>
-          {ligas.map((liga) => (
-            <optgroup key={liga} label={liga}>
-              {times
-                .filter((time) => time.liga === liga)
-                .map((time) => (
+          {ligas.map((liga) => {
+            const doGrupo = times.filter((time) => time.liga === liga && !ocupados.has(time.id))
+            if (!doGrupo.length) return null
+            return (
+              <optgroup key={liga} label={liga}>
+                {doGrupo.map((time) => (
                   <option key={time.id} value={time.id}>
                     {time.nome}
                   </option>
                 ))}
-            </optgroup>
-          ))}
+              </optgroup>
+            )
+          })}
         </select>
       </div>
-      <Botao type="submit" disabled={!nome.trim()} className="sm:px-6">
+      <Botao type="submit" disabled={!nome.trim() || !timeId} className="sm:px-6">
         Adicionar
       </Botao>
     </form>
   )
 }
 
-function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover }) {
+function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover, ocupados }) {
   const { times, buscarTime } = useTimes()
   const [editando, setEditando] = useState(false)
   const [nome, setNome] = useState(participante.nome)
@@ -70,11 +78,14 @@ function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover }) {
       <li className="contorno grid gap-2.5 rounded-lg bg-lima/25 p-2.5 sm:grid-cols-[1fr_1fr_auto]">
         <input value={nome} onChange={(evento) => setNome(evento.target.value)} className={CAMPO} />
         <select value={timeId} onChange={(evento) => setTimeId(evento.target.value)} className={CAMPO}>
-          {times.map((time) => (
-            <option key={time.id} value={time.id}>
-              {time.nome}
-            </option>
-          ))}
+          {times
+            // O próprio time continua na lista; os dos outros, não.
+            .filter((time) => time.id === participante.timeId || !ocupados.has(time.id))
+            .map((time) => (
+              <option key={time.id} value={time.id}>
+                {time.nome}
+              </option>
+            ))}
         </select>
         <div className="flex gap-2">
           <Botao
@@ -311,6 +322,11 @@ export function PainelAdmin({
 }) {
   const [confirmacao, setConfirmacao] = useState(null)
   const podeSortear = participantes.length >= 4
+  // Um time por pessoa, aqui e na inscrição pelo QR.
+  const ocupados = useMemo(
+    () => new Set(participantes.map((participante) => participante.timeId)),
+    [participantes],
+  )
 
   const pedir = (config) => setConfirmacao(config)
 
@@ -348,7 +364,7 @@ export function PainelAdmin({
           }
         />
 
-        <FormularioParticipante aoCadastrar={acoes.adicionarParticipante} />
+        <FormularioParticipante aoCadastrar={acoes.adicionarParticipante} ocupados={ocupados} />
 
         {participantes.length ? (
           <ul className="mt-4 grid gap-1 lg:grid-cols-2">
@@ -357,6 +373,7 @@ export function PainelAdmin({
                 key={participante.id}
                 participante={participante}
                 indice={indice}
+                ocupados={ocupados}
                 aoAtualizar={acoes.atualizarParticipante}
                 aoRemover={(alvo) =>
                   pedir({

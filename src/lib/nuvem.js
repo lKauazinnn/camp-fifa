@@ -87,16 +87,17 @@ export async function gravarNaNuvem(estado, pin) {
  * inscritos) ficam na função do banco.
  * @returns {Promise<number>} a posição do inscrito na lista
  */
-export async function inscrever({ nome, timeId }) {
+export async function inscrever({ nome, timeId, timeNovo = null }) {
   if (!cliente) throw new Error('Inscrição online não está configurada.')
   const { data, error } = await cliente.rpc('inscrever', {
     p_id: ID_CAMPEONATO,
     p_nome: nome,
     p_time: timeId,
+    p_time_novo: timeNovo,
   })
   if (error) throw new Error(traduzir(error))
   const linha = Array.isArray(data) ? data[0] : data
-  return Number(linha?.total ?? 0)
+  return { total: Number(linha?.total ?? 0), timeId: linha?.time_id ?? timeId }
 }
 
 /** Situação da inscrição, para a tela do QR saber o que mostrar. */
@@ -162,6 +163,13 @@ function traduzir(erro) {
   if (/nao existe|não existe/i.test(mensagem)) return 'Campeonato não encontrado no servidor.'
   if (/Failed to fetch|NetworkError/i.test(mensagem)) return 'Sem conexão com o servidor.'
   if (/ja existe alguem inscrito/i.test(mensagem)) return 'Já tem alguém inscrito com esse nome. Coloca o sobrenome.'
+  if (/esse time ja foi escolhido/i.test(mensagem)) return 'Alguém acabou de pegar esse time. Escolhe outro.'
+  if (/ja existe um time com esse nome/i.test(mensagem)) return 'Já existe um time com esse nome.'
+  if (/nome do time precisa/i.test(mensagem)) return 'O nome do time precisa ter de 2 a 40 letras.'
+  if (/duas cores|cor invalida/i.test(mensagem)) return 'Escolhe as duas cores do time.'
+  if (/escudo invalido/i.test(mensagem)) return 'Essa imagem não serve como escudo. Tenta outra.'
+  if (/times personalizados demais/i.test(mensagem)) return 'Já tem times personalizados demais no campeonato.'
+  if (/escolha um time/i.test(mensagem)) return 'Escolhe um time antes de confirmar.'
   if (/de 2 a 40 caracteres/i.test(mensagem)) return 'Escreve seu nome (de 2 a 40 letras).'
   if (/ja foram sorteadas/i.test(mensagem)) return 'As inscrições fecharam: as chaves já foram sorteadas.'
   if (/ja esta lotado/i.test(mensagem)) return 'O campeonato já está lotado.'

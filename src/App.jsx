@@ -88,7 +88,7 @@ export default function App() {
     return (
       <ProvedorDeTimes timesDoUsuario={timesDoUsuario}>
         <div className="min-h-dvh">
-          <Inscricao aoSair={sairDaInscricao} />
+          <Inscricao aoSair={sairDaInscricao} participantes={participantes} />
         </div>
       </ProvedorDeTimes>
     )

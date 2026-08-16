@@ -133,8 +133,15 @@ $$;
 -- É a única gravação que dispensa o PIN, então tem trava própria: só funciona
 -- antes do sorteio, limita o total de inscritos, exige nome utilizável e
 -- recusa nome repetido. Nada além de acrescentar um participante.
-create or replace function public.inscrever(p_id text, p_nome text, p_time text)
-returns table (posicao int, total int)
+-- `p_time_novo` chega preenchido quando a pessoa cadastra um time que não está
+-- na lista: {nome, cores:[hex,hex], escudo?}. O time nasce junto da inscrição.
+create or replace function public.inscrever(
+  p_id text,
+  p_nome text,
+  p_time text default null,
+  p_time_novo jsonb default null
+)
+returns table (posicao int, total int, time_id text)
 language plpgsql
 security definer
 set search_path = public, extensions
@@ -142,9 +149,14 @@ as $$
 declare
   v_estado      jsonb;
   v_nome        text := btrim(coalesce(p_nome, ''));
-  v_time        text := coalesce(nullif(btrim(coalesce(p_time, '')), ''), 'sem-time');
+  v_time        text := nullif(btrim(coalesce(p_time, '')), '');
   v_inscritos   jsonb;
+  v_times       jsonb;
   v_total       int;
+  v_nome_time   text;
+  v_cores       jsonb;
+  v_escudo      text;
+  v_cor         text;
 begin
   if length(v_nome) < 2 or length(v_nome) > 40 then
     raise exception 'nome precisa ter de 2 a 40 caracteres' using errcode = '22023';
@@ -160,7 +172,8 @@ begin
   end if;
 
   v_inscritos := coalesce(v_estado->'participantes', '[]'::jsonb);
-  v_total := jsonb_array_length(v_inscritos);
+  v_times     := coalesce(v_estado->'timesDoUsuario', '[]'::jsonb);
+  v_total     := jsonb_array_length(v_inscritos);
 
   if v_total >= 64 then
     raise exception 'o campeonato ja esta lotado' using errcode = '22023';
@@ -173,9 +186,67 @@ begin
     raise exception 'ja existe alguem inscrito com esse nome' using errcode = '23505';
   end if;
 
+  ---------------------------------------------------------------- time novo --
+  if p_time_novo is not null and p_time_novo <> 'null'::jsonb then
+    v_nome_time := btrim(coalesce(p_time_novo->>'nome', ''));
+    if length(v_nome_time) < 2 or length(v_nome_time) > 40 then
+      raise exception 'o nome do time precisa ter de 2 a 40 caracteres' using errcode = '22023';
+    end if;
+
+    if jsonb_array_length(v_times) >= 40 then
+      raise exception 'ja ha times personalizados demais' using errcode = '22023';
+    end if;
+
+    if exists (
+      select 1 from jsonb_array_elements(v_times) as time_existente
+       where lower(btrim(time_existente->>'nome')) = lower(v_nome_time)
+    ) then
+      raise exception 'ja existe um time com esse nome' using errcode = '23505';
+    end if;
+
+    v_cores := p_time_novo->'cores';
+    if jsonb_typeof(v_cores) <> 'array' or jsonb_array_length(v_cores) <> 2 then
+      raise exception 'o time precisa de duas cores' using errcode = '22023';
+    end if;
+    for v_cor in select jsonb_array_elements_text(v_cores) loop
+      if v_cor !~ '^#[0-9a-fA-F]{6}$' then
+        raise exception 'cor invalida' using errcode = '22023';
+      end if;
+    end loop;
+
+    -- Escudo é opcional; quando vem, só imagem e com tamanho contido.
+    v_escudo := p_time_novo->>'escudo';
+    if v_escudo is not null then
+      if v_escudo !~ '^data:image/(png|jpeg|webp);base64,' or length(v_escudo) > 120000 then
+        raise exception 'escudo invalido' using errcode = '22023';
+      end if;
+    end if;
+
+    v_time := 'novo-' || substr(md5(random()::text || clock_timestamp()::text), 1, 8);
+    v_times := v_times || jsonb_strip_nulls(jsonb_build_object(
+      'id', v_time,
+      'nome', v_nome_time,
+      'liga', 'Meus times',
+      'cores', v_cores,
+      'escudo', v_escudo
+    ));
+  end if;
+
+  if v_time is null then
+    raise exception 'escolha um time' using errcode = '22023';
+  end if;
+
+  ------------------------------------------------------- um time por pessoa --
+  if exists (
+    select 1 from jsonb_array_elements(v_inscritos) as inscrito
+     where inscrito->>'timeId' = v_time
+  ) then
+    raise exception 'esse time ja foi escolhido' using errcode = '23505';
+  end if;
+
   update public.campeonatos
      set estado = jsonb_set(
-           v_estado,
+           jsonb_set(v_estado, '{timesDoUsuario}', v_times),
            '{participantes}',
            v_inscritos || jsonb_build_object(
              'id', 'qr' || substr(md5(random()::text || clock_timestamp()::text), 1, 7),
@@ -187,13 +258,15 @@ begin
          atualizado_em = now()
    where id = p_id;
 
-  return query select v_total + 1, v_total + 1;
+  return query select v_total + 1, v_total + 1, v_time;
 end;
 $$;
 
 revoke all on function public.conferir_pin(text, text) from public;
-revoke all on function public.inscrever(text, text, text) from public;
-grant execute on function public.inscrever(text, text, text) to anon, authenticated;
+-- A assinatura antiga sai de cena para não ficar rota pública sem as travas novas.
+drop function if exists public.inscrever(text, text, text);
+revoke all on function public.inscrever(text, text, text, jsonb) from public;
+grant execute on function public.inscrever(text, text, text, jsonb) to anon, authenticated;
 revoke all on function public.salvar_campeonato(text, jsonb, text) from public;
 revoke all on function public.trocar_pin(text, text, text) from public;
 grant execute on function public.conferir_pin(text, text) to anon, authenticated;
