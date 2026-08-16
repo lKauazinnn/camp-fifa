@@ -67,7 +67,7 @@ export function nomeCurtoDaFase(chave, rodada, totalRodadas) {
 /* Sorteio                                                             */
 /* ------------------------------------------------------------------ */
 
-function embaralhar(lista) {
+export function embaralhar(lista) {
   const copia = [...lista]
   for (let i = copia.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1))

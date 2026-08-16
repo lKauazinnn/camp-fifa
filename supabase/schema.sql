@@ -232,12 +232,13 @@ begin
     ));
   end if;
 
-  if v_time is null then
-    raise exception 'escolha um time' using errcode = '22023';
-  end if;
+  -- Inscrição não exige time: eles são sorteados depois, quando a organização
+  -- já sabe quantas pessoas entraram.
+  v_time := coalesce(v_time, 'sem-time');
 
   ------------------------------------------------------- um time por pessoa --
-  if exists (
+  -- 'sem-time' fica de fora da regra: é o estado de quem ainda não sorteou.
+  if v_time <> 'sem-time' and exists (
     select 1 from jsonb_array_elements(v_inscritos) as inscrito
      where inscrito->>'timeId' = v_time
   ) then

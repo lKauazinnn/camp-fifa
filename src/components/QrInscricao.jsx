@@ -1,6 +1,26 @@
 import { useMemo, useRef, useState } from 'react'
-import { Check, Download, Link2, Printer } from 'lucide-react'
+import { Check, Download, Link2, MessageCircle, Printer } from 'lucide-react'
 import { Botao, Cartao, TituloSecao } from './ui.jsx'
+
+/** Convite pronto para colar no grupo do acampamento. */
+export function textoDoConvite(endereco) {
+  return `⚽ *CAMPEONATO DE FIFA — UNIDOS ACAMP* ⚽
+
+Vai rolar campeonato de FIFA no acamp, e o campeão leva *R$ 100,00* na mão. 💸
+
+Como funciona:
+• Mata-mata, jogos de 6 minutos por tempo
+• Perdeu na primeira fase? Calma, tem repescagem valendo o 3º lugar
+• Os times são *sorteados* — ninguém escolhe, e ninguém repete
+• Só os melhores times do FC 26, sem time de lenda
+
+Pra entrar é só clicar, escrever seu nome e pronto:
+${endereco}
+
+Dá pra acompanhar o chaveamento e os resultados ao vivo por aí mesmo. 📱
+
+Chama a galera e bora! 🏆`
+}
 
 /** Endereço que o QR abre: a mesma página, na tela de inscrição. */
 export function enderecoDeInscricao() {
@@ -145,6 +165,20 @@ export function QrInscricao({ torneio }) {
               Baixar cartaz
             </Botao>
             <Botao
+              variante="cobalto"
+              icone={MessageCircle}
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(textoDoConvite(endereco))
+                  mostrar('Convite copiado. Cola no grupo do acampamento.')
+                } catch {
+                  mostrar('Não consegui copiar o convite.')
+                }
+              }}
+            >
+              Copiar convite
+            </Botao>
+            <Botao
               variante="papel"
               icone={Link2}
               onClick={async () => {
@@ -156,7 +190,7 @@ export function QrInscricao({ torneio }) {
                 }
               }}
             >
-              Copiar link
+              Só o link
             </Botao>
             <Botao
               variante="papel"

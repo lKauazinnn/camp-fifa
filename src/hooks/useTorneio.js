@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ESTADO_EXEMPLO } from '../data/mock.js'
 import { TIMES } from '../data/times.js'
-import { montarTorneio, normalizarResultado, sortearSeeds } from '../lib/torneio.js'
+import { embaralhar, montarTorneio, normalizarResultado, sortearSeeds } from '../lib/torneio.js'
 import { calcularEstatisticas, calcularResumo } from '../lib/estatisticas.js'
 import {
   apagarEstadoSalvo,
@@ -321,10 +321,37 @@ export function useTorneio() {
     [alterar],
   )
 
-  /* -------------------------------- sorteio -------------------------------- */
+  /* -------------------------------- sorteios ------------------------------- */
 
   const sortear = useCallback(() => {
     alterar((anterior) => ({ ...anterior, seeds: sortearSeeds(anterior.participantes), resultados: {} }))
+  }, [alterar])
+
+  /**
+   * Distribui os times entre os inscritos, um para cada, sem repetir.
+   * Feito depois das inscrições, quando já se sabe quanta gente entrou.
+   */
+  const sortearTimes = useCallback(
+    (idsDisponiveis) => {
+      alterar((anterior) => {
+        const sorteados = embaralhar(idsDisponiveis)
+        return {
+          ...anterior,
+          participantes: anterior.participantes.map((participante, indice) => ({
+            ...participante,
+            timeId: sorteados[indice] ?? 'sem-time',
+          })),
+        }
+      })
+    },
+    [alterar],
+  )
+
+  const limparTimes = useCallback(() => {
+    alterar((anterior) => ({
+      ...anterior,
+      participantes: anterior.participantes.map((participante) => ({ ...participante, timeId: 'sem-time' })),
+    }))
   }, [alterar])
 
   /* ------------------------------- resultados ------------------------------ */
@@ -477,6 +504,8 @@ export function useTorneio() {
       atualizarParticipante,
       removerParticipante,
       sortear,
+      sortearTimes,
+      limparTimes,
       salvarResultado,
       limparResultado,
       zerarResultados,
