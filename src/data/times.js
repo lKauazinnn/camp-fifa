@@ -1,13 +1,12 @@
 /**
- * Elenco do campeonato: só times de elite do FC 26.
+ * Elenco do campeonato: só clubes de elite do FC 26.
  *
  * Regras que valeram para montar a lista:
- *   - Nada de seleção de lendas, all-star ou qualquer time montado ("World XI",
- *     "Adidas All-Star" e afins). Só clube e seleção de verdade, para ninguém
- *     entrar com um time quebrado.
- *   - São 66 times, o suficiente para 50 inscritos com folga — e a regra de um
- *     time por pessoa exige mais times do que participantes. Passando disso,
- *     dá para cadastrar um time novo na própria inscrição.
+ *   - Só clube. Sem seleção, sem time de lendas, sem all-star ("World XI",
+ *     "Adidas All-Star" e afins) — nada que entre quebrado no sorteio.
+ *   - São 56 clubes, o suficiente para os 50 inscritos esperados com folga, e a
+ *     regra de um time por pessoa exige mais times do que participantes.
+ *     Passando disso, dá para cadastrar times novos no Painel Admin.
  *
  * Os escudos vêm de servidores públicos em tempo de execução; nenhum logo é
  * redistribuído aqui. Cada id foi conferido visualmente antes de entrar.
@@ -91,17 +90,6 @@ export const TIMES = [
   { id: 'gremio', nome: 'Grêmio', liga: 'Brasileirão', cores: ['#0ea5e9', '#0f172a'], ...escudo(130) },
   { id: 'fluminense', nome: 'Fluminense', liga: 'Brasileirão', cores: ['#7f1d1d', '#065f46'], ...escudo(124) },
 
-  // ------------------------------------------------------------- Seleções ---
-  { id: 'brasil', nome: 'Brasil', liga: 'Seleções', cores: ['#facc15', '#16a34a'], ...escudo(6) },
-  { id: 'argentina', nome: 'Argentina', liga: 'Seleções', cores: ['#38bdf8', '#f8fafc'], ...escudo(26) },
-  { id: 'franca', nome: 'França', liga: 'Seleções', cores: ['#1e3a8a', '#dc2626'], ...escudo(2) },
-  { id: 'espanha', nome: 'Espanha', liga: 'Seleções', cores: ['#dc2626', '#facc15'], ...escudo(9) },
-  { id: 'inglaterra', nome: 'Inglaterra', liga: 'Seleções', cores: ['#f8fafc', '#dc2626'], ...escudo(10) },
-  { id: 'portugal', nome: 'Portugal', liga: 'Seleções', cores: ['#166534', '#dc2626'], ...escudo(27) },
-  { id: 'alemanha', nome: 'Alemanha', liga: 'Seleções', cores: ['#111827', '#facc15'], ...escudo(25) },
-  { id: 'holanda', nome: 'Holanda', liga: 'Seleções', cores: ['#f97316', '#0f172a'], ...escudo(1118) },
-  { id: 'italia', nome: 'Itália', liga: 'Seleções', cores: ['#0064aa', '#f8fafc'], ...escudo(768) },
-  { id: 'belgica', nome: 'Bélgica', liga: 'Seleções', cores: ['#e30613', '#111827'], ...escudo(1) },
 ]
 
 export const TIME_PADRAO = { id: 'sem-time', nome: 'Time livre', liga: '—', cores: ['#475569', '#1e293b'] }

@@ -12,7 +12,7 @@ Como funciona:
 • Mata-mata, jogos de 6 minutos por tempo
 • Perdeu na primeira fase? Calma, tem repescagem valendo o 3º lugar
 • Os times são *sorteados* — ninguém escolhe, e ninguém repete
-• Só os melhores times do FC 26, sem time de lenda
+• Só os melhores clubes do FC 26 — sem seleção e sem time de lenda
 
 Pra entrar é só clicar, escrever seu nome e pronto:
 ${endereco}

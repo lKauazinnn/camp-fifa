@@ -20,8 +20,8 @@ export const PARTICIPANTES_EXEMPLO = [
   { id: 'p11', nome: 'Samuel Costa', timeId: 'milan' },
   { id: 'p12', nome: 'Isaque Ferreira', timeId: 'dortmund' },
   { id: 'p13', nome: 'Vinícius Rocha', timeId: 'chelsea' },
-  { id: 'p14', nome: 'Ana Beatriz Moura', timeId: 'brasil' },
-  { id: 'p15', nome: 'Letícia Prado', timeId: 'argentina' },
+  { id: 'p14', nome: 'Ana Beatriz Moura', timeId: 'napoli' },
+  { id: 'p15', nome: 'Letícia Prado', timeId: 'inter' },
   { id: 'p16', nome: 'Miguel Tavares', timeId: 'corinthians' },
 ]
 

@@ -28,7 +28,7 @@ const BLOCOS = [
     cor: 'bg-papel-escuro',
     titulo: 'Os times',
     itens: [
-      'Só os times da lista: os melhores do FC 26, e nada de seleção de lendas ou time montado.',
+      'Só clube, e só os melhores do FC 26: sem seleção, sem time de lendas, sem all-star.',
       'Cada time é de um jogador só. Escolheu, ninguém mais pega aquele.',
       'Escolheu no cadastro, fica com ele até o fim.',
       'Time que não está na lista pode ser cadastrado na hora da inscrição — desde que não seja time de lenda.',
