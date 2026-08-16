@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
-import QRCode from 'qrcode'
+import { useMemo, useRef, useState } from 'react'
 import { Check, Download, Link2, Printer } from 'lucide-react'
 import { Botao, Cartao, TituloSecao } from './ui.jsx'
 
@@ -9,78 +8,99 @@ export function enderecoDeInscricao() {
   return `${origin}${pathname}#inscricao`
 }
 
+/**
+ * O código é gerado por serviço online, então nada disso pesa no bundle.
+ * São dois endereços: se o primeiro falhar, o segundo assume — e os dois
+ * liberam CORS, o que permite desenhar o QR dentro do cartaz e exportá-lo.
+ */
+function enderecosDoQr(alvo, tamanho = 320) {
+  const dados = encodeURIComponent(alvo)
+  return [
+    `https://api.qrserver.com/v1/create-qr-code/?size=${tamanho}x${tamanho}&margin=8&data=${dados}`,
+    `https://quickchart.io/qr?size=${tamanho}&margin=2&text=${dados}`,
+  ]
+}
+
+function carregarImagem(endereco) {
+  return new Promise((resolver, rejeitar) => {
+    const imagem = new Image()
+    imagem.crossOrigin = 'anonymous'
+    imagem.onload = () => resolver(imagem)
+    imagem.onerror = () => rejeitar(new Error('não consegui gerar o QR'))
+    imagem.src = endereco
+  })
+}
+
 export function QrInscricao({ torneio }) {
-  const tela = useRef(null)
+  const endereco = useMemo(() => enderecoDeInscricao(), [])
+  const opcoes = useMemo(() => enderecosDoQr(endereco), [endereco])
+  const [tentativa, setTentativa] = useState(0)
   const [aviso, setAviso] = useState(null)
-  const [endereco] = useState(() => enderecoDeInscricao())
+  const imagemRef = useRef(null)
+
   const encerrada = torneio.ativo
+  const enderecoDoQr = opcoes[tentativa] ?? null
 
   const mostrar = (texto) => {
     setAviso(texto)
     window.setTimeout(() => setAviso(null), 3500)
   }
 
-  useEffect(() => {
-    if (!tela.current) return
-    QRCode.toCanvas(tela.current, endereco, {
-      width: 320,
-      margin: 1,
-      errorCorrectionLevel: 'M',
-      color: { dark: '#14131a', light: '#fbf9f3' },
-    }).catch(() => {})
-  }, [endereco])
+  /** Monta o cartaz de impressão em volta do QR. */
+  const baixarCartaz = async () => {
+    try {
+      const qr = await carregarImagem(enderecosDoQr(endereco, 600)[tentativa] ?? opcoes[0])
+      const largura = 800
+      const altura = 1000
+      const cartaz = document.createElement('canvas')
+      cartaz.width = largura
+      cartaz.height = altura
+      const ctx = cartaz.getContext('2d')
 
-  const baixar = () => {
-    const canvas = tela.current
-    if (!canvas) return
-    // Cartaz pronto para imprimir: QR grande com a chamada em cima.
-    const cartaz = document.createElement('canvas')
-    const largura = 800
-    const altura = 1000
-    cartaz.width = largura
-    cartaz.height = altura
-    const ctx = cartaz.getContext('2d')
+      ctx.fillStyle = '#f0ece1'
+      ctx.fillRect(0, 0, largura, altura)
+      ctx.fillStyle = '#14131a'
+      ctx.fillRect(0, 0, largura, 150)
 
-    ctx.fillStyle = '#f0ece1'
-    ctx.fillRect(0, 0, largura, altura)
-    ctx.fillStyle = '#14131a'
-    ctx.fillRect(0, 0, largura, 150)
+      ctx.textAlign = 'center'
+      ctx.fillStyle = '#ccff00'
+      ctx.font = 'bold 58px "Archivo Black", Arial Black, sans-serif'
+      ctx.fillText('CAMPEONATO FIFA', largura / 2, 95)
 
-    ctx.fillStyle = '#ccff00'
-    ctx.font = 'bold 58px "Archivo Black", Arial Black, sans-serif'
-    ctx.textAlign = 'center'
-    ctx.fillText('CAMPEONATO FIFA', largura / 2, 95)
+      ctx.fillStyle = '#14131a'
+      ctx.font = 'bold 40px "Archivo Black", Arial Black, sans-serif'
+      ctx.fillText('UNIDOS ACAMP', largura / 2, 215)
+      ctx.font = '26px Inter, Arial, sans-serif'
+      ctx.fillText('Aponte a câmera para se inscrever', largura / 2, 262)
 
-    ctx.fillStyle = '#14131a'
-    ctx.font = 'bold 40px "Archivo Black", Arial Black, sans-serif'
-    ctx.fillText('UNIDOS ACAMP', largura / 2, 215)
+      const lado = 440
+      const x = (largura - lado) / 2
+      ctx.fillStyle = '#14131a'
+      ctx.fillRect(x - 10, 290, lado + 20, lado + 20)
+      ctx.fillStyle = '#fbf9f3'
+      ctx.fillRect(x - 2, 298, lado + 4, lado + 4)
+      ctx.drawImage(qr, x, 300, lado, lado)
 
-    ctx.font = '26px Inter, Arial, sans-serif'
-    ctx.fillText('Aponte a câmera para se inscrever', largura / 2, 262)
+      ctx.fillStyle = '#ff5a1f'
+      ctx.fillRect(0, 800, largura, 110)
+      ctx.fillStyle = '#ffffff'
+      ctx.font = 'bold 54px "Archivo Black", Arial Black, sans-serif'
+      ctx.fillText('R$ 100 PRO CAMPEÃO', largura / 2, 872)
 
-    const lado = 440
-    const x = (largura - lado) / 2
-    ctx.fillStyle = '#14131a'
-    ctx.fillRect(x - 10, 300 - 10, lado + 20, lado + 20)
-    ctx.drawImage(canvas, x, 300, lado, lado)
+      ctx.fillStyle = '#14131a'
+      ctx.font = '22px Inter, Arial, sans-serif'
+      ctx.fillText(endereco.replace(/^https?:\/\//, ''), largura / 2, 955)
 
-    ctx.fillStyle = '#ff5a1f'
-    ctx.fillRect(0, 800, largura, 110)
-    ctx.fillStyle = '#ffffff'
-    ctx.font = 'bold 54px "Archivo Black", Arial Black, sans-serif'
-    ctx.fillText('R$ 100 PRO CAMPEÃO', largura / 2, 872)
-
-    ctx.fillStyle = '#14131a'
-    ctx.font = '22px Inter, Arial, sans-serif'
-    ctx.fillText(endereco.replace(/^https?:\/\//, ''), largura / 2, 955)
-
-    const link = document.createElement('a')
-    link.download = 'inscricao-campeonato-fifa.png'
-    link.href = cartaz.toDataURL('image/png')
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
-    mostrar('Cartaz baixado. É só imprimir e colar.')
+      const link = document.createElement('a')
+      link.download = 'inscricao-campeonato-fifa.png'
+      link.href = cartaz.toDataURL('image/png')
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      mostrar('Cartaz baixado. É só imprimir e colar.')
+    } catch {
+      mostrar('Não consegui montar o cartaz agora. Tente de novo com internet.')
+    }
   }
 
   return (
@@ -92,8 +112,20 @@ export function QrInscricao({ torneio }) {
       />
 
       <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-start">
-        <div className="contorno sombra shrink-0 rounded-xl bg-papel-claro p-3">
-          <canvas ref={tela} className="block size-40 sm:size-48" />
+        <div className="contorno sombra grid size-44 shrink-0 place-items-center rounded-xl bg-papel-claro p-2 sm:size-52">
+          {enderecoDoQr ? (
+            <img
+              ref={imagemRef}
+              src={enderecoDoQr}
+              alt="QR code de inscrição"
+              className="size-full object-contain"
+              onError={() => setTentativa((atual) => atual + 1)}
+            />
+          ) : (
+            <p className="px-3 text-center text-[12px] text-tinta-media">
+              Sem internet para gerar o QR. O link abaixo continua valendo.
+            </p>
+          )}
         </div>
 
         <div className="min-w-0 flex-1">
@@ -109,7 +141,7 @@ export function QrInscricao({ torneio }) {
           )}
 
           <div className="flex flex-wrap gap-2">
-            <Botao icone={Printer} onClick={baixar}>
+            <Botao icone={Printer} onClick={baixarCartaz} disabled={!enderecoDoQr}>
               Baixar cartaz
             </Botao>
             <Botao
@@ -120,7 +152,7 @@ export function QrInscricao({ torneio }) {
                   await navigator.clipboard.writeText(endereco)
                   mostrar('Link copiado.')
                 } catch {
-                  mostrar('Não consegui copiar. Anota: ' + endereco)
+                  mostrar(`Não consegui copiar. Anota: ${endereco}`)
                 }
               }}
             >
@@ -129,14 +161,27 @@ export function QrInscricao({ torneio }) {
             <Botao
               variante="papel"
               icone={Download}
-              onClick={() => {
-                const link = document.createElement('a')
-                link.download = 'qr-inscricao.png'
-                link.href = tela.current.toDataURL('image/png')
-                document.body.appendChild(link)
-                link.click()
-                link.remove()
-                mostrar('QR salvo.')
+              disabled={!enderecoDoQr}
+              onClick={async () => {
+                try {
+                  const qr = await carregarImagem(enderecosDoQr(endereco, 600)[tentativa] ?? opcoes[0])
+                  const tela = document.createElement('canvas')
+                  tela.width = 600
+                  tela.height = 600
+                  const ctx = tela.getContext('2d')
+                  ctx.fillStyle = '#ffffff'
+                  ctx.fillRect(0, 0, 600, 600)
+                  ctx.drawImage(qr, 0, 0, 600, 600)
+                  const link = document.createElement('a')
+                  link.download = 'qr-inscricao.png'
+                  link.href = tela.toDataURL('image/png')
+                  document.body.appendChild(link)
+                  link.click()
+                  link.remove()
+                  mostrar('QR salvo.')
+                } catch {
+                  mostrar('Não consegui baixar o QR agora.')
+                }
               }}
             >
               Só o QR
