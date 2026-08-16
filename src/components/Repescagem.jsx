@@ -1,8 +1,10 @@
-import { buscarTime } from '../data/times.js'
+import { useTimes } from '../contexto/TimesContexto.jsx'
 import { ChaveVisual } from './ChaveVisual.jsx'
 import { Cartao, EscudoTime, EstadoVazio, TituloSecao } from './ui.jsx'
 
 export function Repescagem({ torneio, aoEditarPartida, somenteLeitura }) {
+  const { buscarTime } = useTimes()
+
   if (!torneio.ativo || !torneio.repescagem.length) {
     return (
       <EstadoVazio

@@ -1,10 +1,11 @@
 import { LIMITE_AMARELOS, situacaoDisciplinar } from '../lib/estatisticas.js'
-import { buscarTime } from '../data/times.js'
+import { useTimes } from '../contexto/TimesContexto.jsx'
 import { Cartao, EscudoTime, EstadoVazio, Etiqueta, Metrica, TituloSecao } from './ui.jsx'
 
 const COR_SITUACAO = { vermelho: 'rosa', amarelo: 'rosa', atencao: 'laranja', ok: 'papel' }
 
 function LinhaArtilharia({ linha, posicao }) {
+  const { buscarTime } = useTimes()
   const lider = posicao === 0 && linha.gols > 0
   return (
     <tr className="border-t-2 border-papel-escuro">
@@ -75,6 +76,7 @@ function LinhaDisciplina({ linha }) {
 }
 
 export function Estatisticas({ estatisticas, resumo }) {
+  const { buscarTime } = useTimes()
   const comJogos = estatisticas.filter((linha) => linha.jogos > 0)
 
   if (!comJogos.length) {

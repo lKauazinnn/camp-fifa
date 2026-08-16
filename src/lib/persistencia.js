@@ -15,6 +15,39 @@ const PREFIXO_LINK = '#placar='
 /* Validação                                                           */
 /* ------------------------------------------------------------------ */
 
+const LIMITE_ESCUDO = 300_000
+
+function validarTimesDoUsuario(bruto) {
+  if (!Array.isArray(bruto)) return []
+
+  return bruto
+    .filter((time) => time && typeof time.id === 'string' && time.id.length < 60)
+    .map((time) => {
+      const ajuste = { id: time.id }
+
+      if (typeof time.nome === 'string' && time.nome.trim()) ajuste.nome = time.nome.trim().slice(0, 40)
+      if (typeof time.liga === 'string' && time.liga.trim()) ajuste.liga = time.liga.trim().slice(0, 30)
+      if (
+        Array.isArray(time.cores) &&
+        time.cores.length === 2 &&
+        time.cores.every((cor) => typeof cor === 'string' && /^#[0-9a-f]{6}$/i.test(cor))
+      ) {
+        ajuste.cores = [time.cores[0], time.cores[1]]
+      }
+      // Só data URL de imagem ou endereço https — nada de javascript: nem data de outro tipo.
+      if (
+        typeof time.escudo === 'string' &&
+        time.escudo.length <= LIMITE_ESCUDO &&
+        (/^data:image\/(png|jpeg|webp|gif|svg\+xml);base64,/i.test(time.escudo) || /^https:\/\//i.test(time.escudo))
+      ) {
+        ajuste.escudo = time.escudo
+      }
+
+      return ajuste
+    })
+    .filter((ajuste) => Object.keys(ajuste).length > 1)
+}
+
 /** Garante que o objeto lido de fora tem o formato esperado. */
 export function validarEstado(bruto) {
   if (!bruto || typeof bruto !== 'object') return null
@@ -51,7 +84,7 @@ export function validarEstado(bruto) {
     }
   }
 
-  return { participantes, seeds, resultados }
+  return { participantes, seeds, resultados, timesDoUsuario: validarTimesDoUsuario(bruto.timesDoUsuario) }
 }
 
 /* ------------------------------------------------------------------ */
@@ -144,12 +177,23 @@ function deBase64Url(codificado) {
   return new TextDecoder().decode(bytes)
 }
 
-/** Compacta o estado para caber confortavelmente numa URL de WhatsApp. */
-function compactar({ participantes, seeds, resultados }) {
+/**
+ * Compacta o estado para caber confortavelmente numa URL de WhatsApp.
+ * Os escudos enviados pelo usuário ficam de fora de propósito: uma imagem em
+ * data URL multiplicaria o tamanho do link por dez.
+ */
+function compactar({ participantes, seeds, resultados, timesDoUsuario = [] }) {
   const indicePorId = new Map(participantes.map((participante, indice) => [participante.id, indice]))
   return {
     p: participantes.map((participante) => [participante.nome, participante.timeId]),
     s: seeds.map((id) => (id ? indicePorId.get(id) ?? -1 : -1)),
+    t: timesDoUsuario.map((time) => [
+      time.id,
+      time.nome ?? '',
+      time.liga ?? '',
+      time.cores?.[0] ?? '',
+      time.cores?.[1] ?? '',
+    ]),
     r: Object.fromEntries(
       Object.entries(resultados).map(([id, r]) => [
         id,
@@ -168,6 +212,12 @@ function expandir(compacto) {
   return {
     participantes,
     seeds: (compacto.s ?? []).map((indice) => participantes[indice]?.id ?? null),
+    timesDoUsuario: (compacto.t ?? []).map(([id, nome, liga, cor1, cor2]) => ({
+      id,
+      ...(nome ? { nome } : {}),
+      ...(liga ? { liga } : {}),
+      ...(cor1 && cor2 ? { cores: [cor1, cor2] } : {}),
+    })),
     resultados: Object.fromEntries(
       Object.entries(compacto.r ?? {}).map(([id, valores]) => [
         id,

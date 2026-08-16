@@ -1,4 +1,4 @@
-import { buscarTime } from '../data/times.js'
+import { useTimes } from '../contexto/TimesContexto.jsx'
 import { ChaveVisual } from './ChaveVisual.jsx'
 import { Botao, Cartao, EscudoTime, EstadoVazio, TituloSecao } from './ui.jsx'
 
@@ -9,6 +9,7 @@ const MEDALHAS = [
 ]
 
 function Posicao({ indice, participante }) {
+  const { buscarTime } = useTimes()
   const medalha = MEDALHAS[indice]
   return (
     <div className="flex items-center gap-3 px-4 py-3">
@@ -32,6 +33,7 @@ function Posicao({ indice, participante }) {
 }
 
 function Campeao({ campeao }) {
+  const { buscarTime } = useTimes()
   return (
     <div className="contorno sombra-g relative overflow-hidden rounded-xl bg-cobalto px-6 py-8 text-white sm:px-10">
       <div className="listrado absolute inset-0" aria-hidden="true" />

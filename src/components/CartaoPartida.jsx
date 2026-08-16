@@ -1,7 +1,9 @@
-import { buscarTime } from '../data/times.js'
+import { useTimes } from '../contexto/TimesContexto.jsx'
 import { Cartoes, EscudoTime } from './ui.jsx'
 
 function Lado({ participante, gols, penaltis, mostrarPenaltis, vencedor, perdedor, amarelos, vermelhos }) {
+  const { buscarTime } = useTimes()
+
   if (!participante) {
     return (
       <div className="flex items-center gap-2.5 px-3 py-2.5">

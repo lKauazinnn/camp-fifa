@@ -1,9 +1,10 @@
 import { useMemo, useRef, useState } from 'react'
 import { Check, Download, Link2, Pencil, Trash2, Upload } from 'lucide-react'
-import { LIGAS, TIMES, buscarTime } from '../data/times.js'
+import { useTimes } from '../contexto/TimesContexto.jsx'
 import { formatarHorario } from '../lib/persistencia.js'
 import { Botao, BotaoTexto, Cartao, EscudoTime, Etiqueta, TituloSecao } from './ui.jsx'
 import { ModalConfirmacao } from './ModalConfirmacao.jsx'
+import { GerenciadorDeTimes } from './GerenciadorDeTimes.jsx'
 
 const CAMPO =
   'contorno w-full rounded-lg bg-papel-claro px-3 py-2.5 text-[14px] font-medium placeholder:text-tinta-fraca focus:bg-lima/20 focus:outline-none'
@@ -13,8 +14,9 @@ const CAMPO =
 /* -------------------------------------------------------------------------- */
 
 function FormularioParticipante({ aoCadastrar }) {
+  const { times, ligas } = useTimes()
   const [nome, setNome] = useState('')
-  const [timeId, setTimeId] = useState(TIMES[0].id)
+  const [timeId, setTimeId] = useState(times[0].id)
 
   const enviar = (evento) => {
     evento.preventDefault()
@@ -35,13 +37,15 @@ function FormularioParticipante({ aoCadastrar }) {
       <div className="flex items-center gap-2.5">
         <EscudoTime timeId={timeId} tamanho="md" />
         <select value={timeId} onChange={(evento) => setTimeId(evento.target.value)} className={CAMPO}>
-          {LIGAS.map((liga) => (
+          {ligas.map((liga) => (
             <optgroup key={liga} label={liga}>
-              {TIMES.filter((time) => time.liga === liga).map((time) => (
-                <option key={time.id} value={time.id}>
-                  {time.nome}
-                </option>
-              ))}
+              {times
+                .filter((time) => time.liga === liga)
+                .map((time) => (
+                  <option key={time.id} value={time.id}>
+                    {time.nome}
+                  </option>
+                ))}
             </optgroup>
           ))}
         </select>
@@ -54,6 +58,7 @@ function FormularioParticipante({ aoCadastrar }) {
 }
 
 function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover }) {
+  const { times, buscarTime } = useTimes()
   const [editando, setEditando] = useState(false)
   const [nome, setNome] = useState(participante.nome)
   const [timeId, setTimeId] = useState(participante.timeId)
@@ -63,7 +68,7 @@ function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover }) {
       <li className="contorno grid gap-2.5 rounded-lg bg-lima/25 p-2.5 sm:grid-cols-[1fr_1fr_auto]">
         <input value={nome} onChange={(evento) => setNome(evento.target.value)} className={CAMPO} />
         <select value={timeId} onChange={(evento) => setTimeId(evento.target.value)} className={CAMPO}>
-          {TIMES.map((time) => (
+          {times.map((time) => (
             <option key={time.id} value={time.id}>
               {time.nome}
             </option>
@@ -292,7 +297,7 @@ function BlocoDados({ acoes, salvamento, temDados }) {
 /* Painel                                                                     */
 /* -------------------------------------------------------------------------- */
 
-export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, salvamento }) {
+export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, salvamento, timesDoUsuario = [] }) {
   const [confirmacao, setConfirmacao] = useState(null)
   const podeSortear = participantes.length >= 4
 
@@ -353,6 +358,8 @@ export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, sa
           </p>
         )}
       </Cartao>
+
+      <GerenciadorDeTimes acoes={acoes} totalDeAjustes={timesDoUsuario.length} />
 
       {/* Sorteio */}
       <Cartao cor={podeSortear && !torneio.ativo ? 'cobalto' : 'papel'} className="p-4 sm:p-6">

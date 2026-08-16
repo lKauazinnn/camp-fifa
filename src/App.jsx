@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ProvedorDeTimes } from './contexto/TimesContexto.jsx'
 import { useTema } from './hooks/useTema.js'
 import { useTorneio } from './hooks/useTorneio.js'
 import { Cabecalho } from './components/Cabecalho.jsx'
@@ -41,7 +42,8 @@ function FaixaSomenteLeitura({ acoes }) {
 }
 
 export default function App() {
-  const { participantes, torneio, estatisticas, resumo, salvamento, somenteLeitura, acoes } = useTorneio()
+  const { participantes, timesDoUsuario, torneio, estatisticas, resumo, salvamento, somenteLeitura, acoes } =
+    useTorneio()
   const { tema, alternarTema } = useTema()
   const [abaAtiva, setAbaAtiva] = useState('chaveamento')
   const [partidaEmEdicao, setPartidaEmEdicao] = useState(null)
@@ -53,70 +55,73 @@ export default function App() {
   const abrirResultado = somenteLeitura ? undefined : (partida) => setPartidaEmEdicao(partida.id)
 
   return (
-    <div className="min-h-dvh">
-      {somenteLeitura ? <FaixaSomenteLeitura acoes={acoes} /> : null}
+    <ProvedorDeTimes timesDoUsuario={timesDoUsuario}>
+      <div className="min-h-dvh">
+        {somenteLeitura ? <FaixaSomenteLeitura acoes={acoes} /> : null}
 
-      <Cabecalho
-        totalParticipantes={participantes.length}
-        totalGols={resumo.totalGols}
-        torneio={torneio}
-        tema={tema}
-        aoAlternarTema={alternarTema}
-      />
-
-      <Navegacao abas={abas} abaAtiva={abaAtiva} aoTrocar={setAbaAtiva} />
-
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-        <div key={abaAtiva} className="animar-entrar">
-          {abaAtiva === 'chaveamento' ? (
-            <Chaveamento
-              torneio={torneio}
-              aoEditarPartida={abrirResultado}
-              aoIrParaAdmin={() => setAbaAtiva('admin')}
-              somenteLeitura={somenteLeitura}
-            />
-          ) : null}
-
-          {abaAtiva === 'repescagem' ? (
-            <Repescagem torneio={torneio} aoEditarPartida={abrirResultado} somenteLeitura={somenteLeitura} />
-          ) : null}
-
-          {abaAtiva === 'estatisticas' ? <Estatisticas estatisticas={estatisticas} resumo={resumo} /> : null}
-
-          {abaAtiva === 'regras' ? <Regras /> : null}
-
-          {abaAtiva === 'admin' && !somenteLeitura ? (
-            <PainelAdmin
-              participantes={participantes}
-              torneio={torneio}
-              acoes={acoes}
-              aoEditarPartida={abrirResultado}
-              salvamento={salvamento}
-            />
-          ) : null}
-        </div>
-      </main>
-
-      {/* No tema preto o carvão se confunde com o fundo — vira papel-escuro. */}
-      <footer className="mt-8 border-t-2 border-tinta bg-carvao text-creme escuro:bg-papel-escuro escuro:text-tinta">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-6">
-          <p className="font-display text-lg text-current uppercase">
-            Unidos Acamp <span className="text-lima">· FIFA</span>
-          </p>
-          <p className="rotulo text-[9px] opacity-60">
-            {somenteLeitura ? 'Modo visualização' : 'Salvo automático neste navegador'}
-          </p>
-        </div>
-      </footer>
-
-      {partidaAberta && !somenteLeitura ? (
-        <ModalResultado
-          partida={partidaAberta}
-          aoSalvar={acoes.salvarResultado}
-          aoLimpar={acoes.limparResultado}
-          aoFechar={() => setPartidaEmEdicao(null)}
+        <Cabecalho
+          totalParticipantes={participantes.length}
+          totalGols={resumo.totalGols}
+          torneio={torneio}
+          tema={tema}
+          aoAlternarTema={alternarTema}
         />
-      ) : null}
-    </div>
+
+        <Navegacao abas={abas} abaAtiva={abaAtiva} aoTrocar={setAbaAtiva} />
+
+        <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+          <div key={abaAtiva} className="animar-entrar">
+            {abaAtiva === 'chaveamento' ? (
+              <Chaveamento
+                torneio={torneio}
+                aoEditarPartida={abrirResultado}
+                aoIrParaAdmin={() => setAbaAtiva('admin')}
+                somenteLeitura={somenteLeitura}
+              />
+            ) : null}
+
+            {abaAtiva === 'repescagem' ? (
+              <Repescagem torneio={torneio} aoEditarPartida={abrirResultado} somenteLeitura={somenteLeitura} />
+            ) : null}
+
+            {abaAtiva === 'estatisticas' ? <Estatisticas estatisticas={estatisticas} resumo={resumo} /> : null}
+
+            {abaAtiva === 'regras' ? <Regras /> : null}
+
+            {abaAtiva === 'admin' && !somenteLeitura ? (
+              <PainelAdmin
+                participantes={participantes}
+                timesDoUsuario={timesDoUsuario}
+                torneio={torneio}
+                acoes={acoes}
+                aoEditarPartida={abrirResultado}
+                salvamento={salvamento}
+              />
+            ) : null}
+          </div>
+        </main>
+
+        {/* No tema preto o carvão se confunde com o fundo — vira papel-escuro. */}
+        <footer className="mt-8 border-t-2 border-tinta bg-carvao text-creme escuro:bg-papel-escuro escuro:text-tinta">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-6">
+            <p className="font-display text-lg text-current uppercase">
+              Unidos Acamp <span className="text-lima">· FIFA</span>
+            </p>
+            <p className="rotulo text-[9px] opacity-60">
+              {somenteLeitura ? 'Modo visualização' : 'Salvo automático neste navegador'}
+            </p>
+          </div>
+        </footer>
+
+        {partidaAberta && !somenteLeitura ? (
+          <ModalResultado
+            partida={partidaAberta}
+            aoSalvar={acoes.salvarResultado}
+            aoLimpar={acoes.limparResultado}
+            aoFechar={() => setPartidaEmEdicao(null)}
+          />
+        ) : null}
+      </div>
+    </ProvedorDeTimes>
   )
 }

@@ -55,6 +55,7 @@ Três camadas, da mais automática para a mais manual — todas em `src/lib/pers
 3. **Link do placar** — botão *Copiar link do placar*. O estado do campeonato viaja compactado dentro da
    própria URL (~1,5 KB), então dá para mandar no grupo do WhatsApp e todo mundo abrir o chaveamento como
    está agora, em modo somente leitura, sem backend nenhum. Gere um link novo depois de lançar mais jogos.
+   Os escudos enviados **não** entram no link (apenas nomes e cores), senão ele ficaria dez vezes maior.
 
 Se o navegador bloquear o armazenamento (janela anônima), o Painel Admin avisa em vermelho e pede um backup.
 
@@ -103,6 +104,19 @@ reorganiza automaticamente todas as fases seguintes — inclusive quem cai na re
 - Repescagem: recebe todos os eliminados da 1ª fase; quem vencer a chave fica com o 3º lugar.
 - Empate no tempo normal exige o placar dos pênaltis para definir quem avança.
 - Inscritos fora de uma potência de 2 geram "byes" (classificação direta), distribuídos pela chave.
+
+## Times e escudos
+
+O catálogo traz 40 times prontos (Brasileirão, ligas europeias e seleções) e o Painel Admin permite:
+
+- **Enviar o escudo de verdade** de qualquer time — inclusive os que já vêm na lista. A imagem é reduzida
+  para 96×96 e guardada como data URL (3 a 6 KB), então nada depende de internet depois.
+- **Colar o link** de uma imagem `https://` em vez de subir arquivo.
+- **Criar times novos**, com nome, liga, duas cores e escudo.
+- **Restaurar** um time embutido ao original, ou excluir um time criado.
+
+> Escudos oficiais de clube são marcas registradas, por isso o projeto **não** embarca nenhum logo: as
+> imagens são as que você mesmo enviar, e ficam apenas no seu navegador e nos seus backups.
 
 ## Painel Admin
 

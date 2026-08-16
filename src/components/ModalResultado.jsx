@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Minus, Plus, X } from 'lucide-react'
-import { buscarTime } from '../data/times.js'
+import { useTimes } from '../contexto/TimesContexto.jsx'
 import { RESULTADO_VAZIO, normalizarResultado, resultadoEhValido } from '../lib/torneio.js'
 import { Botao, EscudoTime } from './ui.jsx'
 
@@ -51,6 +51,7 @@ function CampoNumero({ rotulo, valor, aoMudar, maximo = 99, destaque = false }) 
 }
 
 function Lado({ participante, prefixo, formulario, atualizar, vencedor }) {
+  const { buscarTime } = useTimes()
   return (
     <div className={`contorno rounded-lg p-3 ${vencedor ? 'bg-lima/35' : 'bg-papel'}`}>
       <div className="mb-3 flex items-center gap-2.5">

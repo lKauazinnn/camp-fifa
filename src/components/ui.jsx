@@ -1,4 +1,4 @@
-import { buscarTime } from '../data/times.js'
+import { useTimes } from '../contexto/TimesContexto.jsx'
 
 /* -------------------------------------------------------------------------- */
 /* Peças do sistema: contorno preto, sombra sólida, cor com função             */
@@ -96,9 +96,20 @@ export function BotaoTexto({ icone: Icone, children, className = '', disabled, .
   )
 }
 
-/** Escudo: quadrado com contorno, iniciais e a cor do clube na diagonal. */
-export function EscudoTime({ timeId, tamanho = 'md' }) {
-  const time = buscarTime(timeId)
+const TAMANHOS_ESCUDO = {
+  sm: 'size-7 text-[9px] rounded-md',
+  md: 'size-10 text-[11px] rounded-lg',
+  lg: 'size-16 text-base rounded-xl',
+}
+
+/**
+ * Escudo do time: a imagem enviada pelo usuário, quando existe; senão o
+ * quadrado com as iniciais e as cores do clube na diagonal.
+ */
+export function EscudoTime({ timeId, tamanho = 'md', time: timeDireto }) {
+  const { buscarTime } = useTimes()
+  const time = timeDireto ?? buscarTime(timeId)
+
   const iniciais =
     time.nome
       .split(' ')
@@ -106,28 +117,30 @@ export function EscudoTime({ timeId, tamanho = 'md' }) {
       .slice(0, 2)
       .map((palavra) => palavra[0])
       .join('')
-      .toUpperCase() || '?'
-
-  const tamanhos = {
-    sm: 'size-7 text-[9px] rounded-md',
-    md: 'size-10 text-[11px] rounded-lg',
-    lg: 'size-16 text-base rounded-xl',
-  }
+      .toUpperCase() ||
+    time.nome.slice(0, 2).toUpperCase() ||
+    '?'
 
   return (
     <span
-      className={`contorno relative grid shrink-0 place-items-center overflow-hidden bg-papel-claro font-display text-tinta ${tamanhos[tamanho]}`}
+      className={`contorno relative grid shrink-0 place-items-center overflow-hidden bg-papel-claro font-display text-tinta ${TAMANHOS_ESCUDO[tamanho]}`}
       title={time.nome}
       aria-hidden="true"
     >
-      <span
-        className="absolute inset-0"
-        style={{
-          background: `linear-gradient(135deg, ${time.cores[0]} 0 50%, ${time.cores[1]} 50% 100%)`,
-          opacity: 'var(--escudo-opacidade)',
-        }}
-      />
-      <span className="relative">{iniciais}</span>
+      {time.escudo ? (
+        <img src={time.escudo} alt="" loading="lazy" className="absolute inset-0 size-full object-contain p-[3px]" />
+      ) : (
+        <>
+          <span
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(135deg, ${time.cores[0]} 0 50%, ${time.cores[1]} 50% 100%)`,
+              opacity: 'var(--escudo-opacidade)',
+            }}
+          />
+          <span className="relative">{iniciais}</span>
+        </>
+      )}
     </span>
   )
 }
