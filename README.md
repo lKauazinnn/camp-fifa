@@ -51,12 +51,12 @@ placar e **todos os celulares atualizam sozinhos em menos de um segundo**, sem n
 
 ### Como o acesso é protegido
 
-O site é estático, então a chave anônima fica visível para qualquer visitante — o desenho parte desse
+O site é estático, então a chave publicável fica visível para qualquer visitante — o desenho parte desse
 princípio (tudo em `supabase/schema.sql`):
 
 | Quem | Pode |
 |---|---|
-| Qualquer visitante (chave anônima) | **só ler** o placar |
+| Qualquer visitante (chave publicável) | **só ler** o placar |
 | Organizador (com o PIN) | ler e gravar, através da função `salvar_campeonato` |
 
 - A tabela `campeonatos` tem apenas política de `SELECT`. Não existe política de escrita, então nem a chave
@@ -78,8 +78,12 @@ update public.segredos
 ### Configuração
 
 ```bash
-cp .env.example .env   # preencha com a URL e a chave anônima do seu projeto
+cp .env.example .env   # preencha com a URL e a chave publicável do seu projeto
 ```
+
+A chave fica em **Settings → API Keys**. Prefira a *publishable* (`sb_publishable_…`): com o app usando
+ela, as chaves legadas (`anon` e `service_role`) podem ser desativadas no painel, o que é bom porque a
+`service_role` ignora todas as regras de segurança se vazar.
 
 Na Vercel, cadastre as mesmas variáveis em **Settings → Environment Variables** e refaça o deploy. Sem elas
 o site continua funcionando, só que cada aparelho guarda a própria cópia.

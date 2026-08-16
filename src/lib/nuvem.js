@@ -13,7 +13,9 @@ import { createClient } from '@supabase/supabase-js'
  */
 
 const ENDERECO = import.meta.env.VITE_SUPABASE_URL
-const CHAVE_PUBLICA = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Aceita a chave publishable (sb_publishable_…, atual) ou a anônima legada.
+const CHAVE_PUBLICA =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY
 export const ID_CAMPEONATO = import.meta.env.VITE_CAMPEONATO_ID ?? 'unidos-acamp'
 
 export const nuvemConfigurada = Boolean(ENDERECO && CHAVE_PUBLICA)
