@@ -3,24 +3,51 @@ import { buscarTime } from '../data/times.js'
 import { ChaveVisual } from './ChaveVisual.jsx'
 import { Botao, Cartao, EscudoTime, EstadoVazio, TituloSecao } from './ui.jsx'
 
-function Posicao({ rotulo, participante, primeiro = false }) {
+function Posicao({ numero, rotulo, participante, primeiro = false }) {
   return (
-    <div className="flex items-center gap-3 px-4 py-3.5">
-      <span className={`num w-4 shrink-0 text-[13px] ${primeiro ? 'text-realce' : 'text-zinc-600'}`}>{rotulo}</span>
+    <div className="flex items-center gap-4 px-5 py-4">
+      <span className={`num font-serif text-2xl leading-none ${primeiro ? 'dourado' : 'text-perola-600'}`}>
+        {numero}
+      </span>
       {participante ? (
         <>
-          <EscudoTime timeId={participante.timeId} tamanho="sm" />
+          <EscudoTime timeId={participante.timeId} tamanho="sm" vencedor={primeiro} />
           <div className="min-w-0 flex-1">
-            <p className={`truncate text-[13px] ${primeiro ? 'font-medium text-zinc-100' : 'text-zinc-300'}`}>
+            <p className={`truncate text-[13px] ${primeiro ? 'text-perola-100' : 'text-perola-300'}`}>
               {participante.nome}
             </p>
-            <p className="truncate text-[11px] text-zinc-600">{buscarTime(participante.timeId).nome}</p>
+            <p className="truncate text-[11px] text-perola-600">{buscarTime(participante.timeId).nome}</p>
           </div>
+          <span className="rotulo shrink-0">{rotulo}</span>
         </>
       ) : (
-        <p className="text-[13px] text-zinc-600">A definir</p>
+        <>
+          <p className="flex-1 text-[13px] text-perola-600 italic">A definir</p>
+          <span className="rotulo shrink-0">{rotulo}</span>
+        </>
       )}
     </div>
+  )
+}
+
+function Consagracao({ campeao }) {
+  return (
+    <Cartao realce className="relative overflow-hidden px-6 py-8 text-center sm:px-10 sm:py-10">
+      <span
+        className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-[radial-gradient(50%_100%_at_50%_100%,rgba(227,200,140,0.22),transparent)]"
+        aria-hidden="true"
+      />
+      <div className="relative flex flex-col items-center gap-4">
+        <EscudoTime timeId={campeao.timeId} tamanho="lg" vencedor />
+        <div>
+          <p className="rotulo text-realce/80">Campeão do Unidos Acamp</p>
+          <h2 className="dourado mt-3 font-serif text-4xl leading-none sm:text-5xl">{campeao.nome}</h2>
+          <p className="mt-3 text-[13px] text-perola-400">
+            {buscarTime(campeao.timeId).nome} · leva os R$ 100,00
+          </p>
+        </div>
+      </div>
+    </Cartao>
   )
 }
 
@@ -29,8 +56,8 @@ export function Chaveamento({ torneio, aoEditarPartida, aoIrParaAdmin, somenteLe
     return (
       <EstadoVazio
         icone={Swords}
-        titulo="Chaveamento ainda não sorteado"
-        descricao="Cadastre os participantes no Painel Admin e faça o sorteio para gerar as chaves."
+        titulo="O chaveamento ainda não foi sorteado"
+        descricao="Cadastre os participantes no Painel Admin e faça o sorteio para gerar as chaves do mata-mata."
         acao={
           somenteLeitura ? null : (
             <Botao variante="contorno" onClick={aoIrParaAdmin}>
@@ -44,32 +71,24 @@ export function Chaveamento({ torneio, aoEditarPartida, aoIrParaAdmin, somenteLe
 
   return (
     <div className="space-y-6">
-      {torneio.campeao ? (
-        <Cartao className="flex items-center gap-4 border-realce/25 p-5">
-          <EscudoTime timeId={torneio.campeao.timeId} tamanho="lg" />
-          <div className="min-w-0">
-            <p className="rotulo text-realce">Campeão</p>
-            <h2 className="mt-1 truncate text-xl font-semibold text-zinc-50">{torneio.campeao.nome}</h2>
-            <p className="truncate text-[13px] text-zinc-500">
-              {buscarTime(torneio.campeao.timeId).nome} · prêmio de R$ 100,00
-            </p>
+      {torneio.campeao ? <Consagracao campeao={torneio.campeao} /> : null}
+
+      <div className="grid gap-6 lg:grid-cols-[300px_1fr] lg:items-start">
+        <Cartao className="overflow-hidden">
+          <div className="border-b border-borda px-5 py-4">
+            <h3 className="font-serif text-lg leading-none text-perola-100">Pódio</h3>
+            <p className="mt-2 text-[12px] text-perola-500">O terceiro lugar sai da repescagem.</p>
+          </div>
+          <div className="divide-y divide-borda/70">
+            <Posicao numero="1" rotulo="Campeão" participante={torneio.campeao} primeiro />
+            <Posicao numero="2" rotulo="Vice" participante={torneio.vice} />
+            <Posicao numero="3" rotulo="Terceiro" participante={torneio.terceiro} />
           </div>
         </Cartao>
-      ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-[280px_1fr] lg:items-start">
-        <Cartao className="divide-y divide-borda overflow-hidden">
-          <div className="px-4 py-3">
-            <h3 className="text-[13px] font-medium text-zinc-300">Classificação final</h3>
-          </div>
-          <Posicao rotulo="1" participante={torneio.campeao} primeiro />
-          <Posicao rotulo="2" participante={torneio.vice} />
-          <Posicao rotulo="3" participante={torneio.terceiro} />
-        </Cartao>
-
-        <Cartao className="p-4 sm:p-5">
+        <Cartao className="p-5 sm:p-7">
           <TituloSecao
-            className="mb-5"
+            className="mb-8"
             titulo="Chave principal"
             descricao={
               somenteLeitura
@@ -77,9 +96,13 @@ export function Chaveamento({ torneio, aoEditarPartida, aoIrParaAdmin, somenteLe
                 : 'Quem perde na primeira fase cai para a repescagem. Toque em um jogo para lançar o resultado.'
             }
             acao={
-              <span className="num shrink-0 text-[13px] text-zinc-500">
-                {torneio.partidasFinalizadas} de {torneio.totalPartidas} jogos
-              </span>
+              <div className="shrink-0 text-right">
+                <p className="num font-serif text-2xl leading-none text-perola-100">
+                  {torneio.partidasFinalizadas}
+                  <span className="text-perola-600">/{torneio.totalPartidas}</span>
+                </p>
+                <p className="rotulo mt-1.5">Jogos</p>
+              </div>
             }
           />
           <ChaveVisual rodadas={torneio.principal} aoEditar={aoEditarPartida} />

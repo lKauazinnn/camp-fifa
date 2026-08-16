@@ -1,43 +1,79 @@
 @import 'tailwindcss';
 
 /*
- * Paleta enxuta: preto quase puro, hairlines e um único acento verde.
- * Cores adicionais (âmbar, rosa) aparecem apenas onde carregam significado:
- * premiação e cartões.
+ * Meia-noite & Champanhe
+ * Fundo azul-noite profundo, superfícies em vidro fosco com um fio de luz no
+ * topo, e o dourado champanhe reservado para o que tem prestígio: premiação,
+ * campeão, vencedor da partida e estado ativo.
  */
 @theme {
-  --color-fundo: #08090b;
-  --color-superficie: #0d0e11;
-  --color-elevado: #131519;
-  --color-borda: #202329;
-  --color-borda-forte: #2c3037;
+  --color-fundo: #070810;
+  --color-superficie: #0c0e19;
+  --color-elevado: #131728;
+  --color-borda: #1e2133;
+  --color-borda-forte: #2f3350;
 
-  --color-realce: #3ecf8e;
-  --color-realce-claro: #7fe3b8;
-  --color-realce-escuro: #1f7a54;
+  --color-realce: #e3c88c;
+  --color-realce-claro: #f6e7c2;
+  --color-realce-escuro: #a8854a;
 
-  --font-sans:
-    'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --color-perola-100: #f4f1ea;
+  --color-perola-200: #dcdfe8;
+  --color-perola-300: #b9becd;
+  --color-perola-400: #8f95a9;
+  --color-perola-500: #676c81;
+  --color-perola-600: #474c5e;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
 }
 
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
-    scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-fundo font-sans text-zinc-300 antialiased;
+    @apply bg-fundo font-sans text-perola-300 antialiased;
     min-height: 100dvh;
     font-feature-settings: 'cv11', 'ss01';
+  }
+
+  /* Brilho ambiente: um halo dourado no topo e um roxo profundo à esquerda. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(58rem 30rem at 50% -14%, rgba(227, 200, 140, 0.11), transparent 62%),
+      radial-gradient(46rem 30rem at 4% -4%, rgba(96, 78, 168, 0.16), transparent 58%),
+      radial-gradient(40rem 26rem at 100% 6%, rgba(40, 62, 120, 0.14), transparent 60%);
+  }
+
+  /* Grão sutil: tira o aspecto "plástico" do fundo escuro. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.032;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
+  }
+
+  #root {
+    position: relative;
+    z-index: 1;
   }
 
   h1,
   h2,
   h3,
   h4 {
-    @apply text-zinc-100;
-    letter-spacing: -0.02em;
+    @apply text-perola-100;
   }
 
   input,
@@ -48,7 +84,7 @@
   }
 
   select option {
-    background-color: #131519;
+    background-color: #131728;
   }
 
   input[type='number']::-webkit-outer-spin-button,
@@ -65,33 +101,63 @@
   }
 
   :focus-visible {
-    outline: 1px solid var(--color-realce);
+    outline: 1px solid rgba(227, 200, 140, 0.6);
     outline-offset: 2px;
   }
 }
 
 @layer utilities {
-  /* Números alinhados em colunas (placares, tabelas) */
-  .num {
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.03em;
+  /* Superfície de vidro fosco com fio de luz no topo. */
+  .painel {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      0 26px 60px -42px rgba(0, 0, 0, 0.95);
   }
 
-  /* Micro-rótulo cinza usado acima de valores */
+  .painel-realce {
+    background-image: linear-gradient(180deg, rgba(227, 200, 140, 0.1), rgba(227, 200, 140, 0.012));
+    box-shadow:
+      inset 0 1px 0 rgba(246, 231, 194, 0.18),
+      0 26px 60px -42px rgba(0, 0, 0, 0.95);
+  }
+
+  /* Texto em degradê champanhe — reservado ao campeão e à premiação. */
+  .dourado {
+    background: linear-gradient(180deg, #f9edd2 0%, #e3c88c 55%, #b9975c 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .fio-ouro {
+    background: linear-gradient(
+      180deg,
+      rgba(227, 200, 140, 0) 0%,
+      rgba(246, 231, 194, 0.95) 50%,
+      rgba(227, 200, 140, 0) 100%
+    );
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
   .rotulo {
-    @apply text-[10px] font-medium tracking-[0.08em] text-zinc-500 uppercase;
+    @apply text-[10px] font-medium tracking-[0.16em] text-perola-500 uppercase;
   }
 
   .scrollbar-fina {
     scrollbar-width: thin;
-    scrollbar-color: #2c3037 transparent;
+    scrollbar-color: #2f3350 transparent;
   }
   .scrollbar-fina::-webkit-scrollbar {
     height: 6px;
     width: 6px;
   }
   .scrollbar-fina::-webkit-scrollbar-thumb {
-    background: #2c3037;
+    background: #2f3350;
     border-radius: 9999px;
   }
   .scrollbar-fina::-webkit-scrollbar-track {
@@ -108,7 +174,7 @@
   @keyframes surgir {
     from {
       opacity: 0;
-      transform: translateY(4px);
+      transform: translateY(6px);
     }
     to {
       opacity: 1;
@@ -116,19 +182,19 @@
     }
   }
   .animar-surgir {
-    animation: surgir 0.2s ease-out both;
+    animation: surgir 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
-  @keyframes pulsar {
+  @keyframes respirar {
     0%,
     100% {
       opacity: 1;
     }
     50% {
-      opacity: 0.35;
+      opacity: 0.3;
     }
   }
-  .animar-pulsar {
-    animation: pulsar 2.4s ease-in-out infinite;
+  .animar-respirar {
+    animation: respirar 2.6s ease-in-out infinite;
   }
 }

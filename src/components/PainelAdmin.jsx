@@ -6,7 +6,7 @@ import { Botao, Cartao, EscudoTime, Etiqueta, TituloSecao } from './ui.jsx'
 import { ModalConfirmacao } from './ModalConfirmacao.jsx'
 
 const CAMPO =
-  'w-full rounded-lg border border-borda bg-fundo px-3 py-2 text-[13px] text-zinc-200 placeholder:text-zinc-600 focus:border-borda-forte focus:outline-none'
+  'w-full rounded-xl border border-borda bg-fundo/60 px-3.5 py-2.5 text-[13px] text-perola-200 placeholder:text-perola-600 transition-colors focus:border-realce/40 focus:outline-none'
 
 /* -------------------------------------------------------------------------- */
 /* Cadastro                                                                   */
@@ -24,7 +24,7 @@ function FormularioParticipante({ aoCadastrar }) {
   }
 
   return (
-    <form onSubmit={enviar} className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+    <form onSubmit={enviar} className="grid gap-2.5 sm:grid-cols-[1fr_1fr_auto]">
       <input
         value={nome}
         onChange={(evento) => setNome(evento.target.value)}
@@ -32,7 +32,7 @@ function FormularioParticipante({ aoCadastrar }) {
         maxLength={40}
         className={CAMPO}
       />
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2.5">
         <EscudoTime timeId={timeId} tamanho="md" />
         <select value={timeId} onChange={(evento) => setTimeId(evento.target.value)} className={CAMPO}>
           {LIGAS.map((liga) => (
@@ -46,7 +46,7 @@ function FormularioParticipante({ aoCadastrar }) {
           ))}
         </select>
       </div>
-      <Botao type="submit" disabled={!nome.trim()} className="sm:px-5">
+      <Botao type="submit" disabled={!nome.trim()} className="sm:px-6">
         Adicionar
       </Botao>
     </form>
@@ -60,7 +60,7 @@ function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover }) {
 
   if (editando) {
     return (
-      <li className="grid gap-2 rounded-lg border border-borda-forte bg-elevado p-2 sm:grid-cols-[1fr_1fr_auto]">
+      <li className="grid gap-2.5 rounded-xl border border-realce/25 bg-realce/[0.04] p-2.5 sm:grid-cols-[1fr_1fr_auto]">
         <input value={nome} onChange={(evento) => setNome(evento.target.value)} className={CAMPO} />
         <select value={timeId} onChange={(evento) => setTimeId(evento.target.value)} className={CAMPO}>
           {TIMES.map((time) => (
@@ -69,7 +69,7 @@ function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover }) {
             </option>
           ))}
         </select>
-        <div className="flex gap-1.5">
+        <div className="flex gap-2">
           <Botao
             onClick={() => {
               if (nome.trim()) aoAtualizar(participante.id, { nome: nome.trim(), timeId })
@@ -87,18 +87,18 @@ function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover }) {
   }
 
   return (
-    <li className="group flex items-center gap-3 rounded-lg border border-transparent px-2 py-1.5 transition-colors hover:border-borda hover:bg-white/[0.02]">
-      <span className="num w-5 shrink-0 text-right text-[11px] text-zinc-600">{indice + 1}</span>
+    <li className="group flex items-center gap-3 rounded-xl border border-transparent px-2.5 py-2 transition-colors hover:border-borda hover:bg-white/[0.02]">
+      <span className="num w-5 shrink-0 text-right text-[11px] text-perola-600">{indice + 1}</span>
       <EscudoTime timeId={participante.timeId} tamanho="sm" />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[13px] text-zinc-200">{participante.nome}</p>
-        <p className="truncate text-[11px] text-zinc-600">{buscarTime(participante.timeId).nome}</p>
+        <p className="truncate text-[13px] text-perola-200">{participante.nome}</p>
+        <p className="truncate text-[11px] text-perola-600">{buscarTime(participante.timeId).nome}</p>
       </div>
       <div className="flex shrink-0 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
         <button
           type="button"
           onClick={() => setEditando(true)}
-          className="grid size-7 place-items-center rounded-md text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
+          className="grid size-8 place-items-center rounded-lg text-perola-500 transition-colors hover:bg-white/[0.06] hover:text-perola-100"
           aria-label={`Editar ${participante.nome}`}
         >
           <Pencil className="size-3.5" strokeWidth={1.75} />
@@ -106,7 +106,7 @@ function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover }) {
         <button
           type="button"
           onClick={() => aoRemover(participante)}
-          className="grid size-7 place-items-center rounded-md text-zinc-500 transition-colors hover:bg-rose-500/10 hover:text-rose-400"
+          className="grid size-8 place-items-center rounded-lg text-perola-500 transition-colors hover:bg-rose-500/10 hover:text-rose-300"
           aria-label={`Remover ${participante.nome}`}
         >
           <Trash2 className="size-3.5" strokeWidth={1.75} />
@@ -135,11 +135,11 @@ function ListaDeJogos({ torneio, aoEditarPartida }) {
   )
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {grupos.map((grupo) => (
         <div key={grupo.chave}>
-          <div className="mb-1.5 flex items-center gap-2 border-b border-borda pb-1.5">
-            <h4 className="text-[12px] font-medium text-zinc-400">{grupo.titulo}</h4>
+          <div className="mb-2 flex items-center gap-2.5 border-b border-borda pb-2">
+            <h4 className="font-serif text-[15px] leading-none text-perola-200">{grupo.titulo}</h4>
             {grupo.repescagem ? <Etiqueta tom="discreto">Repescagem</Etiqueta> : null}
           </div>
 
@@ -152,35 +152,39 @@ function ListaDeJogos({ torneio, aoEditarPartida }) {
                     type="button"
                     disabled={!disponivel}
                     onClick={() => aoEditarPartida(partida)}
-                    className={`flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors ${
-                      disponivel ? 'hover:bg-white/[0.03]' : 'cursor-not-allowed opacity-40'
+                    className={`flex w-full items-center gap-3 rounded-xl px-2.5 py-2.5 text-left transition-colors ${
+                      disponivel ? 'hover:bg-white/[0.04]' : 'cursor-not-allowed opacity-35'
                     }`}
                   >
-                    <span className="num w-4 shrink-0 text-[11px] text-zinc-600">{partida.numero}</span>
+                    <span className="num w-4 shrink-0 text-[11px] text-perola-600">{partida.numero}</span>
 
-                    <span className="min-w-0 flex-1 truncate text-[13px] text-zinc-300">
-                      {partida.a?.nome ?? <span className="text-zinc-600">A definir</span>}
+                    <span className="min-w-0 flex-1 truncate text-[13px] text-perola-300">
+                      {partida.a?.nome ?? <span className="text-perola-600 italic">A definir</span>}
                     </span>
 
-                    <span className="num shrink-0 text-[13px] text-zinc-400">
+                    <span
+                      className={`num shrink-0 font-serif text-[15px] ${
+                        partida.resultado ? 'text-realce' : 'text-perola-600'
+                      }`}
+                    >
                       {partida.resultado
-                        ? `${partida.resultado.golsA} : ${partida.resultado.golsB}`
+                        ? `${partida.resultado.golsA} · ${partida.resultado.golsB}`
                         : partida.status === 'bye'
                           ? '—'
-                          : '· : ·'}
+                          : '– · –'}
                     </span>
 
-                    <span className="min-w-0 flex-1 truncate text-right text-[13px] text-zinc-300">
-                      {partida.b?.nome ?? <span className="text-zinc-600">A definir</span>}
+                    <span className="min-w-0 flex-1 truncate text-right text-[13px] text-perola-300">
+                      {partida.b?.nome ?? <span className="text-perola-600 italic">A definir</span>}
                     </span>
 
                     <span className="hidden w-16 shrink-0 text-right sm:block">
                       {partida.status === 'finalizada' ? (
-                        <span className="text-[11px] text-realce">Lançado</span>
+                        <span className="rotulo text-realce/70">Lançado</span>
                       ) : partida.status === 'pronta' ? (
-                        <span className="text-[11px] text-amber-400">Lançar</span>
+                        <span className="rotulo text-amber-300/80">Lançar</span>
                       ) : (
-                        <span className="text-[11px] text-zinc-600">—</span>
+                        <span className="rotulo">—</span>
                       )}
                     </span>
                   </button>
@@ -220,33 +224,33 @@ function BlocoDados({ acoes, salvamento, temDados }) {
   }
 
   return (
-    <Cartao className="p-4 sm:p-5">
+    <Cartao className="p-5 sm:p-7">
       <TituloSecao
-        className="mb-4"
+        className="mb-6"
         titulo="Dados e backup"
         descricao="Tudo é salvo automaticamente neste navegador e sobrevive a atualizar a página. O backup em arquivo protege contra limpeza de cache ou troca de aparelho."
       />
 
-      <div className="mb-4 flex items-center gap-2 rounded-lg border border-borda bg-fundo px-3 py-2">
+      <div className="mb-5 flex items-center gap-2.5 rounded-xl border border-borda bg-fundo/50 px-4 py-3">
         {salvamento.falhou ? (
           <>
-            <span className="size-1.5 shrink-0 rounded-full bg-rose-500" />
-            <p className="text-[12px] text-rose-400">
+            <span className="size-1.5 shrink-0 rounded-full bg-rose-400" />
+            <p className="text-[12px] text-rose-300">
               O navegador bloqueou o armazenamento (janela anônima?). Baixe um backup antes de fechar a página.
             </p>
           </>
         ) : (
           <>
-            <span className="size-1.5 shrink-0 rounded-full bg-realce" />
-            <p className="text-[12px] text-zinc-500">
+            <span className="animar-respirar size-1.5 shrink-0 rounded-full bg-realce" />
+            <p className="text-[12px] text-perola-500">
               Salvo automaticamente
-              {salvamento.em ? <span className="text-zinc-400"> · {formatarHorario(salvamento.em)}</span> : null}
+              {salvamento.em ? <span className="text-perola-300"> · {formatarHorario(salvamento.em)}</span> : null}
             </p>
           </>
         )}
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2.5">
         <Botao variante="contorno" icone={Download} onClick={acoes.exportarBackup} disabled={!temDados}>
           Baixar backup
         </Botao>
@@ -268,15 +272,15 @@ function BlocoDados({ acoes, salvamento, temDados }) {
       </div>
 
       {aviso ? (
-        <p className={`mt-3 flex items-center gap-1.5 text-[12px] ${aviso.erro ? 'text-rose-400' : 'text-realce'}`}>
+        <p className={`mt-4 flex items-center gap-2 text-[12px] ${aviso.erro ? 'text-rose-300' : 'text-realce'}`}>
           {aviso.erro ? null : <Check className="size-3.5" strokeWidth={2} />}
           {aviso.texto}
         </p>
       ) : null}
 
-      <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">
-        O link do placar carrega uma cópia dos resultados dentro do próprio endereço — quem abrir vê o campeonato
-        como está agora, em modo somente leitura. Gere um link novo depois de lançar mais jogos.
+      <p className="mt-4 max-w-2xl text-[12px] leading-relaxed text-perola-600">
+        O link do placar carrega uma cópia dos resultados dentro do próprio endereço — quem abrir vê o campeonato como
+        está agora, em modo somente leitura. Gere um link novo depois de lançar mais jogos.
       </p>
     </Cartao>
   )
@@ -293,7 +297,7 @@ export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, sa
   const pedir = (config) => setConfirmacao(config)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <ModalConfirmacao
         aberto={Boolean(confirmacao)}
         titulo={confirmacao?.titulo ?? ''}
@@ -305,18 +309,23 @@ export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, sa
       />
 
       {/* Participantes */}
-      <Cartao className="p-4 sm:p-5">
+      <Cartao className="p-5 sm:p-7">
         <TituloSecao
-          className="mb-4"
+          className="mb-6"
           titulo="Participantes"
           descricao="Cadastre cada jovem e o time que ele vai usar no FIFA."
-          acao={<span className="num shrink-0 text-[13px] text-zinc-500">{participantes.length} inscritos</span>}
+          acao={
+            <div className="shrink-0 text-right">
+              <p className="num font-serif text-2xl leading-none text-perola-100">{participantes.length}</p>
+              <p className="rotulo mt-1.5">Inscritos</p>
+            </div>
+          }
         />
 
         <FormularioParticipante aoCadastrar={acoes.adicionarParticipante} />
 
         {participantes.length ? (
-          <ul className="mt-4 grid gap-0.5 lg:grid-cols-2">
+          <ul className="mt-5 grid gap-1 lg:grid-cols-2">
             {participantes.map((participante, indice) => (
               <LinhaParticipante
                 key={participante.id}
@@ -337,16 +346,16 @@ export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, sa
             ))}
           </ul>
         ) : (
-          <p className="mt-4 rounded-lg border border-dashed border-borda px-4 py-8 text-center text-[13px] text-zinc-600">
+          <p className="mt-5 rounded-xl border border-dashed border-borda px-4 py-10 text-center text-[13px] text-perola-600">
             Nenhum participante cadastrado.
           </p>
         )}
       </Cartao>
 
       {/* Sorteio */}
-      <Cartao className="p-4 sm:p-5">
+      <Cartao className="p-5 sm:p-7">
         <TituloSecao
-          className="mb-4"
+          className="mb-6"
           titulo="Sorteio"
           descricao={
             podeSortear
@@ -354,7 +363,7 @@ export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, sa
               : 'Cadastre pelo menos 4 participantes para sortear as chaves.'
           }
         />
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2.5">
           <Botao
             disabled={!podeSortear}
             onClick={() =>
@@ -390,21 +399,25 @@ export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, sa
       </Cartao>
 
       {/* Resultados */}
-      <Cartao className="p-4 sm:p-5">
+      <Cartao className="p-5 sm:p-7">
         <TituloSecao
-          className="mb-4"
+          className="mb-6"
           titulo="Resultados"
           descricao="Clique em um jogo liberado para registrar placar, cartões e pênaltis."
           acao={
-            <span className="num shrink-0 text-[13px] text-zinc-500">
-              {torneio.partidasFinalizadas}/{torneio.totalPartidas}
-            </span>
+            <div className="shrink-0 text-right">
+              <p className="num font-serif text-2xl leading-none text-perola-100">
+                {torneio.partidasFinalizadas}
+                <span className="text-perola-600">/{torneio.totalPartidas}</span>
+              </p>
+              <p className="rotulo mt-1.5">Lançados</p>
+            </div>
           }
         />
         {torneio.ativo ? (
           <ListaDeJogos torneio={torneio} aoEditarPartida={aoEditarPartida} />
         ) : (
-          <p className="rounded-lg border border-dashed border-borda px-4 py-8 text-center text-[13px] text-zinc-600">
+          <p className="rounded-xl border border-dashed border-borda px-4 py-10 text-center text-[13px] text-perola-600">
             Faça o sorteio para liberar os jogos.
           </p>
         )}
@@ -413,9 +426,9 @@ export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, sa
       <BlocoDados acoes={acoes} salvamento={salvamento} temDados={participantes.length > 0} />
 
       {/* Reinício */}
-      <Cartao className="p-4 sm:p-5">
-        <TituloSecao className="mb-4" titulo="Reiniciar" descricao="Ações que apagam dados do campeonato." />
-        <div className="flex flex-wrap gap-2">
+      <Cartao className="p-5 sm:p-7">
+        <TituloSecao className="mb-6" titulo="Reiniciar" descricao="Ações que apagam dados do campeonato." />
+        <div className="flex flex-wrap gap-2.5">
           <Botao
             variante="contorno"
             onClick={() =>

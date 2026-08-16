@@ -13,17 +13,17 @@ export function ModalConfirmacao({
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4"
+      className="fixed inset-0 z-50 grid place-items-center bg-black/75 p-4 backdrop-blur-[2px]"
       role="dialog"
       aria-modal="true"
       onMouseDown={(evento) => {
         if (evento.target === evento.currentTarget) aoFechar()
       }}
     >
-      <div className="animar-surgir w-full max-w-sm rounded-xl border border-borda bg-superficie p-5">
-        <h2 className="text-[15px] font-medium text-zinc-100">{titulo}</h2>
-        <p className="mt-2 text-[13px] leading-relaxed text-zinc-500">{descricao}</p>
-        <div className="mt-5 flex justify-end gap-2">
+      <div className="painel animar-surgir w-full max-w-sm rounded-2xl border border-borda-forte/60 bg-superficie p-6">
+        <h2 className="font-serif text-xl leading-none text-perola-100">{titulo}</h2>
+        <p className="mt-3 text-[13px] leading-relaxed text-perola-400">{descricao}</p>
+        <div className="mt-6 flex justify-end gap-2">
           <Botao variante="contorno" onClick={aoFechar}>
             Cancelar
           </Botao>

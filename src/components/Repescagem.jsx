@@ -15,56 +15,61 @@ export function Repescagem({ torneio, aoEditarPartida, somenteLeitura }) {
   }
 
   const decisao = torneio.repescagem.at(-1)?.partidas[0] ?? null
+  const disputados = torneio.repescagem.reduce(
+    (total, rodada) => total + rodada.partidas.filter((partida) => partida.status === 'finalizada').length,
+    0,
+  )
+  const totais = torneio.repescagem.reduce(
+    (total, rodada) =>
+      total + rodada.partidas.filter((partida) => partida.status !== 'vazia' && partida.status !== 'bye').length,
+    0,
+  )
 
   return (
-    <div className="space-y-4">
-      <Cartao className="p-4 sm:p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="max-w-xl">
-            <h2 className="text-[15px] font-semibold text-zinc-100">Chave dos eliminados</h2>
-            <p className="mt-1.5 text-[13px] leading-relaxed text-zinc-500">
-              Ninguém joga uma partida só. Todos os eliminados da primeira fase caem automaticamente nesta chave e
-              seguem se enfrentando — quem vencer tudo aqui fica com o terceiro lugar.
-            </p>
-          </div>
+    <div className="space-y-6">
+      <div className="grid gap-6 lg:grid-cols-[1fr_300px] lg:items-start">
+        <Cartao className="p-5 sm:p-7">
+          <h2 className="font-serif text-2xl leading-none text-perola-100">Segunda chance</h2>
+          <p className="mt-4 max-w-xl text-[13px] leading-relaxed text-perola-400">
+            Ninguém viaja para o acampamento para jogar uma partida só. Todos os eliminados da primeira fase caem
+            automaticamente nesta chave e seguem se enfrentando — quem vencer tudo aqui termina o campeonato em{' '}
+            <span className="text-realce">terceiro lugar</span>.
+          </p>
+        </Cartao>
 
-          <div className="shrink-0 rounded-lg border border-borda bg-elevado px-4 py-3">
-            <p className="rotulo">Terceiro lugar</p>
-            {torneio.terceiro ? (
-              <div className="mt-1.5 flex items-center gap-2.5">
-                <EscudoTime timeId={torneio.terceiro.timeId} tamanho="sm" />
-                <div className="min-w-0">
-                  <p className="truncate text-[13px] font-medium text-zinc-100">{torneio.terceiro.nome}</p>
-                  <p className="truncate text-[11px] text-zinc-600">{buscarTime(torneio.terceiro.timeId).nome}</p>
-                </div>
+        <Cartao realce={Boolean(torneio.terceiro)} className="p-5">
+          <p className="rotulo">Terceiro lugar</p>
+          {torneio.terceiro ? (
+            <div className="mt-4 flex items-center gap-3">
+              <EscudoTime timeId={torneio.terceiro.timeId} tamanho="md" vencedor />
+              <div className="min-w-0">
+                <p className="truncate font-serif text-xl leading-none text-perola-100">{torneio.terceiro.nome}</p>
+                <p className="mt-1.5 truncate text-[11px] text-perola-500">
+                  {buscarTime(torneio.terceiro.timeId).nome}
+                </p>
               </div>
-            ) : (
-              <p className="mt-1.5 text-[13px] text-zinc-600">
-                {decisao ? 'Definido na última rodada da repescagem' : 'A definir'}
-              </p>
-            )}
-          </div>
-        </div>
-      </Cartao>
+            </div>
+          ) : (
+            <p className="mt-4 text-[13px] leading-relaxed text-perola-500 italic">
+              {decisao ? 'Decidido na última rodada da repescagem.' : 'A definir.'}
+            </p>
+          )}
+        </Cartao>
+      </div>
 
-      <Cartao className="p-4 sm:p-5">
+      <Cartao className="p-5 sm:p-7">
         <TituloSecao
-          className="mb-5"
-          titulo="Repescagem"
+          className="mb-8"
+          titulo="Chave da repescagem"
           descricao={somenteLeitura ? null : 'Toque em um jogo para lançar o resultado.'}
           acao={
-            <span className="num shrink-0 text-[13px] text-zinc-500">
-              {torneio.repescagem.reduce(
-                (total, rodada) => total + rodada.partidas.filter((p) => p.status === 'finalizada').length,
-                0,
-              )}{' '}
-              de{' '}
-              {torneio.repescagem.reduce(
-                (total, rodada) => total + rodada.partidas.filter((p) => p.status !== 'vazia' && p.status !== 'bye').length,
-                0,
-              )}{' '}
-              jogos
-            </span>
+            <div className="shrink-0 text-right">
+              <p className="num font-serif text-2xl leading-none text-perola-100">
+                {disputados}
+                <span className="text-perola-600">/{totais}</span>
+              </p>
+              <p className="rotulo mt-1.5">Jogos</p>
+            </div>
           }
         />
         <ChaveVisual rodadas={torneio.repescagem} aoEditar={aoEditarPartida} />

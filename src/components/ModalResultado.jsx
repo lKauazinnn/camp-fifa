@@ -9,12 +9,12 @@ function CampoNumero({ rotulo, valor, aoMudar, maximo = 99, destaque = false }) 
 
   return (
     <div>
-      <p className="rotulo mb-1.5 text-center">{rotulo}</p>
-      <div className="flex items-center rounded-lg border border-borda bg-fundo">
+      <p className="rotulo mb-2 text-center">{rotulo}</p>
+      <div className="flex items-center rounded-xl border border-borda bg-fundo/60">
         <button
           type="button"
           onClick={() => ajustar(-1)}
-          className="grid size-9 shrink-0 place-items-center rounded-l-lg text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
+          className="grid size-9 shrink-0 place-items-center rounded-l-xl text-perola-500 transition-colors hover:bg-white/[0.06] hover:text-perola-100"
           aria-label={`Diminuir ${rotulo}`}
         >
           <Minus className="size-3.5" strokeWidth={2} />
@@ -29,14 +29,14 @@ function CampoNumero({ rotulo, valor, aoMudar, maximo = 99, destaque = false }) 
             const numero = Number.parseInt(evento.target.value, 10)
             aoMudar(Number.isFinite(numero) ? Math.min(maximo, Math.max(0, numero)) : 0)
           }}
-          className={`num w-full min-w-0 bg-transparent py-1.5 text-center text-[15px] outline-none ${
-            destaque ? 'font-medium text-zinc-50' : 'text-zinc-300'
+          className={`num w-full min-w-0 bg-transparent py-2 text-center font-serif text-xl outline-none ${
+            destaque ? 'text-realce' : 'text-perola-200'
           }`}
         />
         <button
           type="button"
           onClick={() => ajustar(1)}
-          className="grid size-9 shrink-0 place-items-center rounded-r-lg text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
+          className="grid size-9 shrink-0 place-items-center rounded-r-xl text-perola-500 transition-colors hover:bg-white/[0.06] hover:text-perola-100"
           aria-label={`Aumentar ${rotulo}`}
         >
           <Plus className="size-3.5" strokeWidth={2} />
@@ -48,17 +48,17 @@ function CampoNumero({ rotulo, valor, aoMudar, maximo = 99, destaque = false }) 
 
 function Lado({ participante, prefixo, formulario, atualizar, vencedor }) {
   return (
-    <div className="rounded-lg border border-borda p-3">
-      <div className="mb-3 flex items-center gap-2.5">
-        <EscudoTime timeId={participante.timeId} tamanho="md" />
+    <div className={`rounded-2xl border p-4 transition-colors ${vencedor ? 'border-realce/30 bg-realce/[0.04]' : 'border-borda'}`}>
+      <div className="mb-4 flex items-center gap-3">
+        <EscudoTime timeId={participante.timeId} tamanho="md" vencedor={vencedor} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[13px] font-medium text-zinc-100">{participante.nome}</p>
-          <p className="truncate text-[11px] text-zinc-500">{buscarTime(participante.timeId).nome}</p>
+          <p className="truncate text-[14px] text-perola-100">{participante.nome}</p>
+          <p className="truncate text-[11px] text-perola-500">{buscarTime(participante.timeId).nome}</p>
         </div>
-        {vencedor ? <span className="shrink-0 text-[11px] text-realce">Vence</span> : null}
+        {vencedor ? <span className="rotulo shrink-0 text-realce">Vence</span> : null}
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-2.5">
         <CampoNumero
           rotulo="Gols"
           destaque
@@ -119,7 +119,7 @@ export function ModalResultado({ partida, aoSalvar, aoLimpar, aoFechar }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 backdrop-blur-[2px] sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-label={`Resultado do jogo ${partida.numero}`}
@@ -127,42 +127,37 @@ export function ModalResultado({ partida, aoSalvar, aoLimpar, aoFechar }) {
         if (evento.target === evento.currentTarget) aoFechar()
       }}
     >
-      <div className="animar-surgir max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-borda bg-superficie sm:rounded-xl">
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-borda bg-superficie px-4 py-3">
+      <div className="painel animar-surgir max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-3xl border border-borda-forte/60 bg-superficie sm:rounded-2xl">
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-borda bg-superficie/95 px-5 py-4 backdrop-blur">
           <div className="min-w-0">
-            <p className="rotulo">{partida.fase}</p>
-            <h2 className="mt-0.5 truncate text-[15px] font-medium text-zinc-100">Jogo {partida.numero}</h2>
+            <p className="rotulo text-realce/70">{partida.fase}</p>
+            <h2 className="mt-1.5 truncate font-serif text-xl leading-none text-perola-100">Jogo {partida.numero}</h2>
           </div>
           <button
             type="button"
             onClick={aoFechar}
-            className="grid size-8 shrink-0 place-items-center rounded-lg text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
+            className="grid size-9 shrink-0 place-items-center rounded-xl text-perola-500 transition-colors hover:bg-white/[0.06] hover:text-perola-100"
             aria-label="Fechar"
           >
             <X className="size-4" strokeWidth={1.75} />
           </button>
         </header>
 
-        <div className="space-y-2.5 p-4">
-          <Lado
-            participante={partida.a}
-            prefixo="A"
-            formulario={formulario}
-            atualizar={atualizar}
-            vencedor={vencedorA}
-          />
-          <Lado
-            participante={partida.b}
-            prefixo="B"
-            formulario={formulario}
-            atualizar={atualizar}
-            vencedor={vencedorB}
-          />
+        <div className="space-y-3 p-5">
+          <Lado participante={partida.a} prefixo="A" formulario={formulario} atualizar={atualizar} vencedor={vencedorA} />
+
+          <div className="flex items-center gap-3 py-0.5">
+            <span className="h-px flex-1 bg-borda" />
+            <span className="rotulo">contra</span>
+            <span className="h-px flex-1 bg-borda" />
+          </div>
+
+          <Lado participante={partida.b} prefixo="B" formulario={formulario} atualizar={atualizar} vencedor={vencedorB} />
 
           {empate ? (
-            <div className="rounded-lg border border-borda p-3">
-              <p className="rotulo mb-2.5 text-center">Empate · decisão por pênaltis</p>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-2xl border border-borda p-4">
+              <p className="rotulo mb-3 text-center">Empate · decisão por pênaltis</p>
+              <div className="grid grid-cols-2 gap-2.5">
                 <CampoNumero
                   rotulo={partida.a.nome.split(' ')[0]}
                   maximo={20}
@@ -177,19 +172,19 @@ export function ModalResultado({ partida, aoSalvar, aoLimpar, aoFechar }) {
                 />
               </div>
               {!valido ? (
-                <p className="mt-2.5 text-center text-[12px] text-amber-400">
+                <p className="mt-3 text-center text-[12px] text-amber-300">
                   Informe placares diferentes nos pênaltis para definir quem avança.
                 </p>
               ) : null}
             </div>
           ) : null}
 
-          <p className="pt-1 text-center text-[12px] leading-relaxed text-zinc-600">
+          <p className="pt-1 text-center text-[12px] leading-relaxed text-perola-600">
             Ao salvar, o vencedor avança e o perdedor da primeira fase cai na repescagem.
           </p>
         </div>
 
-        <footer className="sticky bottom-0 flex items-center gap-2 border-t border-borda bg-superficie px-4 py-3">
+        <footer className="sticky bottom-0 flex items-center gap-2 border-t border-borda bg-superficie/95 px-5 py-4 backdrop-blur">
           {partida.resultado ? (
             <Botao
               variante="fantasma"
@@ -206,7 +201,7 @@ export function ModalResultado({ partida, aoSalvar, aoLimpar, aoFechar }) {
               Cancelar
             </Botao>
             <Botao variante="primario" onClick={salvar} disabled={!valido}>
-              Salvar
+              Salvar resultado
             </Botao>
           </div>
         </footer>

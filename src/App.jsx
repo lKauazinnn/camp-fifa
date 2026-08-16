@@ -21,17 +21,17 @@ const ABAS = [
 
 function FaixaSomenteLeitura({ acoes }) {
   return (
-    <div className="border-b border-borda bg-elevado">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-2.5 sm:px-6">
-        <Eye className="size-4 shrink-0 text-zinc-500" strokeWidth={1.75} />
-        <p className="min-w-0 flex-1 text-[12px] text-zinc-400">
+    <div className="border-b border-realce/20 bg-realce/[0.06]">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-5 py-3 sm:px-8">
+        <Eye className="size-4 shrink-0 text-realce/70" strokeWidth={1.75} />
+        <p className="min-w-0 flex-1 text-[12px] text-perola-300">
           Você está vendo um placar compartilhado. Nada aqui altera o campeonato salvo neste aparelho.
         </p>
         <div className="flex gap-2">
-          <Botao variante="contorno" onClick={acoes.adotarSnapshot} className="px-3 py-1.5 text-[12px]">
+          <Botao variante="contorno" onClick={acoes.adotarSnapshot} className="px-3.5 py-1.5 text-[12px]">
             Usar como meu campeonato
           </Botao>
-          <Botao variante="fantasma" onClick={acoes.sairDoSnapshot} className="px-3 py-1.5 text-[12px]">
+          <Botao variante="fantasma" onClick={acoes.sairDoSnapshot} className="px-3.5 py-1.5 text-[12px]">
             Sair
           </Botao>
         </div>
@@ -59,7 +59,7 @@ export default function App() {
 
       <Navegacao abas={abas} abaAtiva={abaAtiva} aoTrocar={setAbaAtiva} />
 
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+      <main className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
         <div key={abaAtiva} className="animar-surgir">
           {abaAtiva === 'chaveamento' ? (
             <Chaveamento
@@ -90,10 +90,14 @@ export default function App() {
         </div>
       </main>
 
-      <footer className="mt-8 border-t border-borda">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-5 text-[12px] text-zinc-600 sm:px-6">
-          <span>Unidos Acamp · Campeonato FIFA</span>
-          <span>{somenteLeitura ? 'Modo visualização' : 'Dados salvos neste navegador'}</span>
+      <footer className="mt-10 border-t border-borda">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-5 py-6 sm:px-8">
+          <p className="font-serif text-[15px] text-perola-300">
+            Unidos Acamp <span className="text-perola-600">· Campeonato FIFA</span>
+          </p>
+          <p className="text-[12px] text-perola-600">
+            {somenteLeitura ? 'Modo visualização' : 'Dados salvos automaticamente neste navegador'}
+          </p>
         </div>
       </footer>
 

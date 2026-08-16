@@ -3,6 +3,7 @@ import { Cartao } from './ui.jsx'
 
 const BLOCOS = [
   {
+    numero: '01',
     titulo: 'Formato',
     itens: [
       'Mata-mata direto: quem perde na chave principal está fora dela.',
@@ -12,6 +13,7 @@ const BLOCOS = [
     ],
   },
   {
+    numero: '02',
     titulo: 'Repescagem',
     itens: [
       'Todos os eliminados da primeira fase entram na chave de repescagem.',
@@ -20,7 +22,8 @@ const BLOCOS = [
     ],
   },
   {
-    titulo: 'Configuração das partidas',
+    numero: '03',
+    titulo: 'Partidas',
     itens: [
       'Seis minutos por tempo, nível Profissional.',
       'Lesões e desgaste desativados, velocidade normal.',
@@ -29,6 +32,7 @@ const BLOCOS = [
     ],
   },
   {
+    numero: '04',
     titulo: 'Empates',
     itens: [
       'Não existe empate no mata-mata: empatou, vai direto para os pênaltis.',
@@ -37,6 +41,7 @@ const BLOCOS = [
     ],
   },
   {
+    numero: '05',
     titulo: 'Disciplina',
     itens: [
       `${LIMITE_AMARELOS} amarelos acumulados geram suspensão no jogo seguinte.`,
@@ -46,6 +51,7 @@ const BLOCOS = [
     ],
   },
   {
+    numero: '06',
     titulo: 'Convivência',
     itens: [
       'Competição saudável: joga para ganhar, torce para todos.',
@@ -58,26 +64,29 @@ const BLOCOS = [
 
 export function Regras() {
   return (
-    <div className="space-y-4">
-      <Cartao className="flex flex-wrap items-center justify-between gap-4 p-5">
+    <div className="space-y-6">
+      <Cartao realce className="flex flex-wrap items-end justify-between gap-6 p-6 sm:p-8">
         <div>
-          <p className="rotulo">Premiação</p>
-          <h2 className="num mt-1 text-2xl font-semibold text-zinc-50">R$ 100,00</h2>
-          <p className="mt-1 text-[13px] text-zinc-500">Entregues ao campeão na noite de encerramento.</p>
+          <p className="rotulo text-realce/80">Premiação</p>
+          <h2 className="num dourado mt-3 font-serif text-5xl leading-none">R$ 100,00</h2>
+          <p className="mt-3 text-[13px] text-perola-400">Entregues ao campeão na noite de encerramento.</p>
         </div>
-        <p className="max-w-xs text-[13px] leading-relaxed text-zinc-500">
+        <p className="max-w-xs text-[13px] leading-relaxed text-perola-400">
           Vice-campeão e terceiro colocado recebem a medalha simbólica do Unidos Acamp.
         </p>
       </Cartao>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {BLOCOS.map(({ titulo, itens }) => (
-          <Cartao key={titulo} className="p-5">
-            <h3 className="text-[13px] font-medium text-zinc-200">{titulo}</h3>
-            <ul className="mt-3 space-y-2.5">
+        {BLOCOS.map(({ numero, titulo, itens }) => (
+          <Cartao key={titulo} className="p-6">
+            <div className="flex items-baseline gap-3">
+              <span className="num font-serif text-lg text-realce/50">{numero}</span>
+              <h3 className="font-serif text-xl leading-none text-perola-100">{titulo}</h3>
+            </div>
+            <ul className="mt-5 space-y-3">
               {itens.map((item) => (
-                <li key={item} className="flex gap-2.5 text-[13px] leading-relaxed text-zinc-400">
-                  <span className="mt-[7px] size-1 shrink-0 rounded-full bg-zinc-700" />
+                <li key={item} className="flex gap-3 text-[13px] leading-relaxed text-perola-400">
+                  <span className="mt-[7px] size-1 shrink-0 rounded-full bg-realce/40" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -86,7 +95,7 @@ export function Regras() {
         ))}
       </div>
 
-      <p className="px-1 text-[12px] leading-relaxed text-zinc-600">
+      <p className="px-1 text-[12px] leading-relaxed text-perola-600">
         Casos omissos são resolvidos pela organização do Unidos Acamp. A decisão da mesa é final.
       </p>
     </div>
