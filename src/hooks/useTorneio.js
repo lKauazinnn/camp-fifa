@@ -43,10 +43,6 @@ function comCamposNovos(estado) {
   return { timesDoUsuario: [], ...estado }
 }
 
-function temConteudo(estado) {
-  return Boolean(estado?.participantes?.length)
-}
-
 function lerPinGuardado() {
   try {
     return window.sessionStorage.getItem(CHAVE_PIN) || null
@@ -66,7 +62,11 @@ export function useTorneio() {
   const [estado, setEstado] = useState(() => {
     if (snapshot) return comCamposNovos(snapshot)
     const salvo = lerEstadoSalvo()
-    return comCamposNovos(salvo ? salvo.estado : clonarExemplo())
+    if (salvo) return comCamposNovos(salvo.estado)
+    // O campeonato de exemplo só faz sentido sem nuvem. Com nuvem ligada, o
+    // estado real chega do servidor logo em seguida — mostrar 16 jogadores
+    // fictícios no lugar da lista de inscritos seria pior do que mostrar nada.
+    return comCamposNovos(nuvemConfigurada ? ESTADO_VAZIO : clonarExemplo())
   })
 
   const [salvamento, setSalvamento] = useState(() => {
@@ -118,9 +118,9 @@ export function useTorneio() {
         // Ignora o eco da própria gravação.
         if (remoto.versao === versaoRef.current) return
         versaoRef.current = remoto.versao
-        if (temConteudo(remoto.estado)) {
-          setEstado(comCamposNovos(validarEstado(remoto.estado) ?? ESTADO_VAZIO))
-        }
+        // O servidor é a fonte da verdade, inclusive quando está vazio: se a
+        // organização apagou tudo, os aparelhos precisam apagar também.
+        setEstado(comCamposNovos(validarEstado(remoto.estado) ?? ESTADO_VAZIO))
       } catch (erro) {
         if (ativo) setNuvem((atual) => ({ ...atual, erro: erro.message }))
       }
@@ -226,18 +226,6 @@ export function useTorneio() {
       /* sem sessionStorage o PIN vale só enquanto a aba estiver aberta */
     }
     setPin(tentativa)
-
-    // Primeira vez: se a nuvem está vazia e há campeonato aqui, publica.
-    try {
-      const remoto = await lerDaNuvem()
-      if (remoto && !temConteudo(remoto.estado) && temConteudo(estadoRef.current)) {
-        const resultado = await gravarNaNuvem(estadoRef.current, tentativa)
-        versaoRef.current = resultado.versao
-        setNuvem((atual) => ({ ...atual, versao: resultado.versao, atualizadoEm: resultado.atualizadoEm }))
-      }
-    } catch {
-      /* falha aqui não impede o destravamento */
-    }
     return true
   }, [])
 

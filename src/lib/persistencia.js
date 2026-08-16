@@ -55,7 +55,13 @@ export function validarEstado(bruto) {
   const participantes = Array.isArray(bruto.participantes)
     ? bruto.participantes
         .filter((item) => item && typeof item.id === 'string' && typeof item.nome === 'string')
-        .map((item) => ({ id: item.id, nome: item.nome, timeId: String(item.timeId ?? 'sem-time') }))
+        .map((item) => ({
+          id: item.id,
+          nome: item.nome,
+          timeId: String(item.timeId ?? 'sem-time'),
+          // Carimbo de quando a pessoa se inscreveu pelo QR, quando existir.
+          ...(typeof item.em === 'string' ? { em: item.em } : {}),
+        }))
     : []
 
   const idsValidos = new Set(participantes.map((participante) => participante.id))

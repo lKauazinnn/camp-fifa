@@ -1,139 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Check, Download, Link2, Pencil, Trash2, Upload } from 'lucide-react'
-import { useTimes } from '../contexto/TimesContexto.jsx'
+import { useMemo, useRef, useState } from 'react'
+import { Check, Download, Link2, Upload } from 'lucide-react'
 import { formatarHorario } from '../lib/persistencia.js'
-import { Botao, BotaoTexto, Cartao, EscudoTime, Etiqueta, TituloSecao } from './ui.jsx'
+import { Botao, BotaoTexto, Cartao, Etiqueta, TituloSecao } from './ui.jsx'
 import { ModalConfirmacao } from './ModalConfirmacao.jsx'
 import { GerenciadorDeTimes } from './GerenciadorDeTimes.jsx'
 import { BarraDoOrganizador, Destravar } from './Destravar.jsx'
 import { QrInscricao } from './QrInscricao.jsx'
 import { SorteioDeTimes } from './SorteioDeTimes.jsx'
-
-const CAMPO =
-  'contorno w-full rounded-lg bg-papel-claro px-3 py-2.5 text-[14px] font-medium placeholder:text-tinta-fraca focus:bg-lima/20 focus:outline-none'
-
-/* -------------------------------------------------------------------------- */
-/* Cadastro                                                                   */
-/* -------------------------------------------------------------------------- */
-
-function FormularioParticipante({ aoCadastrar, ocupados }) {
-  const { times, ligas } = useTimes()
-  const livres = times.filter((time) => !ocupados.has(time.id))
-  const [nome, setNome] = useState('')
-  const [timeId, setTimeId] = useState(livres[0]?.id ?? times[0].id)
-
-  // Se o time selecionado for tomado (pelo QR, por exemplo), pula para outro livre.
-  useEffect(() => {
-    if (ocupados.has(timeId)) setTimeId(livres[0]?.id ?? '')
-  }, [ocupados, timeId, livres])
-
-  const enviar = (evento) => {
-    evento.preventDefault()
-    if (!nome.trim() || !timeId) return
-    aoCadastrar({ nome, timeId })
-    setNome('')
-  }
-
-  return (
-    <form onSubmit={enviar} className="grid gap-2.5 sm:grid-cols-[1fr_1fr_auto]">
-      <input
-        value={nome}
-        onChange={(evento) => setNome(evento.target.value)}
-        placeholder="Nome do jogador"
-        maxLength={40}
-        className={CAMPO}
-      />
-      <div className="flex items-center gap-2.5">
-        <EscudoTime timeId={timeId} tamanho="md" />
-        <select value={timeId} onChange={(evento) => setTimeId(evento.target.value)} className={CAMPO}>
-          {ligas.map((liga) => {
-            const doGrupo = times.filter((time) => time.liga === liga && !ocupados.has(time.id))
-            if (!doGrupo.length) return null
-            return (
-              <optgroup key={liga} label={liga}>
-                {doGrupo.map((time) => (
-                  <option key={time.id} value={time.id}>
-                    {time.nome}
-                  </option>
-                ))}
-              </optgroup>
-            )
-          })}
-        </select>
-      </div>
-      <Botao type="submit" disabled={!nome.trim() || !timeId} className="sm:px-6">
-        Adicionar
-      </Botao>
-    </form>
-  )
-}
-
-function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover, ocupados }) {
-  const { times, buscarTime } = useTimes()
-  const [editando, setEditando] = useState(false)
-  const [nome, setNome] = useState(participante.nome)
-  const [timeId, setTimeId] = useState(participante.timeId)
-
-  if (editando) {
-    return (
-      <li className="contorno grid gap-2.5 rounded-lg bg-lima/25 p-2.5 sm:grid-cols-[1fr_1fr_auto]">
-        <input value={nome} onChange={(evento) => setNome(evento.target.value)} className={CAMPO} />
-        <select value={timeId} onChange={(evento) => setTimeId(evento.target.value)} className={CAMPO}>
-          {times
-            // O próprio time continua na lista; os dos outros, não.
-            .filter((time) => time.id === participante.timeId || !ocupados.has(time.id))
-            .map((time) => (
-              <option key={time.id} value={time.id}>
-                {time.nome}
-              </option>
-            ))}
-        </select>
-        <div className="flex gap-2">
-          <Botao
-            onClick={() => {
-              if (nome.trim()) aoAtualizar(participante.id, { nome: nome.trim(), timeId })
-              setEditando(false)
-            }}
-          >
-            Salvar
-          </Botao>
-          <Botao variante="papel" onClick={() => setEditando(false)}>
-            Cancelar
-          </Botao>
-        </div>
-      </li>
-    )
-  }
-
-  return (
-    <li className="group flex items-center gap-2.5 rounded-lg border-2 border-transparent px-2 py-1.5 transition-colors hover:border-tinta hover:bg-papel-claro">
-      <span className="num w-5 shrink-0 text-right font-display text-[11px] text-tinta-fraca">{indice + 1}</span>
-      <EscudoTime timeId={participante.timeId} tamanho="sm" />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[14px] font-medium">{participante.nome}</p>
-        <p className="truncate text-[11px] text-tinta-fraca">{buscarTime(participante.timeId).nome}</p>
-      </div>
-      <div className="acoes-linha flex shrink-0 gap-0.5 transition-opacity">
-        <button
-          type="button"
-          onClick={() => setEditando(true)}
-          className="grid size-8 place-items-center rounded-md border-2 border-transparent transition-colors hover:border-tinta hover:bg-lima hover:text-carvao"
-          aria-label={`Editar ${participante.nome}`}
-        >
-          <Pencil className="size-3.5" strokeWidth={2.5} />
-        </button>
-        <button
-          type="button"
-          onClick={() => aoRemover(participante)}
-          className="grid size-8 place-items-center rounded-md border-2 border-transparent transition-colors hover:border-tinta hover:bg-rosa hover:text-white"
-          aria-label={`Remover ${participante.nome}`}
-        >
-          <Trash2 className="size-3.5" strokeWidth={2.5} />
-        </button>
-      </div>
-    </li>
-  )
-}
+import { ListaDeInscritos } from './ListaDeInscritos.jsx'
 
 /* -------------------------------------------------------------------------- */
 /* Jogos                                                                      */
@@ -323,11 +197,6 @@ export function PainelAdmin({
 }) {
   const [confirmacao, setConfirmacao] = useState(null)
   const podeSortear = participantes.length >= 4
-  // Um time por pessoa, aqui e na inscrição pelo QR.
-  const ocupados = useMemo(
-    () => new Set(participantes.map((participante) => participante.timeId)),
-    [participantes],
-  )
 
   const pedir = (config) => setConfirmacao(config)
 
@@ -351,52 +220,14 @@ export function PainelAdmin({
         aoFechar={() => setConfirmacao(null)}
       />
 
-      {/* Jogadores */}
-      <Cartao className="p-4 sm:p-6">
-        <TituloSecao
-          className="mb-5"
-          titulo="Jogadores"
-          descricao="Cadastre cada um com o time que vai usar no FIFA."
-          acao={
-            <div className="contorno shrink-0 rounded-lg bg-lima px-3 py-2 text-center text-carvao">
-              <p className="num font-display text-2xl leading-none">{participantes.length}</p>
-              <p className="rotulo mt-1 text-[9px] opacity-70">Inscritos</p>
-            </div>
-          }
-        />
-
-        <FormularioParticipante aoCadastrar={acoes.adicionarParticipante} ocupados={ocupados} />
-
-        {participantes.length ? (
-          <ul className="mt-4 grid gap-1 lg:grid-cols-2">
-            {participantes.map((participante, indice) => (
-              <LinhaParticipante
-                key={participante.id}
-                participante={participante}
-                indice={indice}
-                ocupados={ocupados}
-                aoAtualizar={acoes.atualizarParticipante}
-                aoRemover={(alvo) =>
-                  pedir({
-                    titulo: `Tirar ${alvo.nome}?`,
-                    descricao: torneio.ativo
-                      ? 'Ele já está no chaveamento. Tirar agora apaga o sorteio e todos os placares lançados.'
-                      : 'O jogador some da lista de inscritos.',
-                    textoConfirmar: 'Pode tirar',
-                    acao: () => acoes.removerParticipante(alvo.id),
-                  })
-                }
-              />
-            ))}
-          </ul>
-        ) : (
-          <p className="contorno mt-4 rounded-lg border-dashed px-4 py-8 text-center text-[13px] text-tinta-media">
-            Ninguém cadastrado ainda.
-          </p>
-        )}
-      </Cartao>
-
       {nuvem?.configurada ? <QrInscricao torneio={torneio} /> : null}
+
+      <ListaDeInscritos
+        participantes={participantes}
+        torneio={torneio}
+        acoes={acoes}
+        aoPedirConfirmacao={pedir}
+      />
 
       {participantes.length ? (
         <SorteioDeTimes participantes={participantes} acoes={acoes} aoPedirConfirmacao={pedir} />

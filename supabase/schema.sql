@@ -249,10 +249,13 @@ begin
      set estado = jsonb_set(
            jsonb_set(v_estado, '{timesDoUsuario}', v_times),
            '{participantes}',
+           -- O id começa com "qr" para a organização distinguir quem se
+           -- inscreveu sozinho de quem foi cadastrado à mão no painel.
            v_inscritos || jsonb_build_object(
              'id', 'qr' || substr(md5(random()::text || clock_timestamp()::text), 1, 7),
              'nome', v_nome,
-             'timeId', v_time
+             'timeId', v_time,
+             'em', to_char(now() at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
            )
          ),
          versao = versao + 1,
