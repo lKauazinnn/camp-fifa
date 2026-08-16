@@ -10,11 +10,15 @@ function CampoNumero({ rotulo, valor, aoMudar, maximo = 99, destaque = false }) 
   return (
     <div>
       <p className="rotulo mb-1.5 text-center text-[9px] text-tinta-media">{rotulo}</p>
-      <div className={`contorno flex items-center overflow-hidden rounded-lg ${destaque ? 'bg-lima' : 'bg-papel-claro'}`}>
+      <div
+        className={`contorno flex items-center overflow-hidden rounded-lg ${
+          destaque ? 'bg-lima text-carvao' : 'bg-papel-claro'
+        }`}
+      >
         <button
           type="button"
           onClick={() => ajustar(-1)}
-          className="grid size-9 shrink-0 place-items-center border-r-2 border-tinta transition-colors hover:bg-tinta hover:text-papel-claro"
+          className="grid size-9 shrink-0 place-items-center border-r-2 border-tinta transition-colors hover:bg-carvao hover:text-creme"
           aria-label={`Diminuir ${rotulo}`}
         >
           <Minus className="size-3.5" strokeWidth={3} />
@@ -34,7 +38,7 @@ function CampoNumero({ rotulo, valor, aoMudar, maximo = 99, destaque = false }) 
         <button
           type="button"
           onClick={() => ajustar(1)}
-          className="grid size-9 shrink-0 place-items-center border-l-2 border-tinta transition-colors hover:bg-tinta hover:text-papel-claro"
+          className="grid size-9 shrink-0 place-items-center border-l-2 border-tinta transition-colors hover:bg-carvao hover:text-creme"
           aria-label={`Aumentar ${rotulo}`}
         >
           <Plus className="size-3.5" strokeWidth={3} />
@@ -54,7 +58,7 @@ function Lado({ participante, prefixo, formulario, atualizar, vencedor }) {
           <p className="truncate text-[11px] text-tinta-media">{buscarTime(participante.timeId).nome}</p>
         </div>
         {vencedor ? (
-          <span className="contorno rotulo shrink-0 rounded-md bg-lima px-2 py-1 text-[9px]">Vence</span>
+          <span className="contorno rotulo shrink-0 rounded-md bg-lima px-2 py-1 text-[9px] text-carvao">Vence</span>
         ) : null}
       </div>
 
@@ -119,7 +123,7 @@ export function ModalResultado({ partida, aoSalvar, aoLimpar, aoFechar }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-tinta/60 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-carvao/70 sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-label={`Resultado do jogo ${partida.numero}`}
@@ -128,15 +132,16 @@ export function ModalResultado({ partida, aoSalvar, aoLimpar, aoFechar }) {
       }}
     >
       <div className="contorno sombra-g animar-entrar max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-xl bg-papel sm:rounded-xl">
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b-2 border-tinta bg-tinta px-4 py-3 text-papel-claro">
+        {/* Cabeçalho sempre escuro, nos dois temas: é o bloco invertido do modal. */}
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b-2 border-tinta bg-carvao px-4 py-3 text-creme">
           <div className="min-w-0">
             <p className="rotulo text-[9px] text-lima">{partida.fase}</p>
-            <h2 className="mt-1 truncate text-xl text-papel-claro">Jogo {partida.numero}</h2>
+            <h2 className="mt-1 truncate text-xl text-creme">Jogo {partida.numero}</h2>
           </div>
           <button
             type="button"
             onClick={aoFechar}
-            className="grid size-8 shrink-0 place-items-center rounded-md border-2 border-papel-claro/40 transition-colors hover:border-lima hover:text-lima"
+            className="grid size-8 shrink-0 place-items-center rounded-md border-2 border-creme/40 transition-colors hover:border-lima hover:text-lima"
             aria-label="Fechar"
           >
             <X className="size-4" strokeWidth={3} />

@@ -3,7 +3,7 @@ import { ChaveVisual } from './ChaveVisual.jsx'
 import { Botao, Cartao, EscudoTime, EstadoVazio, TituloSecao } from './ui.jsx'
 
 const MEDALHAS = [
-  { numero: '1', rotulo: 'Campeão', cor: 'bg-lima' },
+  { numero: '1', rotulo: 'Campeão', cor: 'bg-lima text-carvao' },
   { numero: '2', rotulo: 'Vice', cor: 'bg-papel-escuro' },
   { numero: '3', rotulo: 'Terceiro', cor: 'bg-laranja text-white' },
 ]
@@ -38,7 +38,7 @@ function Campeao({ campeao }) {
       <div className="relative flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
         <EscudoTime timeId={campeao.timeId} tamanho="lg" />
         <div className="min-w-0">
-          <span className="contorno rotulo inline-block rounded-md bg-lima px-2 py-1 text-[10px] text-tinta">
+          <span className="contorno rotulo inline-block rounded-md bg-lima px-2 py-1 text-[10px] text-carvao">
             Campeão 🏆
           </span>
           <h2 className="mt-3 truncate text-4xl text-white sm:text-5xl">{campeao.nome}</h2>
@@ -93,12 +93,12 @@ export function Chaveamento({ torneio, aoEditarPartida, aoIrParaAdmin, somenteLe
                 : 'Quem perde na primeira fase cai pra repescagem. Toque num jogo pra lançar o placar.'
             }
             acao={
-              <div className="contorno shrink-0 rounded-lg bg-lima px-3 py-2 text-center">
+              <div className="contorno shrink-0 rounded-lg bg-lima px-3 py-2 text-center text-carvao">
                 <p className="num font-display text-2xl leading-none">
                   {torneio.partidasFinalizadas}
-                  <span className="text-tinta-media">/{torneio.totalPartidas}</span>
+                  <span className="opacity-45">/{torneio.totalPartidas}</span>
                 </p>
-                <p className="rotulo mt-1 text-[9px]">Jogos</p>
+                <p className="rotulo mt-1 text-[9px] opacity-70">Jogos</p>
               </div>
             }
           />

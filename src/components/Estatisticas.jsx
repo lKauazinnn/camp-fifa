@@ -11,7 +11,7 @@ function LinhaArtilharia({ linha, posicao }) {
       <td className="py-2.5 pr-3">
         <span
           className={`grid size-7 place-items-center rounded-md font-display text-[13px] ${
-            lider ? 'contorno bg-lima' : 'text-tinta-fraca'
+            lider ? 'contorno bg-lima text-carvao' : 'text-tinta-fraca'
           }`}
         >
           {posicao + 1}
@@ -34,7 +34,7 @@ function LinhaArtilharia({ linha, posicao }) {
       <td className="py-2.5 pl-3 text-right">
         <span
           className={`num inline-grid min-w-9 place-items-center rounded-md px-1.5 py-0.5 font-display text-[17px] ${
-            lider ? 'contorno bg-lima' : ''
+            lider ? 'contorno bg-lima text-carvao' : ''
           }`}
         >
           {linha.gols}
@@ -109,23 +109,23 @@ export function Estatisticas({ estatisticas, resumo }) {
       </div>
 
       {resumo.artilheiro ? (
-        <div className="contorno sombra-g relative overflow-hidden rounded-xl bg-lima px-5 py-5 sm:px-6">
+        <div className="contorno sombra-g relative overflow-hidden rounded-xl bg-lima px-5 py-5 text-carvao sm:px-6">
           <div className="relative flex items-center gap-4">
             <EscudoTime timeId={resumo.artilheiro.participante.timeId} tamanho="lg" />
             <div className="min-w-0 flex-1">
-              <span className="contorno rotulo inline-block rounded-md bg-tinta px-2 py-1 text-[10px] text-papel-claro">
+              <span className="contorno rotulo inline-block rounded-md bg-carvao px-2 py-1 text-[10px] text-creme">
                 Artilheiro
               </span>
-              <p className="mt-2.5 truncate font-display text-3xl leading-none uppercase">
+              <p className="mt-2.5 truncate font-display text-3xl leading-none text-carvao uppercase">
                 {resumo.artilheiro.participante.nome}
               </p>
-              <p className="mt-2 truncate text-[12px] font-medium text-tinta-media">
+              <p className="mt-2 truncate text-[12px] font-medium opacity-65">
                 {buscarTime(resumo.artilheiro.participante.timeId).nome} · {resumo.artilheiro.jogos} jogos
               </p>
             </div>
             <div className="shrink-0 text-center">
               <p className="num font-display text-6xl leading-none">{resumo.artilheiro.gols}</p>
-              <p className="rotulo mt-1 text-[9px] text-tinta-media">Gols</p>
+              <p className="rotulo mt-1 text-[9px] opacity-65">Gols</p>
             </div>
           </div>
         </div>

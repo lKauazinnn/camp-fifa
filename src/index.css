@@ -23,11 +23,41 @@
   --color-laranja: #ff5a1f;
   --color-rosa: #ff2d6f;
 
+  /* Constantes: não mudam com o tema. Servem para texto sobre cor viva. */
+  --color-carvao: #14131a;
+  --color-creme: #f0ece1;
+
   --font-display: 'Archivo Black', 'Arial Black', system-ui, sans-serif;
   --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
+  /*
+   * Tema claro (padrão) e tema preto. O preto inverte papel e tinta e escurece
+   * a sombra sólida; as três cores vivas continuam idênticas nos dois.
+   */
+  :root {
+    color-scheme: light;
+    --sombra-cor: #14131a;
+    --pontos: rgba(20, 19, 26, 0.09);
+  }
+
+  :root[data-tema='escuro'] {
+    color-scheme: dark;
+    --color-papel: #14131c;
+    --color-papel-claro: #1e1d2a;
+    --color-papel-escuro: #2b2a3a;
+
+    --color-tinta: #f2eee4;
+    --color-tinta-media: #a8a4b6;
+    --color-tinta-fraca: #6e6b7d;
+
+    --color-cobalto: #5470ff;
+
+    --sombra-cor: #000000;
+    --pontos: rgba(242, 238, 228, 0.09);
+  }
+
   html {
     -webkit-text-size-adjust: 100%;
   }
@@ -36,8 +66,11 @@
     @apply bg-papel font-sans text-tinta antialiased;
     min-height: 100dvh;
     /* Malha de pontos, como papel milimetrado de vestiário. */
-    background-image: radial-gradient(rgba(20, 19, 26, 0.09) 1px, transparent 1px);
+    background-image: radial-gradient(var(--pontos) 1px, transparent 1px);
     background-size: 22px 22px;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
   }
 
   h1,
@@ -82,13 +115,13 @@
     border: 2px solid var(--color-tinta);
   }
   .sombra {
-    box-shadow: 4px 4px 0 var(--color-tinta);
+    box-shadow: 4px 4px 0 var(--sombra-cor);
   }
   .sombra-p {
-    box-shadow: 3px 3px 0 var(--color-tinta);
+    box-shadow: 3px 3px 0 var(--sombra-cor);
   }
   .sombra-g {
-    box-shadow: 6px 6px 0 var(--color-tinta);
+    box-shadow: 6px 6px 0 var(--sombra-cor);
   }
 
   /* Botões e cards clicáveis afundam ao serem pressionados */
@@ -100,11 +133,11 @@
   }
   .apertar:hover {
     transform: translate(-1px, -1px);
-    box-shadow: 5px 5px 0 var(--color-tinta);
+    box-shadow: 5px 5px 0 var(--sombra-cor);
   }
   .apertar:active {
     transform: translate(3px, 3px);
-    box-shadow: 1px 1px 0 var(--color-tinta);
+    box-shadow: 1px 1px 0 var(--sombra-cor);
   }
 
   /* Etiqueta em caixa alta, o rótulo padrão do sistema */
@@ -120,6 +153,13 @@
   .marcado {
     background: linear-gradient(180deg, transparent 55%, var(--color-lima) 55%);
     padding-inline: 0.15em;
+  }
+
+  /* No tema preto o marca-texto vira bloco cheio: meio-a-meio não teria contraste. */
+  :root[data-tema='escuro'] .marcado {
+    background: var(--color-lima);
+    color: var(--color-carvao);
+    border-radius: 3px;
   }
 
   /* Listras diagonais para faixas de destaque */

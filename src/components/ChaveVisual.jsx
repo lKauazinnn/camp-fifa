@@ -28,11 +28,11 @@ function ChaveDesktop({ rodadas, aoEditar }) {
             <div key={rodada.rodada} className="flex w-[256px] flex-col">
               <div
                 className={`contorno sombra-p mb-5 rounded-lg px-3 py-2 text-center ${
-                  ultima ? 'bg-cobalto text-white' : terminada ? 'bg-lima' : 'bg-papel-claro'
+                  ultima ? 'bg-cobalto text-white' : terminada ? 'bg-lima text-carvao' : 'bg-papel-claro'
                 }`}
               >
                 <p className="font-display text-[13px] uppercase">{rodada.nome}</p>
-                <p className={`rotulo num mt-1 text-[9px] ${ultima ? 'text-white/70' : 'text-tinta-media'}`}>
+                <p className={`rotulo num mt-1 text-[9px] ${ultima || terminada ? 'opacity-70' : 'text-tinta-media'}`}>
                   {concluidas(rodada)} de {rodada.partidas.length} jogos
                 </p>
               </div>
@@ -99,7 +99,7 @@ function ChaveMobile({ rodadas, aoEditar }) {
               type="button"
               onClick={() => setAtiva(indice)}
               className={`contorno rotulo shrink-0 rounded-lg px-3 py-2 text-[10px] ${
-                selecionada ? 'sombra-p bg-lima text-tinta' : 'bg-papel-claro text-tinta-media'
+                selecionada ? 'sombra-p bg-lima text-carvao' : 'bg-papel-claro text-tinta-media'
               }`}
             >
               {item.nomeCurto}

@@ -4,7 +4,7 @@ import { Cartao } from './ui.jsx'
 const BLOCOS = [
   {
     numero: '01',
-    cor: 'bg-lima',
+    cor: 'bg-lima text-carvao',
     titulo: 'Como funciona',
     itens: [
       'Mata-mata direto: perdeu na chave principal, saiu dela.',
@@ -75,7 +75,7 @@ export function Regras() {
         <div className="listrado absolute inset-0" aria-hidden="true" />
         <div className="relative flex flex-wrap items-end justify-between gap-6">
           <div>
-            <span className="contorno rotulo inline-block rounded-md bg-lima px-2 py-1 text-[10px] text-tinta">
+            <span className="contorno rotulo inline-block rounded-md bg-lima px-2 py-1 text-[10px] text-carvao">
               Premiação
             </span>
             <p className="num mt-3 font-display text-6xl leading-none">R$ 100</p>
@@ -92,7 +92,8 @@ export function Regras() {
           <Cartao key={titulo} className="overflow-hidden">
             <div className={`flex items-center gap-3 border-b-2 border-tinta px-4 py-3 ${cor}`}>
               <span className="num font-display text-2xl leading-none">{numero}</span>
-              <h3 className={`text-xl ${cor.includes('text-white') ? 'text-white' : ''}`}>{titulo}</h3>
+              {/* text-current: o título assume a cor definida pela faixa */}
+              <h3 className="text-xl text-current">{titulo}</h3>
             </div>
             <ul className="space-y-3 p-4">
               {itens.map((item) => (

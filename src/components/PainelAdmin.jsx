@@ -98,7 +98,7 @@ function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover }) {
         <button
           type="button"
           onClick={() => setEditando(true)}
-          className="grid size-8 place-items-center rounded-md border-2 border-transparent transition-colors hover:border-tinta hover:bg-lima"
+          className="grid size-8 place-items-center rounded-md border-2 border-transparent transition-colors hover:border-tinta hover:bg-lima hover:text-carvao"
           aria-label={`Editar ${participante.nome}`}
         >
           <Pencil className="size-3.5" strokeWidth={2.5} />
@@ -166,7 +166,7 @@ function ListaDeJogos({ torneio, aoEditarPartida }) {
 
                     <span
                       className={`num contorno shrink-0 rounded-md px-2 py-0.5 font-display text-[13px] ${
-                        partida.resultado ? 'bg-lima' : 'border-dashed bg-transparent text-tinta-fraca'
+                        partida.resultado ? 'bg-lima text-carvao' : 'border-dashed bg-transparent text-tinta-fraca'
                       }`}
                     >
                       {partida.resultado
@@ -233,12 +233,12 @@ function BlocoDados({ acoes, salvamento, temDados }) {
 
       <div
         className={`contorno mb-4 flex items-center gap-2.5 rounded-lg px-3 py-2.5 ${
-          salvamento.falhou ? 'bg-rosa text-white' : 'bg-lima'
+          salvamento.falhou ? 'bg-rosa text-white' : 'bg-lima text-carvao'
         }`}
       >
         <span
-          className={`size-2 shrink-0 rounded-full border-2 border-tinta ${
-            salvamento.falhou ? 'bg-white' : 'animar-piscar bg-tinta'
+          className={`size-2 shrink-0 rounded-full border-2 ${
+            salvamento.falhou ? 'border-white bg-white' : 'animar-piscar border-carvao bg-carvao'
           }`}
         />
         <p className="text-[12px] font-bold">
@@ -272,7 +272,7 @@ function BlocoDados({ acoes, salvamento, temDados }) {
       {aviso ? (
         <p
           className={`contorno mt-3 inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[12px] font-bold ${
-            aviso.erro ? 'bg-rosa text-white' : 'bg-lima'
+            aviso.erro ? 'bg-rosa text-white' : 'bg-lima text-carvao'
           }`}
         >
           {aviso.erro ? null : <Check className="size-3.5" strokeWidth={3} />}
@@ -317,9 +317,9 @@ export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, sa
           titulo="Jogadores"
           descricao="Cadastre cada um com o time que vai usar no FIFA."
           acao={
-            <div className="contorno shrink-0 rounded-lg bg-lima px-3 py-2 text-center">
+            <div className="contorno shrink-0 rounded-lg bg-lima px-3 py-2 text-center text-carvao">
               <p className="num font-display text-2xl leading-none">{participantes.length}</p>
-              <p className="rotulo mt-1 text-[9px]">Inscritos</p>
+              <p className="rotulo mt-1 text-[9px] opacity-70">Inscritos</p>
             </div>
           }
         />

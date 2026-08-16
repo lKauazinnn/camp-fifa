@@ -1,16 +1,35 @@
+import { Moon, Sun } from 'lucide-react'
 import { BarraProgresso } from './ui.jsx'
 
 function Caixa({ valor, rotulo, cor = 'papel' }) {
-  const fundos = { papel: 'bg-papel-claro', lima: 'bg-lima', cobalto: 'bg-cobalto text-white' }
+  const fundos = { papel: 'bg-papel-claro', lima: 'bg-lima text-carvao', cobalto: 'bg-cobalto text-white' }
   return (
     <div className={`contorno sombra-p min-w-24 flex-1 rounded-lg px-3 py-2.5 ${fundos[cor]}`}>
       <p className="num font-display text-2xl leading-none">{valor}</p>
-      <p className={`rotulo mt-1.5 text-[9px] ${cor === 'cobalto' ? 'text-white/70' : 'text-tinta-media'}`}>{rotulo}</p>
+      <p className={`rotulo mt-1.5 text-[9px] ${cor === 'papel' ? 'text-tinta-media' : 'opacity-70'}`}>{rotulo}</p>
     </div>
   )
 }
 
-export function Cabecalho({ totalParticipantes, totalGols, torneio }) {
+function BotaoTema({ tema, aoAlternar }) {
+  const escuro = tema === 'escuro'
+  return (
+    <button
+      type="button"
+      onClick={aoAlternar}
+      aria-label={escuro ? 'Mudar para o tema claro' : 'Mudar para o tema preto'}
+      title={escuro ? 'Tema claro' : 'Tema preto'}
+      className={`contorno sombra-p apertar rotulo inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-[10px] ${
+        escuro ? 'bg-lima text-carvao' : 'bg-papel-claro'
+      }`}
+    >
+      {escuro ? <Sun className="size-3.5" strokeWidth={2.5} /> : <Moon className="size-3.5" strokeWidth={2.5} />}
+      {escuro ? 'Claro' : 'Preto'}
+    </button>
+  )
+}
+
+export function Cabecalho({ totalParticipantes, totalGols, torneio, tema, aoAlternarTema }) {
   return (
     <header className="mx-auto max-w-6xl px-4 pt-7 pb-5 sm:px-6 sm:pt-10">
       <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
@@ -20,6 +39,7 @@ export function Cabecalho({ totalParticipantes, totalGols, torneio }) {
               Unidos Acamp
             </span>
             <span className="rotulo text-[10px] text-tinta-media">Acampamento da galera</span>
+            <BotaoTema tema={tema} aoAlternar={aoAlternarTema} />
           </div>
 
           <h1 className="mt-4 text-[3rem] leading-[0.86] sm:text-[5.5rem]">
@@ -39,9 +59,7 @@ export function Cabecalho({ totalParticipantes, totalGols, torneio }) {
           <div className="relative">
             <p className="rotulo text-[10px] text-white/80">Prêmio do campeão</p>
             <p className="num mt-1.5 font-display text-5xl leading-none">R$100</p>
-            <p className="mt-2 text-[12px] leading-snug font-medium">
-              na mão, na noite de encerramento
-            </p>
+            <p className="mt-2 text-[12px] leading-snug font-medium">na mão, na noite de encerramento</p>
           </div>
         </div>
       </div>

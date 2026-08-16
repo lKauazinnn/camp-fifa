@@ -5,9 +5,10 @@ import { buscarTime } from '../data/times.js'
 /* -------------------------------------------------------------------------- */
 
 export function Cartao({ children, cor = 'papel', className = '', ...props }) {
+  // Fundos de cor viva fixam o texto em carvão/branco: eles não mudam com o tema.
   const fundos = {
     papel: 'bg-papel-claro',
-    lima: 'bg-lima',
+    lima: 'bg-lima text-carvao',
     cobalto: 'bg-cobalto text-white',
     laranja: 'bg-laranja text-white',
     tinta: 'bg-tinta text-papel-claro',
@@ -32,7 +33,7 @@ export function TituloSecao({ titulo, descricao, acao, className = '' }) {
 }
 
 const CORES_ETIQUETA = {
-  lima: 'bg-lima text-tinta',
+  lima: 'bg-lima text-carvao',
   cobalto: 'bg-cobalto text-white',
   laranja: 'bg-laranja text-white',
   rosa: 'bg-rosa text-white',
@@ -51,7 +52,7 @@ export function Etiqueta({ cor = 'papel', children, className = '' }) {
 }
 
 const CORES_BOTAO = {
-  primario: 'bg-lima text-tinta',
+  primario: 'bg-lima text-carvao',
   cobalto: 'bg-cobalto text-white',
   laranja: 'bg-laranja text-white',
   papel: 'bg-papel-claro text-tinta',
@@ -172,7 +173,8 @@ export function Metrica({ valor, rotulo, className = '' }) {
   return (
     <div className={className}>
       <p className="num font-display text-3xl leading-none">{valor}</p>
-      <p className="rotulo mt-2 text-tinta-media">{rotulo}</p>
+      {/* opacidade em vez de cor fixa: funciona sobre papel e sobre cor viva */}
+      <p className="rotulo mt-2 opacity-60">{rotulo}</p>
     </div>
   )
 }

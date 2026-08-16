@@ -13,7 +13,7 @@ export function ModalConfirmacao({
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-tinta/60 p-4"
+      className="fixed inset-0 z-50 grid place-items-center bg-carvao/70 p-4"
       role="dialog"
       aria-modal="true"
       onMouseDown={(evento) => {

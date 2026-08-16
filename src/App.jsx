@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTema } from './hooks/useTema.js'
 import { useTorneio } from './hooks/useTorneio.js'
 import { Cabecalho } from './components/Cabecalho.jsx'
 import { Navegacao } from './components/Navegacao.jsx'
@@ -22,7 +23,7 @@ function FaixaSomenteLeitura({ acoes }) {
   return (
     <div className="border-b-2 border-tinta bg-cobalto text-white">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-2.5 sm:px-6">
-        <span className="contorno rotulo rounded-md bg-lima px-2 py-1 text-[9px] text-tinta">Só olhando</span>
+        <span className="contorno rotulo rounded-md bg-lima px-2 py-1 text-[9px] text-carvao">Só olhando</span>
         <p className="min-w-0 flex-1 text-[12px] font-medium">
           Este é um placar compartilhado. Nada aqui mexe no campeonato salvo no seu aparelho.
         </p>
@@ -41,6 +42,7 @@ function FaixaSomenteLeitura({ acoes }) {
 
 export default function App() {
   const { participantes, torneio, estatisticas, resumo, salvamento, somenteLeitura, acoes } = useTorneio()
+  const { tema, alternarTema } = useTema()
   const [abaAtiva, setAbaAtiva] = useState('chaveamento')
   const [partidaEmEdicao, setPartidaEmEdicao] = useState(null)
 
@@ -54,7 +56,13 @@ export default function App() {
     <div className="min-h-dvh">
       {somenteLeitura ? <FaixaSomenteLeitura acoes={acoes} /> : null}
 
-      <Cabecalho totalParticipantes={participantes.length} totalGols={resumo.totalGols} torneio={torneio} />
+      <Cabecalho
+        totalParticipantes={participantes.length}
+        totalGols={resumo.totalGols}
+        torneio={torneio}
+        tema={tema}
+        aoAlternarTema={alternarTema}
+      />
 
       <Navegacao abas={abas} abaAtiva={abaAtiva} aoTrocar={setAbaAtiva} />
 
@@ -89,12 +97,12 @@ export default function App() {
         </div>
       </main>
 
-      <footer className="mt-8 border-t-2 border-tinta bg-tinta text-papel-claro">
+      <footer className="mt-8 border-t-2 border-tinta bg-carvao text-creme">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-6">
-          <p className="font-display text-lg uppercase">
+          <p className="font-display text-lg text-creme uppercase">
             Unidos Acamp <span className="text-lima">· FIFA</span>
           </p>
-          <p className="rotulo text-[9px] text-papel-claro/60">
+          <p className="rotulo text-[9px] text-creme/60">
             {somenteLeitura ? 'Modo visualização' : 'Salvo automático neste navegador'}
           </p>
         </div>

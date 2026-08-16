@@ -36,7 +36,7 @@ function Lado({ participante, gols, penaltis, mostrarPenaltis, vencedor, perdedo
           gols === null
             ? 'text-tinta-fraca'
             : vencedor
-              ? 'border-2 border-tinta bg-lima text-tinta'
+              ? 'border-2 border-tinta bg-lima text-carvao'
               : 'border-2 border-transparent text-tinta-media'
         }`}
       >
@@ -46,12 +46,14 @@ function Lado({ participante, gols, penaltis, mostrarPenaltis, vencedor, perdedo
   )
 }
 
-function Faixa({ partida }) {
+function Faixa({ partida, sobreCor = false }) {
   const { status } = partida
+  // No card da final a tarja fica sobre cobalto: os tons apagados viram branco.
+  const apagado = sobreCor ? 'text-white/70' : 'text-tinta-fraca'
 
   if (status === 'finalizada') {
     return (
-      <span className="rotulo rounded bg-lima px-1.5 py-0.5 text-[9px] text-tinta">
+      <span className="rotulo rounded bg-lima px-1.5 py-0.5 text-[9px] text-carvao">
         {partida.penaltis ? 'Nos pênaltis' : 'Fim de jogo'}
       </span>
     )
@@ -65,12 +67,16 @@ function Faixa({ partida }) {
     )
   }
   if (status === 'bye') {
-    return <span className="rotulo rounded bg-cobalto px-1.5 py-0.5 text-[9px] text-white">Passou direto</span>
+    return sobreCor ? (
+      <span className="rotulo rounded bg-white px-1.5 py-0.5 text-[9px] text-cobalto">Passou direto</span>
+    ) : (
+      <span className="rotulo rounded bg-cobalto px-1.5 py-0.5 text-[9px] text-white">Passou direto</span>
+    )
   }
   if (status === 'vazia') {
-    return <span className="rotulo text-[9px] text-tinta-fraca">Sem jogo</span>
+    return <span className={`rotulo text-[9px] ${apagado}`}>Sem jogo</span>
   }
-  return <span className="rotulo text-[9px] text-tinta-fraca">Aguardando</span>
+  return <span className={`rotulo text-[9px] ${apagado}`}>Aguardando</span>
 }
 
 export function CartaoPartida({ partida, aoEditar, destaque = false }) {
@@ -87,7 +93,7 @@ export function CartaoPartida({ partida, aoEditar, destaque = false }) {
         <span className={`rotulo num text-[9px] ${destaque ? 'text-white' : 'text-tinta-media'}`}>
           {destaque ? 'Decisão' : `Jogo ${partida.numero}`}
         </span>
-        <Faixa partida={partida} />
+        <Faixa partida={partida} sobreCor={destaque} />
       </div>
 
       <div className="divide-y-2 divide-papel-escuro bg-papel-claro">

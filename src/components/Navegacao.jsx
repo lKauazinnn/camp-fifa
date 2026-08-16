@@ -13,7 +13,7 @@ export function Navegacao({ abas, abaAtiva, aoTrocar }) {
               className={`rotulo shrink-0 rounded-lg px-3.5 py-2 text-[11px] whitespace-nowrap transition-all duration-150 ${
                 ativa
                   ? 'contorno sombra-p bg-tinta text-papel-claro'
-                  : 'border-2 border-transparent text-tinta-media hover:border-tinta hover:bg-lima hover:text-tinta'
+                  : 'border-2 border-transparent text-tinta-media hover:border-tinta hover:bg-lima hover:text-carvao'
               }`}
             >
               <span className="hidden sm:inline">{aba.rotulo}</span>
