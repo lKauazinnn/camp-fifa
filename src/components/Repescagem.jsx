@@ -1,4 +1,3 @@
-import { RotateCcw } from 'lucide-react'
 import { buscarTime } from '../data/times.js'
 import { ChaveVisual } from './ChaveVisual.jsx'
 import { Cartao, EscudoTime, EstadoVazio, TituloSecao } from './ui.jsx'
@@ -7,9 +6,8 @@ export function Repescagem({ torneio, aoEditarPartida, somenteLeitura }) {
   if (!torneio.ativo || !torneio.repescagem.length) {
     return (
       <EstadoVazio
-        icone={RotateCcw}
-        titulo="Repescagem indisponível"
-        descricao="A chave dos eliminados é criada junto com o sorteio da primeira fase."
+        titulo="Repescagem ainda não existe"
+        descricao="A chave dos eliminados nasce junto com o sorteio da primeira fase."
       />
     )
   }
@@ -26,49 +24,54 @@ export function Repescagem({ torneio, aoEditarPartida, somenteLeitura }) {
   )
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[1fr_300px] lg:items-start">
-        <Cartao className="p-5 sm:p-7">
-          <h2 className="font-serif text-2xl leading-none text-perola-100">Segunda chance</h2>
-          <p className="mt-4 max-w-xl text-[13px] leading-relaxed text-perola-400">
-            Ninguém viaja para o acampamento para jogar uma partida só. Todos os eliminados da primeira fase caem
-            automaticamente nesta chave e seguem se enfrentando — quem vencer tudo aqui termina o campeonato em{' '}
-            <span className="text-realce">terceiro lugar</span>.
+    <div className="space-y-5">
+      <div className="grid gap-5 lg:grid-cols-[1fr_300px] lg:items-start">
+        <Cartao className="p-5 sm:p-6">
+          <h2 className="text-3xl">
+            Ninguém sai fora
+            <br />
+            <span className="marcado">com um jogo só</span>
+          </h2>
+          <p className="mt-4 max-w-xl text-[14px] leading-snug text-tinta-media">
+            Perdeu na primeira fase? Você cai automaticamente aqui e continua jogando. Quem ganhar tudo nesta chave
+            termina o campeonato em <strong className="text-tinta">terceiro lugar</strong> — e ainda leva medalha.
           </p>
         </Cartao>
 
-        <Cartao realce={Boolean(torneio.terceiro)} className="p-5">
-          <p className="rotulo">Terceiro lugar</p>
+        <Cartao cor={torneio.terceiro ? 'laranja' : 'papel'} className="p-5">
+          <p className={`rotulo text-[10px] ${torneio.terceiro ? 'text-white/80' : 'text-tinta-media'}`}>
+            Terceiro lugar
+          </p>
           {torneio.terceiro ? (
-            <div className="mt-4 flex items-center gap-3">
-              <EscudoTime timeId={torneio.terceiro.timeId} tamanho="md" vencedor />
+            <div className="mt-3 flex items-center gap-3">
+              <EscudoTime timeId={torneio.terceiro.timeId} tamanho="md" />
               <div className="min-w-0">
-                <p className="truncate font-serif text-xl leading-none text-perola-100">{torneio.terceiro.nome}</p>
-                <p className="mt-1.5 truncate text-[11px] text-perola-500">
-                  {buscarTime(torneio.terceiro.timeId).nome}
+                <p className="truncate font-display text-xl leading-tight text-white uppercase">
+                  {torneio.terceiro.nome}
                 </p>
+                <p className="mt-1 truncate text-[11px] text-white/75">{buscarTime(torneio.terceiro.timeId).nome}</p>
               </div>
             </div>
           ) : (
-            <p className="mt-4 text-[13px] leading-relaxed text-perola-500 italic">
-              {decisao ? 'Decidido na última rodada da repescagem.' : 'A definir.'}
+            <p className="mt-3 text-[13px] leading-snug text-tinta-media">
+              {decisao ? 'Sai na última rodada da repescagem.' : 'Ainda vai demorar.'}
             </p>
           )}
         </Cartao>
       </div>
 
-      <Cartao className="p-5 sm:p-7">
+      <Cartao className="p-4 sm:p-6">
         <TituloSecao
-          className="mb-8"
+          className="mb-6"
           titulo="Chave da repescagem"
-          descricao={somenteLeitura ? null : 'Toque em um jogo para lançar o resultado.'}
+          descricao={somenteLeitura ? null : 'Toque num jogo pra lançar o placar.'}
           acao={
-            <div className="shrink-0 text-right">
-              <p className="num font-serif text-2xl leading-none text-perola-100">
+            <div className="contorno shrink-0 rounded-lg bg-papel-escuro px-3 py-2 text-center">
+              <p className="num font-display text-2xl leading-none">
                 {disputados}
-                <span className="text-perola-600">/{totais}</span>
+                <span className="text-tinta-media">/{totais}</span>
               </p>
-              <p className="rotulo mt-1.5">Jogos</p>
+              <p className="rotulo mt-1 text-[9px]">Jogos</p>
             </div>
           }
         />

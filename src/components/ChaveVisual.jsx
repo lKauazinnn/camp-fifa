@@ -14,23 +14,26 @@ function concluidas(rodada) {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Desktop — colunas ligadas por hairlines                                    */
+/* Desktop — colunas ligadas por traços grossos                               */
 /* -------------------------------------------------------------------------- */
 
 function ChaveDesktop({ rodadas, aoEditar }) {
   return (
-    <div className="scrollbar-fina hidden overflow-x-auto pb-2 md:block">
-      <div className="flex min-w-max items-stretch gap-12 px-px">
+    <div className="scrollbar-fina hidden overflow-x-auto pb-3 md:block">
+      <div className="flex min-w-max items-stretch gap-10 px-1 pt-1">
         {rodadas.map((rodada, indiceRodada) => {
           const ultima = indiceRodada === rodadas.length - 1
+          const terminada = concluidas(rodada) === rodada.partidas.length
           return (
-            <div key={rodada.rodada} className="flex w-[258px] flex-col">
-              <div className="mb-5 text-center">
-                <p className={`font-serif text-[15px] leading-none ${ultima ? 'dourado' : 'text-perola-200'}`}>
-                  {rodada.nome}
-                </p>
-                <p className="num mt-2 text-[10px] tracking-[0.14em] text-perola-600 uppercase">
-                  {concluidas(rodada)} de {rodada.partidas.length}
+            <div key={rodada.rodada} className="flex w-[256px] flex-col">
+              <div
+                className={`contorno sombra-p mb-5 rounded-lg px-3 py-2 text-center ${
+                  ultima ? 'bg-cobalto text-white' : terminada ? 'bg-lima' : 'bg-papel-claro'
+                }`}
+              >
+                <p className="font-display text-[13px] uppercase">{rodada.nome}</p>
+                <p className={`rotulo num mt-1 text-[9px] ${ultima ? 'text-white/70' : 'text-tinta-media'}`}>
+                  {concluidas(rodada)} de {rodada.partidas.length} jogos
                 </p>
               </div>
 
@@ -38,16 +41,19 @@ function ChaveDesktop({ rodadas, aoEditar }) {
                 {agruparEmPares(rodada.partidas).map((par, indicePar) => (
                   <div key={indicePar} className="relative flex flex-1 flex-col justify-around">
                     {par.length === 2 && !ultima ? (
-                      <span className="absolute top-1/4 bottom-1/4 -right-6 w-px bg-borda" aria-hidden="true" />
+                      <span
+                        className="absolute top-1/4 bottom-1/4 -right-5 w-[2px] bg-tinta"
+                        aria-hidden="true"
+                      />
                     ) : null}
 
                     {par.map((partida) => (
-                      <div key={partida.id} className="relative py-2.5">
+                      <div key={partida.id} className="relative py-2">
                         {indiceRodada > 0 ? (
-                          <span className="absolute top-1/2 -left-6 h-px w-6 bg-borda" aria-hidden="true" />
+                          <span className="absolute top-1/2 -left-5 h-[2px] w-5 bg-tinta" aria-hidden="true" />
                         ) : null}
                         {!ultima ? (
-                          <span className="absolute top-1/2 -right-6 h-px w-6 bg-borda" aria-hidden="true" />
+                          <span className="absolute top-1/2 -right-5 h-[2px] w-5 bg-tinta" aria-hidden="true" />
                         ) : null}
                         <CartaoPartida partida={partida} aoEditar={aoEditar} destaque={ultima} />
                       </div>
@@ -84,7 +90,7 @@ function ChaveMobile({ rodadas, aoEditar }) {
 
   return (
     <div className="md:hidden">
-      <div className="sem-barra -mx-1 mb-5 flex gap-1.5 overflow-x-auto px-1 pb-1">
+      <div className="sem-barra -mx-1 mb-5 flex gap-2 overflow-x-auto px-1 py-1">
         {rodadas.map((item, indice) => {
           const selecionada = indice === ativa
           return (
@@ -92,14 +98,12 @@ function ChaveMobile({ rodadas, aoEditar }) {
               key={item.rodada}
               type="button"
               onClick={() => setAtiva(indice)}
-              className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12px] transition-colors ${
-                selecionada
-                  ? 'border-realce/40 bg-realce/10 text-realce'
-                  : 'border-borda text-perola-500 hover:text-perola-300'
+              className={`contorno rotulo shrink-0 rounded-lg px-3 py-2 text-[10px] ${
+                selecionada ? 'sombra-p bg-lima text-tinta' : 'bg-papel-claro text-tinta-media'
               }`}
             >
               {item.nomeCurto}
-              <span className="num ml-2 text-[10px] opacity-70">
+              <span className="num ml-1.5 opacity-60">
                 {concluidas(item)}/{item.partidas.length}
               </span>
             </button>
@@ -107,7 +111,7 @@ function ChaveMobile({ rodadas, aoEditar }) {
         })}
       </div>
 
-      <div className="animar-surgir space-y-2.5">
+      <div className="animar-entrar space-y-3">
         {rodada.partidas.map((partida) => (
           <CartaoPartida
             key={partida.id}

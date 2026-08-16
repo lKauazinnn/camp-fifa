@@ -1,53 +1,53 @@
-import { Swords } from 'lucide-react'
 import { buscarTime } from '../data/times.js'
 import { ChaveVisual } from './ChaveVisual.jsx'
 import { Botao, Cartao, EscudoTime, EstadoVazio, TituloSecao } from './ui.jsx'
 
-function Posicao({ numero, rotulo, participante, primeiro = false }) {
+const MEDALHAS = [
+  { numero: '1', rotulo: 'Campeão', cor: 'bg-lima' },
+  { numero: '2', rotulo: 'Vice', cor: 'bg-papel-escuro' },
+  { numero: '3', rotulo: 'Terceiro', cor: 'bg-laranja text-white' },
+]
+
+function Posicao({ indice, participante }) {
+  const medalha = MEDALHAS[indice]
   return (
-    <div className="flex items-center gap-4 px-5 py-4">
-      <span className={`num font-serif text-2xl leading-none ${primeiro ? 'dourado' : 'text-perola-600'}`}>
-        {numero}
+    <div className="flex items-center gap-3 px-4 py-3">
+      <span className={`contorno grid size-9 shrink-0 place-items-center rounded-lg font-display text-lg ${medalha.cor}`}>
+        {medalha.numero}
       </span>
       {participante ? (
         <>
-          <EscudoTime timeId={participante.timeId} tamanho="sm" vencedor={primeiro} />
+          <EscudoTime timeId={participante.timeId} tamanho="sm" />
           <div className="min-w-0 flex-1">
-            <p className={`truncate text-[13px] ${primeiro ? 'text-perola-100' : 'text-perola-300'}`}>
-              {participante.nome}
-            </p>
-            <p className="truncate text-[11px] text-perola-600">{buscarTime(participante.timeId).nome}</p>
+            <p className="truncate text-[14px] font-bold">{participante.nome}</p>
+            <p className="truncate text-[11px] text-tinta-fraca">{buscarTime(participante.timeId).nome}</p>
           </div>
-          <span className="rotulo shrink-0">{rotulo}</span>
         </>
       ) : (
-        <>
-          <p className="flex-1 text-[13px] text-perola-600 italic">A definir</p>
-          <span className="rotulo shrink-0">{rotulo}</span>
-        </>
+        <p className="flex-1 text-[13px] text-tinta-fraca">ainda em disputa</p>
       )}
+      <span className="rotulo shrink-0 text-[9px] text-tinta-media">{medalha.rotulo}</span>
     </div>
   )
 }
 
-function Consagracao({ campeao }) {
+function Campeao({ campeao }) {
   return (
-    <Cartao realce className="relative overflow-hidden px-6 py-8 text-center sm:px-10 sm:py-10">
-      <span
-        className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-[radial-gradient(50%_100%_at_50%_100%,rgba(227,200,140,0.22),transparent)]"
-        aria-hidden="true"
-      />
-      <div className="relative flex flex-col items-center gap-4">
-        <EscudoTime timeId={campeao.timeId} tamanho="lg" vencedor />
-        <div>
-          <p className="rotulo text-realce/80">Campeão do Unidos Acamp</p>
-          <h2 className="dourado mt-3 font-serif text-4xl leading-none sm:text-5xl">{campeao.nome}</h2>
-          <p className="mt-3 text-[13px] text-perola-400">
-            {buscarTime(campeao.timeId).nome} · leva os R$ 100,00
+    <div className="contorno sombra-g relative overflow-hidden rounded-xl bg-cobalto px-6 py-8 text-white sm:px-10">
+      <div className="listrado absolute inset-0" aria-hidden="true" />
+      <div className="relative flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
+        <EscudoTime timeId={campeao.timeId} tamanho="lg" />
+        <div className="min-w-0">
+          <span className="contorno rotulo inline-block rounded-md bg-lima px-2 py-1 text-[10px] text-tinta">
+            Campeão 🏆
+          </span>
+          <h2 className="mt-3 truncate text-4xl text-white sm:text-5xl">{campeao.nome}</h2>
+          <p className="mt-2 text-[14px] font-medium text-white/80">
+            {buscarTime(campeao.timeId).nome} · levou os R$ 100
           </p>
         </div>
       </div>
-    </Cartao>
+    </div>
   )
 }
 
@@ -55,14 +55,11 @@ export function Chaveamento({ torneio, aoEditarPartida, aoIrParaAdmin, somenteLe
   if (!torneio.ativo) {
     return (
       <EstadoVazio
-        icone={Swords}
-        titulo="O chaveamento ainda não foi sorteado"
-        descricao="Cadastre os participantes no Painel Admin e faça o sorteio para gerar as chaves do mata-mata."
+        titulo="Ainda não tem chaveamento"
+        descricao="Cadastre a galera no Painel Admin e clique em sortear. As chaves e a repescagem saem prontas na hora."
         acao={
           somenteLeitura ? null : (
-            <Botao variante="contorno" onClick={aoIrParaAdmin}>
-              Abrir Painel Admin
-            </Botao>
+            <Botao onClick={aoIrParaAdmin}>Ir para o Painel Admin</Botao>
           )
         }
       />
@@ -70,38 +67,38 @@ export function Chaveamento({ torneio, aoEditarPartida, aoIrParaAdmin, somenteLe
   }
 
   return (
-    <div className="space-y-6">
-      {torneio.campeao ? <Consagracao campeao={torneio.campeao} /> : null}
+    <div className="space-y-5">
+      {torneio.campeao ? <Campeao campeao={torneio.campeao} /> : null}
 
-      <div className="grid gap-6 lg:grid-cols-[300px_1fr] lg:items-start">
+      <div className="grid gap-5 lg:grid-cols-[300px_1fr] lg:items-start">
         <Cartao className="overflow-hidden">
-          <div className="border-b border-borda px-5 py-4">
-            <h3 className="font-serif text-lg leading-none text-perola-100">Pódio</h3>
-            <p className="mt-2 text-[12px] text-perola-500">O terceiro lugar sai da repescagem.</p>
+          <div className="border-b-2 border-tinta bg-papel-escuro px-4 py-3">
+            <h3 className="text-xl">Pódio</h3>
+            <p className="mt-1 text-[12px] text-tinta-media">O terceiro sai da repescagem.</p>
           </div>
-          <div className="divide-y divide-borda/70">
-            <Posicao numero="1" rotulo="Campeão" participante={torneio.campeao} primeiro />
-            <Posicao numero="2" rotulo="Vice" participante={torneio.vice} />
-            <Posicao numero="3" rotulo="Terceiro" participante={torneio.terceiro} />
+          <div className="divide-y-2 divide-papel-escuro">
+            <Posicao indice={0} participante={torneio.campeao} />
+            <Posicao indice={1} participante={torneio.vice} />
+            <Posicao indice={2} participante={torneio.terceiro} />
           </div>
         </Cartao>
 
-        <Cartao className="p-5 sm:p-7">
+        <Cartao className="p-4 sm:p-6">
           <TituloSecao
-            className="mb-8"
+            className="mb-6"
             titulo="Chave principal"
             descricao={
               somenteLeitura
-                ? 'Quem perde na primeira fase cai para a repescagem.'
-                : 'Quem perde na primeira fase cai para a repescagem. Toque em um jogo para lançar o resultado.'
+                ? 'Quem perde na primeira fase cai pra repescagem.'
+                : 'Quem perde na primeira fase cai pra repescagem. Toque num jogo pra lançar o placar.'
             }
             acao={
-              <div className="shrink-0 text-right">
-                <p className="num font-serif text-2xl leading-none text-perola-100">
+              <div className="contorno shrink-0 rounded-lg bg-lima px-3 py-2 text-center">
+                <p className="num font-display text-2xl leading-none">
                   {torneio.partidasFinalizadas}
-                  <span className="text-perola-600">/{torneio.totalPartidas}</span>
+                  <span className="text-tinta-media">/{torneio.totalPartidas}</span>
                 </p>
-                <p className="rotulo mt-1.5">Jogos</p>
+                <p className="rotulo mt-1 text-[9px]">Jogos</p>
               </div>
             }
           />

@@ -4,89 +4,100 @@ import { Cartao } from './ui.jsx'
 const BLOCOS = [
   {
     numero: '01',
-    titulo: 'Formato',
+    cor: 'bg-lima',
+    titulo: 'Como funciona',
     itens: [
-      'Mata-mata direto: quem perde na chave principal está fora dela.',
-      'Fases na ordem Oitavas, Quartas, Semifinal e Final.',
-      'O chaveamento inicial sai por sorteio, sem cabeças de chave.',
-      'Se os inscritos não fecharem uma potência de 2, algumas chaves recebem classificação direta.',
+      'Mata-mata direto: perdeu na chave principal, saiu dela.',
+      'Oitavas, quartas, semifinal e final, nessa ordem.',
+      'O chaveamento sai por sorteio — sem cabeça de chave, sem panelinha.',
+      'Se o número de inscritos não fechar, alguém passa direto na primeira fase.',
     ],
   },
   {
     numero: '02',
+    cor: 'bg-laranja text-white',
     titulo: 'Repescagem',
     itens: [
-      'Todos os eliminados da primeira fase entram na chave de repescagem.',
-      'A repescagem também é mata-mata e mantém a ordem dos confrontos originais.',
-      'O vencedor da repescagem fica com o terceiro lugar.',
+      'Todo mundo que cai na primeira fase entra na repescagem.',
+      'Também é mata-mata, mantendo a ordem dos confrontos.',
+      'Quem vencer a repescagem fica com o terceiro lugar.',
     ],
   },
   {
     numero: '03',
-    titulo: 'Partidas',
+    cor: 'bg-papel-escuro',
+    titulo: 'Os jogos',
     itens: [
       'Seis minutos por tempo, nível Profissional.',
-      'Lesões e desgaste desativados, velocidade normal.',
-      'Cada participante escolhe um time no cadastro e mantém até o fim.',
-      'Times repetidos são permitidos.',
+      'Lesão e desgaste desligados, velocidade normal.',
+      'Escolheu o time no cadastro, fica com ele até o fim.',
+      'Pode repetir time — aqui vale a habilidade, não o elenco.',
     ],
   },
   {
     numero: '04',
-    titulo: 'Empates',
+    cor: 'bg-cobalto text-white',
+    titulo: 'Deu empate',
     itens: [
-      'Não existe empate no mata-mata: empatou, vai direto para os pênaltis.',
-      'A prorrogação é dispensada para manter a programação do acampamento.',
-      'O placar dos pênaltis não conta na artilharia.',
+      'Não existe empate: acabou empatado, vai direto pros pênaltis.',
+      'Sem prorrogação, pra não atrasar a programação.',
+      'Gol de pênalti na decisão não conta na artilharia.',
     ],
   },
   {
     numero: '05',
-    titulo: 'Disciplina',
+    cor: 'bg-rosa text-white',
+    titulo: 'Cartões',
     itens: [
-      `${LIMITE_AMARELOS} amarelos acumulados geram suspensão no jogo seguinte.`,
-      'Cartão vermelho suspende automaticamente o próximo jogo.',
-      'Controle arremessado, palavrão ou desrespeito ao adversário rende cartão da organização.',
-      'Reincidência pode resultar em W.O.',
+      `${LIMITE_AMARELOS} amarelos acumulados = fica de fora do jogo seguinte.`,
+      'Vermelho suspende automaticamente na próxima partida.',
+      'Controle arremessado, palavrão ou zoação pesada = cartão da organização.',
+      'Insistiu? A organização pode dar W.O.',
     ],
   },
   {
     numero: '06',
-    titulo: 'Convivência',
+    cor: 'bg-papel-escuro',
+    titulo: 'O combinado',
     itens: [
-      'Competição saudável: joga para ganhar, torce para todos.',
-      'Cumprimente o adversário antes e depois da partida.',
-      'Mais de 10 minutos de atraso caracteriza W.O.',
-      'Quem estiver na programação espiritual tem o jogo remarcado, sem prejuízo.',
+      'Joga pra ganhar, mas torce por todo mundo.',
+      'Cumprimenta o adversário antes e depois. Sempre.',
+      'Mais de 10 minutos de atraso é W.O.',
+      'Quem estiver na programação espiritual joga depois, sem prejuízo.',
     ],
   },
 ]
 
 export function Regras() {
   return (
-    <div className="space-y-6">
-      <Cartao realce className="flex flex-wrap items-end justify-between gap-6 p-6 sm:p-8">
-        <div>
-          <p className="rotulo text-realce/80">Premiação</p>
-          <h2 className="num dourado mt-3 font-serif text-5xl leading-none">R$ 100,00</h2>
-          <p className="mt-3 text-[13px] text-perola-400">Entregues ao campeão na noite de encerramento.</p>
+    <div className="space-y-5">
+      <div className="contorno sombra-g relative overflow-hidden rounded-xl bg-laranja px-6 py-7 text-white sm:px-8">
+        <div className="listrado absolute inset-0" aria-hidden="true" />
+        <div className="relative flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <span className="contorno rotulo inline-block rounded-md bg-lima px-2 py-1 text-[10px] text-tinta">
+              Premiação
+            </span>
+            <p className="num mt-3 font-display text-6xl leading-none">R$ 100</p>
+            <p className="mt-2 text-[14px] font-medium">na mão do campeão, na noite de encerramento.</p>
+          </div>
+          <p className="max-w-xs text-[13px] leading-snug font-medium text-white/85">
+            Vice e terceiro colocado levam a medalha do Unidos Acamp. E o direito de encher o saco até o ano que vem.
+          </p>
         </div>
-        <p className="max-w-xs text-[13px] leading-relaxed text-perola-400">
-          Vice-campeão e terceiro colocado recebem a medalha simbólica do Unidos Acamp.
-        </p>
-      </Cartao>
+      </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {BLOCOS.map(({ numero, titulo, itens }) => (
-          <Cartao key={titulo} className="p-6">
-            <div className="flex items-baseline gap-3">
-              <span className="num font-serif text-lg text-realce/50">{numero}</span>
-              <h3 className="font-serif text-xl leading-none text-perola-100">{titulo}</h3>
+        {BLOCOS.map(({ numero, cor, titulo, itens }) => (
+          <Cartao key={titulo} className="overflow-hidden">
+            <div className={`flex items-center gap-3 border-b-2 border-tinta px-4 py-3 ${cor}`}>
+              <span className="num font-display text-2xl leading-none">{numero}</span>
+              <h3 className={`text-xl ${cor.includes('text-white') ? 'text-white' : ''}`}>{titulo}</h3>
             </div>
-            <ul className="mt-5 space-y-3">
+            <ul className="space-y-3 p-4">
               {itens.map((item) => (
-                <li key={item} className="flex gap-3 text-[13px] leading-relaxed text-perola-400">
-                  <span className="mt-[7px] size-1 shrink-0 rounded-full bg-realce/40" />
+                <li key={item} className="flex gap-2.5 text-[13px] leading-snug">
+                  <span className="mt-1.5 size-2 shrink-0 rounded-sm border-2 border-tinta bg-lima" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -95,8 +106,8 @@ export function Regras() {
         ))}
       </div>
 
-      <p className="px-1 text-[12px] leading-relaxed text-perola-600">
-        Casos omissos são resolvidos pela organização do Unidos Acamp. A decisão da mesa é final.
+      <p className="px-1 text-[12px] font-medium text-tinta-media">
+        Deu treta em algo que não está aqui? A organização do Unidos Acamp decide — e a decisão da mesa é final.
       </p>
     </div>
   )

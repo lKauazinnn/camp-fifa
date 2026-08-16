@@ -2,11 +2,11 @@ import { useMemo, useRef, useState } from 'react'
 import { Check, Download, Link2, Pencil, Trash2, Upload } from 'lucide-react'
 import { LIGAS, TIMES, buscarTime } from '../data/times.js'
 import { formatarHorario } from '../lib/persistencia.js'
-import { Botao, Cartao, EscudoTime, Etiqueta, TituloSecao } from './ui.jsx'
+import { Botao, BotaoTexto, Cartao, EscudoTime, Etiqueta, TituloSecao } from './ui.jsx'
 import { ModalConfirmacao } from './ModalConfirmacao.jsx'
 
 const CAMPO =
-  'w-full rounded-xl border border-borda bg-fundo/60 px-3.5 py-2.5 text-[13px] text-perola-200 placeholder:text-perola-600 transition-colors focus:border-realce/40 focus:outline-none'
+  'contorno w-full rounded-lg bg-papel-claro px-3 py-2.5 text-[14px] font-medium placeholder:text-tinta-fraca focus:bg-lima/20 focus:outline-none'
 
 /* -------------------------------------------------------------------------- */
 /* Cadastro                                                                   */
@@ -28,7 +28,7 @@ function FormularioParticipante({ aoCadastrar }) {
       <input
         value={nome}
         onChange={(evento) => setNome(evento.target.value)}
-        placeholder="Nome do participante"
+        placeholder="Nome do jogador"
         maxLength={40}
         className={CAMPO}
       />
@@ -60,7 +60,7 @@ function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover }) {
 
   if (editando) {
     return (
-      <li className="grid gap-2.5 rounded-xl border border-realce/25 bg-realce/[0.04] p-2.5 sm:grid-cols-[1fr_1fr_auto]">
+      <li className="contorno grid gap-2.5 rounded-lg bg-lima/25 p-2.5 sm:grid-cols-[1fr_1fr_auto]">
         <input value={nome} onChange={(evento) => setNome(evento.target.value)} className={CAMPO} />
         <select value={timeId} onChange={(evento) => setTimeId(evento.target.value)} className={CAMPO}>
           {TIMES.map((time) => (
@@ -78,7 +78,7 @@ function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover }) {
           >
             Salvar
           </Botao>
-          <Botao variante="fantasma" onClick={() => setEditando(false)}>
+          <Botao variante="papel" onClick={() => setEditando(false)}>
             Cancelar
           </Botao>
         </div>
@@ -87,29 +87,29 @@ function LinhaParticipante({ participante, indice, aoAtualizar, aoRemover }) {
   }
 
   return (
-    <li className="group flex items-center gap-3 rounded-xl border border-transparent px-2.5 py-2 transition-colors hover:border-borda hover:bg-white/[0.02]">
-      <span className="num w-5 shrink-0 text-right text-[11px] text-perola-600">{indice + 1}</span>
+    <li className="group flex items-center gap-2.5 rounded-lg border-2 border-transparent px-2 py-1.5 transition-colors hover:border-tinta hover:bg-papel-claro">
+      <span className="num w-5 shrink-0 text-right font-display text-[11px] text-tinta-fraca">{indice + 1}</span>
       <EscudoTime timeId={participante.timeId} tamanho="sm" />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[13px] text-perola-200">{participante.nome}</p>
-        <p className="truncate text-[11px] text-perola-600">{buscarTime(participante.timeId).nome}</p>
+        <p className="truncate text-[14px] font-medium">{participante.nome}</p>
+        <p className="truncate text-[11px] text-tinta-fraca">{buscarTime(participante.timeId).nome}</p>
       </div>
       <div className="flex shrink-0 gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
         <button
           type="button"
           onClick={() => setEditando(true)}
-          className="grid size-8 place-items-center rounded-lg text-perola-500 transition-colors hover:bg-white/[0.06] hover:text-perola-100"
+          className="grid size-8 place-items-center rounded-md border-2 border-transparent transition-colors hover:border-tinta hover:bg-lima"
           aria-label={`Editar ${participante.nome}`}
         >
-          <Pencil className="size-3.5" strokeWidth={1.75} />
+          <Pencil className="size-3.5" strokeWidth={2.5} />
         </button>
         <button
           type="button"
           onClick={() => aoRemover(participante)}
-          className="grid size-8 place-items-center rounded-lg text-perola-500 transition-colors hover:bg-rose-500/10 hover:text-rose-300"
+          className="grid size-8 place-items-center rounded-md border-2 border-transparent transition-colors hover:border-tinta hover:bg-rosa hover:text-white"
           aria-label={`Remover ${participante.nome}`}
         >
-          <Trash2 className="size-3.5" strokeWidth={1.75} />
+          <Trash2 className="size-3.5" strokeWidth={2.5} />
         </button>
       </div>
     </li>
@@ -135,15 +135,15 @@ function ListaDeJogos({ torneio, aoEditarPartida }) {
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {grupos.map((grupo) => (
         <div key={grupo.chave}>
-          <div className="mb-2 flex items-center gap-2.5 border-b border-borda pb-2">
-            <h4 className="font-serif text-[15px] leading-none text-perola-200">{grupo.titulo}</h4>
-            {grupo.repescagem ? <Etiqueta tom="discreto">Repescagem</Etiqueta> : null}
+          <div className="mb-2 flex items-center gap-2 border-b-2 border-tinta pb-2">
+            <h4 className="text-lg">{grupo.titulo}</h4>
+            {grupo.repescagem ? <Etiqueta cor="laranja">Repescagem</Etiqueta> : null}
           </div>
 
-          <ul>
+          <ul className="space-y-1">
             {grupo.partidas.map((partida) => {
               const disponivel = partida.editavel
               return (
@@ -152,40 +152,40 @@ function ListaDeJogos({ torneio, aoEditarPartida }) {
                     type="button"
                     disabled={!disponivel}
                     onClick={() => aoEditarPartida(partida)}
-                    className={`flex w-full items-center gap-3 rounded-xl px-2.5 py-2.5 text-left transition-colors ${
-                      disponivel ? 'hover:bg-white/[0.04]' : 'cursor-not-allowed opacity-35'
+                    className={`flex w-full items-center gap-2.5 rounded-lg border-2 px-2.5 py-2 text-left transition-colors ${
+                      disponivel
+                        ? 'border-transparent hover:border-tinta hover:bg-papel-claro'
+                        : 'cursor-not-allowed border-transparent opacity-40'
                     }`}
                   >
-                    <span className="num w-4 shrink-0 text-[11px] text-perola-600">{partida.numero}</span>
+                    <span className="num w-4 shrink-0 font-display text-[11px] text-tinta-fraca">{partida.numero}</span>
 
-                    <span className="min-w-0 flex-1 truncate text-[13px] text-perola-300">
-                      {partida.a?.nome ?? <span className="text-perola-600 italic">A definir</span>}
+                    <span className="min-w-0 flex-1 truncate text-[13px] font-medium">
+                      {partida.a?.nome ?? <span className="text-tinta-fraca">a definir</span>}
                     </span>
 
                     <span
-                      className={`num shrink-0 font-serif text-[15px] ${
-                        partida.resultado ? 'text-realce' : 'text-perola-600'
+                      className={`num contorno shrink-0 rounded-md px-2 py-0.5 font-display text-[13px] ${
+                        partida.resultado ? 'bg-lima' : 'border-dashed bg-transparent text-tinta-fraca'
                       }`}
                     >
                       {partida.resultado
-                        ? `${partida.resultado.golsA} · ${partida.resultado.golsB}`
+                        ? `${partida.resultado.golsA} - ${partida.resultado.golsB}`
                         : partida.status === 'bye'
-                          ? '—'
-                          : '– · –'}
+                          ? 'bye'
+                          : '– – –'}
                     </span>
 
-                    <span className="min-w-0 flex-1 truncate text-right text-[13px] text-perola-300">
-                      {partida.b?.nome ?? <span className="text-perola-600 italic">A definir</span>}
+                    <span className="min-w-0 flex-1 truncate text-right text-[13px] font-medium">
+                      {partida.b?.nome ?? <span className="text-tinta-fraca">a definir</span>}
                     </span>
 
                     <span className="hidden w-16 shrink-0 text-right sm:block">
-                      {partida.status === 'finalizada' ? (
-                        <span className="rotulo text-realce/70">Lançado</span>
-                      ) : partida.status === 'pronta' ? (
-                        <span className="rotulo text-amber-300/80">Lançar</span>
-                      ) : (
-                        <span className="rotulo">—</span>
-                      )}
+                      {partida.status === 'pronta' ? (
+                        <span className="rotulo text-[9px] text-laranja">Lançar</span>
+                      ) : partida.status === 'finalizada' ? (
+                        <span className="rotulo text-[9px] text-tinta-fraca">Ok</span>
+                      ) : null}
                     </span>
                   </button>
                 </li>
@@ -217,53 +217,51 @@ function BlocoDados({ acoes, salvamento, temDados }) {
     if (!arquivo) return
     try {
       const total = await acoes.importarBackup(arquivo)
-      mostrar(`Backup restaurado: ${total} participantes.`)
+      mostrar(`Backup restaurado: ${total} jogadores.`)
     } catch (erro) {
-      mostrar(erro.message || 'Não foi possível ler o arquivo.', true)
+      mostrar(erro.message || 'Não deu pra ler o arquivo.', true)
     }
   }
 
   return (
-    <Cartao className="p-5 sm:p-7">
+    <Cartao className="p-4 sm:p-6">
       <TituloSecao
-        className="mb-6"
-        titulo="Dados e backup"
-        descricao="Tudo é salvo automaticamente neste navegador e sobrevive a atualizar a página. O backup em arquivo protege contra limpeza de cache ou troca de aparelho."
+        className="mb-5"
+        titulo="Backup"
+        descricao="Tudo é salvo sozinho neste navegador e aguenta atualizar a página. O arquivo de backup protege contra limpar o cache ou trocar de celular."
       />
 
-      <div className="mb-5 flex items-center gap-2.5 rounded-xl border border-borda bg-fundo/50 px-4 py-3">
-        {salvamento.falhou ? (
-          <>
-            <span className="size-1.5 shrink-0 rounded-full bg-rose-400" />
-            <p className="text-[12px] text-rose-300">
-              O navegador bloqueou o armazenamento (janela anônima?). Baixe um backup antes de fechar a página.
-            </p>
-          </>
-        ) : (
-          <>
-            <span className="animar-respirar size-1.5 shrink-0 rounded-full bg-realce" />
-            <p className="text-[12px] text-perola-500">
-              Salvo automaticamente
-              {salvamento.em ? <span className="text-perola-300"> · {formatarHorario(salvamento.em)}</span> : null}
-            </p>
-          </>
-        )}
+      <div
+        className={`contorno mb-4 flex items-center gap-2.5 rounded-lg px-3 py-2.5 ${
+          salvamento.falhou ? 'bg-rosa text-white' : 'bg-lima'
+        }`}
+      >
+        <span
+          className={`size-2 shrink-0 rounded-full border-2 border-tinta ${
+            salvamento.falhou ? 'bg-white' : 'animar-piscar bg-tinta'
+          }`}
+        />
+        <p className="text-[12px] font-bold">
+          {salvamento.falhou
+            ? 'O navegador bloqueou o armazenamento (aba anônima?). Baixe um backup antes de fechar.'
+            : `Salvo automaticamente${salvamento.em ? ` · ${formatarHorario(salvamento.em)}` : ''}`}
+        </p>
       </div>
 
       <div className="flex flex-wrap gap-2.5">
-        <Botao variante="contorno" icone={Download} onClick={acoes.exportarBackup} disabled={!temDados}>
+        <Botao variante="papel" icone={Download} onClick={acoes.exportarBackup} disabled={!temDados}>
           Baixar backup
         </Botao>
-        <Botao variante="contorno" icone={Upload} onClick={() => inputArquivo.current?.click()}>
+        <Botao variante="papel" icone={Upload} onClick={() => inputArquivo.current?.click()}>
           Restaurar backup
         </Botao>
         <Botao
-          variante="contorno"
+          variante="cobalto"
           icone={Link2}
           disabled={!temDados}
           onClick={async () => {
             const copiou = await acoes.copiarLink()
-            mostrar(copiou ? 'Link copiado — cole no grupo do acampamento.' : 'Não foi possível copiar o link.', !copiou)
+            mostrar(copiou ? 'Link copiado! Cola no grupo do acampamento.' : 'Não deu pra copiar o link.', !copiou)
           }}
         >
           Copiar link do placar
@@ -272,15 +270,19 @@ function BlocoDados({ acoes, salvamento, temDados }) {
       </div>
 
       {aviso ? (
-        <p className={`mt-4 flex items-center gap-2 text-[12px] ${aviso.erro ? 'text-rose-300' : 'text-realce'}`}>
-          {aviso.erro ? null : <Check className="size-3.5" strokeWidth={2} />}
+        <p
+          className={`contorno mt-3 inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[12px] font-bold ${
+            aviso.erro ? 'bg-rosa text-white' : 'bg-lima'
+          }`}
+        >
+          {aviso.erro ? null : <Check className="size-3.5" strokeWidth={3} />}
           {aviso.texto}
         </p>
       ) : null}
 
-      <p className="mt-4 max-w-2xl text-[12px] leading-relaxed text-perola-600">
-        O link do placar carrega uma cópia dos resultados dentro do próprio endereço — quem abrir vê o campeonato como
-        está agora, em modo somente leitura. Gere um link novo depois de lançar mais jogos.
+      <p className="mt-4 max-w-2xl text-[12px] leading-snug text-tinta-media">
+        O link do placar leva uma cópia dos resultados dentro do próprio endereço — quem abrir vê o campeonato como
+        está agora, só pra olhar. Gere um link novo depois de lançar mais jogos.
       </p>
     </Cartao>
   )
@@ -297,7 +299,7 @@ export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, sa
   const pedir = (config) => setConfirmacao(config)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <ModalConfirmacao
         aberto={Boolean(confirmacao)}
         titulo={confirmacao?.titulo ?? ''}
@@ -308,16 +310,16 @@ export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, sa
         aoFechar={() => setConfirmacao(null)}
       />
 
-      {/* Participantes */}
-      <Cartao className="p-5 sm:p-7">
+      {/* Jogadores */}
+      <Cartao className="p-4 sm:p-6">
         <TituloSecao
-          className="mb-6"
-          titulo="Participantes"
-          descricao="Cadastre cada jovem e o time que ele vai usar no FIFA."
+          className="mb-5"
+          titulo="Jogadores"
+          descricao="Cadastre cada um com o time que vai usar no FIFA."
           acao={
-            <div className="shrink-0 text-right">
-              <p className="num font-serif text-2xl leading-none text-perola-100">{participantes.length}</p>
-              <p className="rotulo mt-1.5">Inscritos</p>
+            <div className="contorno shrink-0 rounded-lg bg-lima px-3 py-2 text-center">
+              <p className="num font-display text-2xl leading-none">{participantes.length}</p>
+              <p className="rotulo mt-1 text-[9px]">Inscritos</p>
             </div>
           }
         />
@@ -325,7 +327,7 @@ export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, sa
         <FormularioParticipante aoCadastrar={acoes.adicionarParticipante} />
 
         {participantes.length ? (
-          <ul className="mt-5 grid gap-1 lg:grid-cols-2">
+          <ul className="mt-4 grid gap-1 lg:grid-cols-2">
             {participantes.map((participante, indice) => (
               <LinhaParticipante
                 key={participante.id}
@@ -334,11 +336,11 @@ export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, sa
                 aoAtualizar={acoes.atualizarParticipante}
                 aoRemover={(alvo) =>
                   pedir({
-                    titulo: `Remover ${alvo.nome}?`,
+                    titulo: `Tirar ${alvo.nome}?`,
                     descricao: torneio.ativo
-                      ? 'Este participante já está no chaveamento. Removê-lo apaga o sorteio e os resultados lançados.'
-                      : 'O participante será excluído da lista de inscritos.',
-                    textoConfirmar: 'Remover',
+                      ? 'Ele já está no chaveamento. Tirar agora apaga o sorteio e todos os placares lançados.'
+                      : 'O jogador some da lista de inscritos.',
+                    textoConfirmar: 'Pode tirar',
                     acao: () => acoes.removerParticipante(alvo.id),
                   })
                 }
@@ -346,126 +348,130 @@ export function PainelAdmin({ participantes, torneio, acoes, aoEditarPartida, sa
             ))}
           </ul>
         ) : (
-          <p className="mt-5 rounded-xl border border-dashed border-borda px-4 py-10 text-center text-[13px] text-perola-600">
-            Nenhum participante cadastrado.
+          <p className="contorno mt-4 rounded-lg border-dashed px-4 py-8 text-center text-[13px] text-tinta-media">
+            Ninguém cadastrado ainda.
           </p>
         )}
       </Cartao>
 
       {/* Sorteio */}
-      <Cartao className="p-5 sm:p-7">
-        <TituloSecao
-          className="mb-6"
-          titulo="Sorteio"
-          descricao={
-            podeSortear
-              ? 'Gera os confrontos da chave principal e a repescagem de uma vez.'
-              : 'Cadastre pelo menos 4 participantes para sortear as chaves.'
-          }
-        />
-        <div className="flex flex-wrap gap-2.5">
-          <Botao
-            disabled={!podeSortear}
-            onClick={() =>
-              torneio.ativo
-                ? pedir({
-                    titulo: 'Sortear novamente?',
-                    descricao: 'Um novo sorteio embaralha os confrontos e apaga os resultados já lançados.',
-                    textoConfirmar: 'Sortear de novo',
-                    acao: acoes.sortear,
-                  })
-                : acoes.sortear()
-            }
-          >
-            {torneio.ativo ? 'Sortear novamente' : 'Sortear confrontos'}
-          </Botao>
+      <Cartao cor={podeSortear && !torneio.ativo ? 'cobalto' : 'papel'} className="p-4 sm:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className={`text-2xl sm:text-[28px] ${podeSortear && !torneio.ativo ? 'text-white' : ''}`}>Sorteio</h2>
+            <p
+              className={`mt-2 max-w-lg text-[14px] leading-snug ${
+                podeSortear && !torneio.ativo ? 'text-white/80' : 'text-tinta-media'
+              }`}
+            >
+              {podeSortear
+                ? 'Embaralha todo mundo e monta a chave principal + a repescagem de uma vez.'
+                : 'Cadastre pelo menos 4 jogadores pra poder sortear.'}
+            </p>
+          </div>
 
-          {torneio.ativo ? (
+          <div className="flex flex-wrap gap-2.5">
             <Botao
-              variante="contorno"
+              disabled={!podeSortear}
               onClick={() =>
-                pedir({
-                  titulo: 'Zerar todos os placares?',
-                  descricao: 'Os confrontos continuam, mas os resultados voltam a ficar em aberto.',
-                  textoConfirmar: 'Zerar placares',
-                  acao: acoes.zerarResultados,
-                })
+                torneio.ativo
+                  ? pedir({
+                      titulo: 'Sortear de novo?',
+                      descricao: 'Um sorteio novo embaralha os confrontos e apaga todos os placares já lançados.',
+                      textoConfirmar: 'Pode sortear',
+                      acao: acoes.sortear,
+                    })
+                  : acoes.sortear()
               }
             >
-              Zerar placares
+              {torneio.ativo ? 'Sortear de novo' : 'Sortear as chaves'}
             </Botao>
-          ) : null}
+
+            {torneio.ativo ? (
+              <Botao
+                variante="papel"
+                onClick={() =>
+                  pedir({
+                    titulo: 'Zerar os placares?',
+                    descricao: 'Os confrontos continuam iguais, mas todos os resultados voltam a ficar em aberto.',
+                    textoConfirmar: 'Zerar',
+                    acao: acoes.zerarResultados,
+                  })
+                }
+              >
+                Zerar placares
+              </Botao>
+            ) : null}
+          </div>
         </div>
       </Cartao>
 
       {/* Resultados */}
-      <Cartao className="p-5 sm:p-7">
+      <Cartao className="p-4 sm:p-6">
         <TituloSecao
-          className="mb-6"
-          titulo="Resultados"
-          descricao="Clique em um jogo liberado para registrar placar, cartões e pênaltis."
+          className="mb-5"
+          titulo="Lançar placares"
+          descricao="Toque num jogo liberado pra registrar gols, cartões e pênaltis."
           acao={
-            <div className="shrink-0 text-right">
-              <p className="num font-serif text-2xl leading-none text-perola-100">
+            <div className="contorno shrink-0 rounded-lg bg-papel-escuro px-3 py-2 text-center">
+              <p className="num font-display text-2xl leading-none">
                 {torneio.partidasFinalizadas}
-                <span className="text-perola-600">/{torneio.totalPartidas}</span>
+                <span className="text-tinta-media">/{torneio.totalPartidas}</span>
               </p>
-              <p className="rotulo mt-1.5">Lançados</p>
+              <p className="rotulo mt-1 text-[9px]">Lançados</p>
             </div>
           }
         />
         {torneio.ativo ? (
           <ListaDeJogos torneio={torneio} aoEditarPartida={aoEditarPartida} />
         ) : (
-          <p className="rounded-xl border border-dashed border-borda px-4 py-10 text-center text-[13px] text-perola-600">
-            Faça o sorteio para liberar os jogos.
+          <p className="contorno rounded-lg border-dashed px-4 py-8 text-center text-[13px] text-tinta-media">
+            Faça o sorteio pra liberar os jogos.
           </p>
         )}
       </Cartao>
 
       <BlocoDados acoes={acoes} salvamento={salvamento} temDados={participantes.length > 0} />
 
-      {/* Reinício */}
-      <Cartao className="p-5 sm:p-7">
-        <TituloSecao className="mb-6" titulo="Reiniciar" descricao="Ações que apagam dados do campeonato." />
-        <div className="flex flex-wrap gap-2.5">
-          <Botao
-            variante="contorno"
+      {/* Recomeçar */}
+      <Cartao className="p-4 sm:p-6">
+        <TituloSecao className="mb-5" titulo="Recomeçar" descricao="Cuidado: daqui pra baixo, apaga coisa." />
+        <div className="flex flex-wrap items-center gap-2.5">
+          <BotaoTexto
             onClick={() =>
               pedir({
-                titulo: 'Restaurar dados de exemplo?',
-                descricao: 'O campeonato atual será substituído pelos 16 participantes de demonstração.',
+                titulo: 'Voltar pros dados de exemplo?',
+                descricao: 'O campeonato atual será trocado pelos 16 jogadores de demonstração.',
                 textoConfirmar: 'Restaurar',
-                variante: 'primario',
+                variante: 'cobalto',
                 acao: acoes.restaurarExemplo,
               })
             }
           >
             Dados de exemplo
-          </Botao>
+          </BotaoTexto>
 
-          <Botao
-            variante="contorno"
+          <BotaoTexto
             disabled={!torneio.ativo}
             onClick={() =>
               pedir({
                 titulo: 'Desfazer o chaveamento?',
-                descricao: 'O sorteio e os resultados são apagados. A lista de participantes é mantida.',
+                descricao: 'O sorteio e os placares somem. A lista de jogadores continua.',
                 textoConfirmar: 'Desfazer',
                 acao: acoes.desfazerChaveamento,
               })
             }
           >
             Desfazer chaveamento
-          </Botao>
+          </BotaoTexto>
 
           <Botao
             variante="perigo"
             onClick={() =>
               pedir({
-                titulo: 'Apagar tudo?',
+                titulo: 'Apagar tudo mesmo?',
                 descricao:
-                  'Participantes, sorteio e resultados serão removidos deste navegador. Baixe um backup antes se quiser poder voltar atrás.',
+                  'Jogadores, sorteio e placares somem deste navegador. Baixe um backup antes se quiser poder voltar atrás.',
                 textoConfirmar: 'Apagar tudo',
                 acao: acoes.limparTudo,
               })

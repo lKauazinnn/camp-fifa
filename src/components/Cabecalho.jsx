@@ -1,60 +1,66 @@
 import { BarraProgresso } from './ui.jsx'
 
-function Indicador({ valor, rotulo }) {
+function Caixa({ valor, rotulo, cor = 'papel' }) {
+  const fundos = { papel: 'bg-papel-claro', lima: 'bg-lima', cobalto: 'bg-cobalto text-white' }
   return (
-    <div className="min-w-0">
-      <p className="num font-serif text-xl leading-none text-perola-100">{valor}</p>
-      <p className="rotulo mt-1.5 truncate">{rotulo}</p>
+    <div className={`contorno sombra-p min-w-24 flex-1 rounded-lg px-3 py-2.5 ${fundos[cor]}`}>
+      <p className="num font-display text-2xl leading-none">{valor}</p>
+      <p className={`rotulo mt-1.5 text-[9px] ${cor === 'cobalto' ? 'text-white/70' : 'text-tinta-media'}`}>{rotulo}</p>
     </div>
   )
 }
 
 export function Cabecalho({ totalParticipantes, totalGols, torneio }) {
   return (
-    <header className="relative">
-      <div className="mx-auto max-w-6xl px-5 pt-12 pb-8 sm:px-8 sm:pt-16">
-        <div className="flex flex-wrap items-start justify-between gap-8">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2.5">
-              <span className="h-px w-8 bg-[linear-gradient(90deg,transparent,#a8854a)]" aria-hidden="true" />
-              <p className="rotulo text-realce/80">Unidos Acamp</p>
-            </div>
-
-            <h1 className="mt-4 font-serif text-[2.75rem] leading-[0.95] text-perola-100 sm:text-6xl">
-              Campeonato <span className="dourado italic">FIFA</span>
-            </h1>
-
-            <p className="mt-4 max-w-md text-[13px] leading-relaxed text-perola-400">
-              Mata-mata entre os jovens do acampamento, com repescagem para quem cair na primeira fase.
-            </p>
+    <header className="mx-auto max-w-6xl px-4 pt-7 pb-5 sm:px-6 sm:pt-10">
+      <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="contorno rotulo rounded-md bg-tinta px-2 py-1 text-[10px] text-papel-claro">
+              Unidos Acamp
+            </span>
+            <span className="rotulo text-[10px] text-tinta-media">Acampamento da galera</span>
           </div>
 
-          {/* Premiação */}
-          <div className="painel-realce relative w-full max-w-64 overflow-hidden rounded-2xl border border-realce/25 px-5 py-4 sm:w-auto">
-            <p className="rotulo text-realce/70">Premiação</p>
-            <p className="num dourado mt-2 font-serif text-4xl leading-none">R$ 100</p>
-            <p className="mt-2 text-[12px] text-perola-400">
-              para o campeão <span className="text-perola-500">· pagos no encerramento</span>
+          <h1 className="mt-4 text-[3rem] leading-[0.86] sm:text-[5.5rem]">
+            Campeonato
+            <br />
+            <span className="marcado">FIFA</span>
+          </h1>
+
+          <p className="mt-4 max-w-md text-[14px] leading-snug text-tinta-media">
+            Mata-mata entre a galera do acampamento. Perdeu na primeira fase? Calma, tem repescagem.
+          </p>
+        </div>
+
+        {/* Premiação */}
+        <div className="girar-2 contorno sombra-g relative w-full rounded-xl bg-laranja px-5 py-4 text-white lg:w-64">
+          <div className="listrado absolute inset-0 rounded-[10px]" aria-hidden="true" />
+          <div className="relative">
+            <p className="rotulo text-[10px] text-white/80">Prêmio do campeão</p>
+            <p className="num mt-1.5 font-display text-5xl leading-none">R$100</p>
+            <p className="mt-2 text-[12px] leading-snug font-medium">
+              na mão, na noite de encerramento
             </p>
           </div>
         </div>
+      </div>
 
-        {/* Indicadores */}
-        <div className="mt-10 flex flex-wrap items-end gap-x-10 gap-y-6 border-t border-borda pt-6">
-          <Indicador valor={totalParticipantes} rotulo="Inscritos" />
-          <Indicador valor={totalGols} rotulo="Gols marcados" />
-          <Indicador valor={`${torneio.partidasFinalizadas}/${torneio.totalPartidas}`} rotulo="Jogos disputados" />
+      {/* Placar geral */}
+      <div className="mt-7 flex flex-wrap items-stretch gap-3">
+        <Caixa valor={totalParticipantes} rotulo="Jogadores" />
+        <Caixa valor={totalGols} rotulo="Gols" cor="lima" />
+        <Caixa valor={`${torneio.partidasFinalizadas}/${torneio.totalPartidas}`} rotulo="Jogos" />
 
-          {torneio.ativo ? (
-            <div className="ml-auto w-full max-w-64 min-w-40">
-              <div className="mb-2 flex items-baseline justify-between">
-                <span className="rotulo">Andamento</span>
-                <span className="num text-[11px] text-realce">{torneio.progresso}%</span>
-              </div>
-              <BarraProgresso valor={torneio.progresso} />
+        {torneio.ativo ? (
+          <div className="contorno sombra-p min-w-52 flex-[2] rounded-lg bg-papel-claro px-3 py-2.5">
+            <div className="mb-2 flex items-baseline justify-between">
+              <p className="rotulo text-[9px] text-tinta-media">Andamento do campeonato</p>
+              <p className="num font-display text-[13px]">{torneio.progresso}%</p>
             </div>
-          ) : null}
-        </div>
+            <BarraProgresso valor={torneio.progresso} />
+          </div>
+        ) : null}
       </div>
     </header>
   )

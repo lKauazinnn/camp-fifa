@@ -4,36 +4,40 @@ import { Cartoes, EscudoTime } from './ui.jsx'
 function Lado({ participante, gols, penaltis, mostrarPenaltis, vencedor, perdedor, amarelos, vermelhos }) {
   if (!participante) {
     return (
-      <div className="flex items-center gap-3 px-3.5 py-2.5">
-        <span className="size-7 shrink-0 rounded-full border border-dashed border-borda-forte/60" />
-        <span className="text-[13px] text-perola-600 italic">A definir</span>
+      <div className="flex items-center gap-2.5 px-3 py-2.5">
+        <span className="size-7 shrink-0 rounded-md border-2 border-dashed border-tinta-fraca" />
+        <span className="text-[13px] text-tinta-fraca">esperando…</span>
       </div>
     )
   }
 
   return (
-    <div className={`relative flex items-center gap-3 px-3.5 py-2.5 ${perdedor ? 'opacity-40' : ''}`}>
-      {vencedor ? (
-        <span className="fio-ouro absolute top-1.5 bottom-1.5 left-0 w-[2px] rounded-full" aria-hidden="true" />
-      ) : null}
-
-      <EscudoTime timeId={participante.timeId} tamanho="sm" vencedor={vencedor} />
+    <div className={`flex items-center gap-2.5 px-3 py-2.5 ${perdedor ? 'opacity-45' : ''}`}>
+      <EscudoTime timeId={participante.timeId} tamanho="sm" />
 
       <div className="min-w-0 flex-1">
-        <p className={`truncate text-[13px] leading-tight ${vencedor ? 'text-perola-100' : 'text-perola-300'}`}>
+        <p className={`truncate text-[13px] leading-tight ${vencedor ? 'font-bold text-tinta' : 'text-tinta'}`}>
           {participante.nome}
         </p>
-        <div className="mt-1 flex items-center gap-2">
-          <p className="truncate text-[11px] text-perola-600">{buscarTime(participante.timeId).nome}</p>
+        <div className="mt-0.5 flex items-center gap-1.5">
+          <p className="truncate text-[11px] text-tinta-fraca">{buscarTime(participante.timeId).nome}</p>
           <Cartoes amarelos={amarelos} vermelhos={vermelhos} />
         </div>
       </div>
 
-      {mostrarPenaltis ? <span className="num shrink-0 text-[11px] text-perola-500">({penaltis})</span> : null}
+      {mostrarPenaltis ? (
+        <span className="num shrink-0 rounded border border-tinta bg-papel-escuro px-1 text-[10px] font-bold">
+          {penaltis}
+        </span>
+      ) : null}
 
       <span
-        className={`num w-5 shrink-0 text-right text-[17px] ${
-          gols === null ? 'text-perola-600' : vencedor ? 'text-realce' : 'text-perola-400'
+        className={`num grid size-8 shrink-0 place-items-center rounded-md font-display text-[15px] ${
+          gols === null
+            ? 'text-tinta-fraca'
+            : vencedor
+              ? 'border-2 border-tinta bg-lima text-tinta'
+              : 'border-2 border-transparent text-tinta-media'
         }`}
       >
         {gols === null ? '–' : gols}
@@ -42,29 +46,31 @@ function Lado({ participante, gols, penaltis, mostrarPenaltis, vencedor, perdedo
   )
 }
 
-function Situacao({ partida }) {
+function Faixa({ partida }) {
   const { status } = partida
 
-  if (status === 'finalizada' && partida.penaltis) {
-    return <span className="text-[10px] tracking-[0.08em] text-perola-500 uppercase">Pênaltis</span>
-  }
   if (status === 'finalizada') {
-    return <span className="text-[10px] tracking-[0.08em] text-realce/70 uppercase">Encerrado</span>
+    return (
+      <span className="rotulo rounded bg-lima px-1.5 py-0.5 text-[9px] text-tinta">
+        {partida.penaltis ? 'Nos pênaltis' : 'Fim de jogo'}
+      </span>
+    )
   }
   if (status === 'pronta') {
     return (
-      <span className="flex items-center gap-1.5 text-[10px] tracking-[0.08em] text-amber-300/80 uppercase">
-        <span className="animar-respirar size-[3px] rounded-full bg-amber-300" />A jogar
+      <span className="rotulo flex items-center gap-1 rounded bg-laranja px-1.5 py-0.5 text-[9px] text-white">
+        <span className="animar-piscar size-1 rounded-full bg-white" />
+        Bora jogar
       </span>
     )
   }
   if (status === 'bye') {
-    return <span className="text-[10px] tracking-[0.08em] text-perola-500 uppercase">Classificado</span>
+    return <span className="rotulo rounded bg-cobalto px-1.5 py-0.5 text-[9px] text-white">Passou direto</span>
   }
   if (status === 'vazia') {
-    return <span className="text-[10px] tracking-[0.08em] text-perola-600 uppercase">Sem jogo</span>
+    return <span className="rotulo text-[9px] text-tinta-fraca">Sem jogo</span>
   }
-  return <span className="text-[10px] tracking-[0.08em] text-perola-600 uppercase">Aguardando</span>
+  return <span className="rotulo text-[9px] text-tinta-fraca">Aguardando</span>
 }
 
 export function CartaoPartida({ partida, aoEditar, destaque = false }) {
@@ -73,12 +79,18 @@ export function CartaoPartida({ partida, aoEditar, destaque = false }) {
 
   const conteudo = (
     <>
-      <div className="flex items-center justify-between gap-2 border-b border-borda/70 px-3.5 py-2">
-        <span className="num text-[10px] tracking-[0.08em] text-perola-600 uppercase">Jogo {partida.numero}</span>
-        <Situacao partida={partida} />
+      <div
+        className={`flex items-center justify-between gap-2 border-b-2 border-tinta px-3 py-1.5 ${
+          destaque ? 'bg-cobalto' : 'bg-papel-escuro'
+        }`}
+      >
+        <span className={`rotulo num text-[9px] ${destaque ? 'text-white' : 'text-tinta-media'}`}>
+          {destaque ? 'Decisão' : `Jogo ${partida.numero}`}
+        </span>
+        <Faixa partida={partida} />
       </div>
 
-      <div className="divide-y divide-borda/60">
+      <div className="divide-y-2 divide-papel-escuro bg-papel-claro">
         <Lado
           participante={partida.a}
           gols={resultado ? resultado.golsA : null}
@@ -103,18 +115,12 @@ export function CartaoPartida({ partida, aoEditar, destaque = false }) {
     </>
   )
 
-  const base = `w-full overflow-hidden rounded-xl border text-left transition-all duration-200 ${
-    destaque ? 'painel-realce border-realce/25' : 'painel border-borda'
-  }`
+  const base = 'contorno sombra-p w-full overflow-hidden rounded-lg text-left'
 
   if (!clicavel) return <div className={base}>{conteudo}</div>
 
   return (
-    <button
-      type="button"
-      onClick={() => aoEditar(partida)}
-      className={`${base} hover:-translate-y-px hover:border-realce/35`}
-    >
+    <button type="button" onClick={() => aoEditar(partida)} className={`${base} apertar`}>
       {conteudo}
     </button>
   )

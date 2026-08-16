@@ -1,7 +1,7 @@
 export function Navegacao({ abas, abaAtiva, aoTrocar }) {
   return (
-    <nav className="sticky top-0 z-30 border-y border-borda bg-fundo/80 backdrop-blur-xl">
-      <div className="sem-barra mx-auto flex max-w-6xl gap-7 overflow-x-auto px-5 sm:gap-9 sm:px-8">
+    <nav className="sticky top-0 z-30 border-y-2 border-tinta bg-papel/95 backdrop-blur">
+      <div className="sem-barra mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-2.5 sm:px-6">
         {abas.map((aba) => {
           const ativa = aba.id === abaAtiva
           return (
@@ -10,18 +10,14 @@ export function Navegacao({ abas, abaAtiva, aoTrocar }) {
               type="button"
               onClick={() => aoTrocar(aba.id)}
               aria-current={ativa ? 'page' : undefined}
-              className={`relative shrink-0 py-4 text-[13px] whitespace-nowrap transition-colors duration-200 ${
-                ativa ? 'text-realce' : 'text-perola-500 hover:text-perola-200'
+              className={`rotulo shrink-0 rounded-lg px-3.5 py-2 text-[11px] whitespace-nowrap transition-all duration-150 ${
+                ativa
+                  ? 'contorno sombra-p bg-tinta text-papel-claro'
+                  : 'border-2 border-transparent text-tinta-media hover:border-tinta hover:bg-lima hover:text-tinta'
               }`}
             >
               <span className="hidden sm:inline">{aba.rotulo}</span>
               <span className="sm:hidden">{aba.rotuloCurto}</span>
-              <span
-                className={`absolute inset-x-0 -bottom-px h-px transition-opacity duration-200 ${
-                  ativa ? 'bg-[linear-gradient(90deg,transparent,#e3c88c,transparent)] opacity-100' : 'opacity-0'
-                }`}
-                aria-hidden="true"
-              />
             </button>
           )
         })}

@@ -1,31 +1,30 @@
 @import 'tailwindcss';
 
 /*
- * Meia-noite & Champanhe
- * Fundo azul-noite profundo, superfícies em vidro fosco com um fio de luz no
- * topo, e o dourado champanhe reservado para o que tem prestígio: premiação,
- * campeão, vencedor da partida e estado ativo.
+ * PÔSTER DE CAMPEONATO
+ * Papel bege, tinta preta, bordas de 2px e sombra sólida (sem blur).
+ * Três cores elétricas com função fixa:
+ *   lima    -> vitória, avanço, tudo que é positivo
+ *   cobalto -> destaques informativos e o campeão
+ *   laranja -> premiação, alertas e coisas que pedem atenção
  */
 @theme {
-  --color-fundo: #070810;
-  --color-superficie: #0c0e19;
-  --color-elevado: #131728;
-  --color-borda: #1e2133;
-  --color-borda-forte: #2f3350;
+  --color-papel: #f0ece1;
+  --color-papel-claro: #fbf9f3;
+  --color-papel-escuro: #e3ddcc;
 
-  --color-realce: #e3c88c;
-  --color-realce-claro: #f6e7c2;
-  --color-realce-escuro: #a8854a;
+  --color-tinta: #14131a;
+  --color-tinta-media: #56535f;
+  --color-tinta-fraca: #8b8794;
 
-  --color-perola-100: #f4f1ea;
-  --color-perola-200: #dcdfe8;
-  --color-perola-300: #b9becd;
-  --color-perola-400: #8f95a9;
-  --color-perola-500: #676c81;
-  --color-perola-600: #474c5e;
+  --color-lima: #ccff00;
+  --color-lima-escura: #a8d400;
+  --color-cobalto: #2b4dff;
+  --color-laranja: #ff5a1f;
+  --color-rosa: #ff2d6f;
 
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --font-display: 'Archivo Black', 'Arial Black', system-ui, sans-serif;
+  --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
@@ -34,46 +33,20 @@
   }
 
   body {
-    @apply bg-fundo font-sans text-perola-300 antialiased;
+    @apply bg-papel font-sans text-tinta antialiased;
     min-height: 100dvh;
-    font-feature-settings: 'cv11', 'ss01';
-  }
-
-  /* Brilho ambiente: um halo dourado no topo e um roxo profundo à esquerda. */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(58rem 30rem at 50% -14%, rgba(227, 200, 140, 0.11), transparent 62%),
-      radial-gradient(46rem 30rem at 4% -4%, rgba(96, 78, 168, 0.16), transparent 58%),
-      radial-gradient(40rem 26rem at 100% 6%, rgba(40, 62, 120, 0.14), transparent 60%);
-  }
-
-  /* Grão sutil: tira o aspecto "plástico" do fundo escuro. */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.032;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
-  }
-
-  #root {
-    position: relative;
-    z-index: 1;
+    /* Malha de pontos, como papel milimetrado de vestiário. */
+    background-image: radial-gradient(rgba(20, 19, 26, 0.09) 1px, transparent 1px);
+    background-size: 22px 22px;
   }
 
   h1,
   h2,
   h3,
   h4 {
-    @apply text-perola-100;
+    @apply font-display text-tinta uppercase;
+    letter-spacing: -0.01em;
+    line-height: 0.95;
   }
 
   input,
@@ -81,10 +54,6 @@
   button,
   textarea {
     font: inherit;
-  }
-
-  select option {
-    background-color: #131728;
   }
 
   input[type='number']::-webkit-outer-spin-button,
@@ -97,68 +66,89 @@
   }
 
   ::selection {
-    @apply bg-realce/25 text-white;
+    background: #ccff00;
+    color: #14131a;
   }
 
   :focus-visible {
-    outline: 1px solid rgba(227, 200, 140, 0.6);
+    outline: 3px solid #2b4dff;
     outline-offset: 2px;
   }
 }
 
 @layer utilities {
-  /* Superfície de vidro fosco com fio de luz no topo. */
-  .painel {
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012));
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.07),
-      0 26px 60px -42px rgba(0, 0, 0, 0.95);
+  /* Contorno e sombra sólida — a base de todo o sistema */
+  .contorno {
+    border: 2px solid var(--color-tinta);
+  }
+  .sombra {
+    box-shadow: 4px 4px 0 var(--color-tinta);
+  }
+  .sombra-p {
+    box-shadow: 3px 3px 0 var(--color-tinta);
+  }
+  .sombra-g {
+    box-shadow: 6px 6px 0 var(--color-tinta);
   }
 
-  .painel-realce {
-    background-image: linear-gradient(180deg, rgba(227, 200, 140, 0.1), rgba(227, 200, 140, 0.012));
-    box-shadow:
-      inset 0 1px 0 rgba(246, 231, 194, 0.18),
-      0 26px 60px -42px rgba(0, 0, 0, 0.95);
+  /* Botões e cards clicáveis afundam ao serem pressionados */
+  .apertar {
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.12s ease,
+      background-color 0.15s ease;
+  }
+  .apertar:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0 var(--color-tinta);
+  }
+  .apertar:active {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 var(--color-tinta);
   }
 
-  /* Texto em degradê champanhe — reservado ao campeão e à premiação. */
-  .dourado {
-    background: linear-gradient(180deg, #f9edd2 0%, #e3c88c 55%, #b9975c 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  .fio-ouro {
-    background: linear-gradient(
-      180deg,
-      rgba(227, 200, 140, 0) 0%,
-      rgba(246, 231, 194, 0.95) 50%,
-      rgba(227, 200, 140, 0) 100%
-    );
+  /* Etiqueta em caixa alta, o rótulo padrão do sistema */
+  .rotulo {
+    @apply font-display text-[10px] tracking-[0.1em] uppercase;
   }
 
   .num {
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
   }
 
-  .rotulo {
-    @apply text-[10px] font-medium tracking-[0.16em] text-perola-500 uppercase;
+  /* Marca-texto atrás de uma palavra */
+  .marcado {
+    background: linear-gradient(180deg, transparent 55%, var(--color-lima) 55%);
+    padding-inline: 0.15em;
+  }
+
+  /* Listras diagonais para faixas de destaque */
+  .listrado {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgba(20, 19, 26, 0.09) 0 6px,
+      transparent 6px 12px
+    );
+  }
+
+  .girar-1 {
+    transform: rotate(-1.5deg);
+  }
+  .girar-2 {
+    transform: rotate(2deg);
   }
 
   .scrollbar-fina {
     scrollbar-width: thin;
-    scrollbar-color: #2f3350 transparent;
+    scrollbar-color: var(--color-tinta) transparent;
   }
   .scrollbar-fina::-webkit-scrollbar {
-    height: 6px;
-    width: 6px;
+    height: 8px;
+    width: 8px;
   }
   .scrollbar-fina::-webkit-scrollbar-thumb {
-    background: #2f3350;
-    border-radius: 9999px;
+    background: var(--color-tinta);
+    border-radius: 0;
   }
   .scrollbar-fina::-webkit-scrollbar-track {
     background: transparent;
@@ -171,30 +161,30 @@
     display: none;
   }
 
-  @keyframes surgir {
+  @keyframes entrar {
     from {
       opacity: 0;
-      transform: translateY(6px);
+      transform: translateY(10px);
     }
     to {
       opacity: 1;
       transform: none;
     }
   }
-  .animar-surgir {
-    animation: surgir 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  .animar-entrar {
+    animation: entrar 0.28s cubic-bezier(0.34, 1.4, 0.64, 1) both;
   }
 
-  @keyframes respirar {
+  @keyframes piscar {
     0%,
     100% {
       opacity: 1;
     }
     50% {
-      opacity: 0.3;
+      opacity: 0.25;
     }
   }
-  .animar-respirar {
-    animation: respirar 2.6s ease-in-out infinite;
+  .animar-piscar {
+    animation: piscar 1.4s ease-in-out infinite;
   }
 }

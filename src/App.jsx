@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Eye } from 'lucide-react'
 import { useTorneio } from './hooks/useTorneio.js'
 import { Cabecalho } from './components/Cabecalho.jsx'
 import { Navegacao } from './components/Navegacao.jsx'
@@ -14,24 +13,24 @@ import { Botao } from './components/ui.jsx'
 const ABAS = [
   { id: 'chaveamento', rotulo: 'Chaveamento', rotuloCurto: 'Chaves' },
   { id: 'repescagem', rotulo: 'Repescagem', rotuloCurto: 'Repescagem' },
-  { id: 'estatisticas', rotulo: 'Estatísticas', rotuloCurto: 'Estatísticas' },
+  { id: 'estatisticas', rotulo: 'Estatísticas', rotuloCurto: 'Números' },
   { id: 'regras', rotulo: 'Regras', rotuloCurto: 'Regras' },
   { id: 'admin', rotulo: 'Painel Admin', rotuloCurto: 'Admin' },
 ]
 
 function FaixaSomenteLeitura({ acoes }) {
   return (
-    <div className="border-b border-realce/20 bg-realce/[0.06]">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-5 py-3 sm:px-8">
-        <Eye className="size-4 shrink-0 text-realce/70" strokeWidth={1.75} />
-        <p className="min-w-0 flex-1 text-[12px] text-perola-300">
-          Você está vendo um placar compartilhado. Nada aqui altera o campeonato salvo neste aparelho.
+    <div className="border-b-2 border-tinta bg-cobalto text-white">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-2.5 sm:px-6">
+        <span className="contorno rotulo rounded-md bg-lima px-2 py-1 text-[9px] text-tinta">Só olhando</span>
+        <p className="min-w-0 flex-1 text-[12px] font-medium">
+          Este é um placar compartilhado. Nada aqui mexe no campeonato salvo no seu aparelho.
         </p>
         <div className="flex gap-2">
-          <Botao variante="contorno" onClick={acoes.adotarSnapshot} className="px-3.5 py-1.5 text-[12px]">
-            Usar como meu campeonato
+          <Botao variante="papel" onClick={acoes.adotarSnapshot} className="px-3 py-1.5 text-[10px]">
+            Usar como meu
           </Botao>
-          <Botao variante="fantasma" onClick={acoes.sairDoSnapshot} className="px-3.5 py-1.5 text-[12px]">
+          <Botao variante="papel" onClick={acoes.sairDoSnapshot} className="px-3 py-1.5 text-[10px]">
             Sair
           </Botao>
         </div>
@@ -59,8 +58,8 @@ export default function App() {
 
       <Navegacao abas={abas} abaAtiva={abaAtiva} aoTrocar={setAbaAtiva} />
 
-      <main className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
-        <div key={abaAtiva} className="animar-surgir">
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        <div key={abaAtiva} className="animar-entrar">
           {abaAtiva === 'chaveamento' ? (
             <Chaveamento
               torneio={torneio}
@@ -90,13 +89,13 @@ export default function App() {
         </div>
       </main>
 
-      <footer className="mt-10 border-t border-borda">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-5 py-6 sm:px-8">
-          <p className="font-serif text-[15px] text-perola-300">
-            Unidos Acamp <span className="text-perola-600">· Campeonato FIFA</span>
+      <footer className="mt-8 border-t-2 border-tinta bg-tinta text-papel-claro">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-6">
+          <p className="font-display text-lg uppercase">
+            Unidos Acamp <span className="text-lima">· FIFA</span>
           </p>
-          <p className="text-[12px] text-perola-600">
-            {somenteLeitura ? 'Modo visualização' : 'Dados salvos automaticamente neste navegador'}
+          <p className="rotulo text-[9px] text-papel-claro/60">
+            {somenteLeitura ? 'Modo visualização' : 'Salvo automático neste navegador'}
           </p>
         </div>
       </footer>
