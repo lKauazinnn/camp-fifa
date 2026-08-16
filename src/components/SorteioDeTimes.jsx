@@ -150,6 +150,11 @@ export function SorteioDeTimes({ participantes, acoes, aoPedirConfirmacao }) {
                         <span className="min-w-0 flex-1 truncate text-[11px] leading-tight font-bold">
                           {time.nome}
                         </span>
+                        {time.forca ? (
+                          <span className="num contorno shrink-0 rounded bg-papel-claro px-1 font-display text-[10px] text-carvao">
+                            {time.forca}
+                          </span>
+                        ) : null}
                       </button>
                     )
                   })}
@@ -197,6 +202,11 @@ export function SorteioDeTimes({ participantes, acoes, aoPedirConfirmacao }) {
                     {buscarTime(participante.timeId).nome}
                   </span>
                 </span>
+                {buscarTime(participante.timeId).forca ? (
+                  <span className="num shrink-0 font-display text-[12px] text-tinta-media">
+                    {buscarTime(participante.timeId).forca}
+                  </span>
+                ) : null}
               </li>
             ))}
           </ul>

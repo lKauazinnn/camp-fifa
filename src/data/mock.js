@@ -22,7 +22,7 @@ export const PARTICIPANTES_EXEMPLO = [
   { id: 'p13', nome: 'Vinícius Rocha', timeId: 'chelsea' },
   { id: 'p14', nome: 'Ana Beatriz Moura', timeId: 'napoli' },
   { id: 'p15', nome: 'Letícia Prado', timeId: 'inter' },
-  { id: 'p16', nome: 'Miguel Tavares', timeId: 'benfica' },
+  { id: 'p16', nome: 'Miguel Tavares', timeId: 'leverkusen' },
 ]
 
 /** Ordem fixa da 1ª fase (nos torneios reais isso vem do sorteio). */
