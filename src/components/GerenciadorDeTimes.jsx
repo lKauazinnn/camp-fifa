@@ -23,7 +23,7 @@ function novoIdDeTime(nome) {
 /* Escolha do escudo: arquivo do aparelho ou endereço na internet             */
 /* -------------------------------------------------------------------------- */
 
-function SeletorDeEscudo({ escudo, aoDefinir, aoLimpar, compacto = false }) {
+function SeletorDeEscudo({ escudo, aoDefinir, aoLimpar, podeLimpar = true, compacto = false }) {
   const entrada = useRef(null)
   const [mostrarEndereco, setMostrarEndereco] = useState(false)
   const [endereco, setEndereco] = useState('')
@@ -65,7 +65,7 @@ function SeletorDeEscudo({ escudo, aoDefinir, aoLimpar, compacto = false }) {
           {carregando ? 'Abrindo…' : escudo ? 'Trocar' : 'Enviar escudo'}
         </BotaoTexto>
         <BotaoTexto onClick={() => setMostrarEndereco((atual) => !atual)}>Colar link</BotaoTexto>
-        {escudo ? (
+        {escudo && podeLimpar ? (
           <BotaoTexto icone={X} onClick={aoLimpar}>
             Tirar
           </BotaoTexto>
@@ -178,7 +178,7 @@ function FormularioDeTime({ aoSalvar, aoCancelar, ligaPadrao }) {
 /* Lista                                                                      */
 /* -------------------------------------------------------------------------- */
 
-function LinhaTime({ time, ehEmbutido, temAjuste, acoes }) {
+function LinhaTime({ time, ehEmbutido, temAjuste, temEscudoProprio, acoes }) {
   return (
     <li className="flex flex-wrap items-center gap-3 rounded-lg border-2 border-transparent px-2 py-2 transition-colors hover:border-tinta hover:bg-papel-claro">
       <EscudoTime timeId={time.id} tamanho="md" />
@@ -194,6 +194,7 @@ function LinhaTime({ time, ehEmbutido, temAjuste, acoes }) {
 
       <SeletorDeEscudo
         escudo={time.escudo}
+        podeLimpar={temEscudoProprio}
         aoDefinir={(escudo) => acoes.salvarTime({ id: time.id, escudo })}
         aoLimpar={() => acoes.removerEscudo(time.id)}
         compacto
@@ -213,7 +214,7 @@ function LinhaTime({ time, ehEmbutido, temAjuste, acoes }) {
 }
 
 export function GerenciadorDeTimes({ acoes, totalDeAjustes }) {
-  const { times, ehEmbutido, temAjuste, ligaDoUsuario } = useTimes()
+  const { times, ehEmbutido, temAjuste, temEscudoProprio, ligaDoUsuario } = useTimes()
   const [busca, setBusca] = useState('')
   const [criando, setCriando] = useState(false)
 
@@ -231,7 +232,7 @@ export function GerenciadorDeTimes({ acoes, totalDeAjustes }) {
       <TituloSecao
         className="mb-4"
         titulo="Times e escudos"
-        descricao="Envie o escudo de verdade de qualquer time ou crie times que não estão na lista."
+        descricao="Os times da lista já vêm com o escudo oficial. Você pode trocar por outra imagem ou criar times que não estão aqui."
         acao={
           <div className="contorno shrink-0 rounded-lg bg-papel-escuro px-3 py-2 text-center">
             <p className="num font-display text-2xl leading-none">{times.length}</p>
@@ -273,6 +274,7 @@ export function GerenciadorDeTimes({ acoes, totalDeAjustes }) {
             time={time}
             ehEmbutido={ehEmbutido(time.id)}
             temAjuste={temAjuste(time.id)}
+            temEscudoProprio={temEscudoProprio(time.id)}
             acoes={acoes}
           />
         ))}
@@ -284,10 +286,10 @@ export function GerenciadorDeTimes({ acoes, totalDeAjustes }) {
       </ul>
 
       <p className="mt-3 text-[12px] leading-snug text-tinta-media">
-        As imagens ficam guardadas neste navegador junto com o campeonato ({totalDeAjustes} time
-        {totalDeAjustes === 1 ? '' : 's'} com ajuste). Elas entram no backup em arquivo, mas{' '}
-        <strong className="text-tinta">não</strong> no link do placar — ali vão só os nomes e as cores, para o link não
-        ficar gigante.
+        Os escudos da lista vêm de um servidor público e precisam de internet; sem conexão, o time aparece com as
+        iniciais. Imagens que <strong className="text-tinta">você</strong> enviar ficam salvas neste navegador (
+        {totalDeAjustes} time{totalDeAjustes === 1 ? '' : 's'} com ajuste), funcionam offline e entram no backup em
+        arquivo — mas não no link do placar, para ele não ficar gigante.
       </p>
     </Cartao>
   )

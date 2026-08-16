@@ -34,6 +34,9 @@ export function criarCatalogo(timesDoUsuario = []) {
   const times = [...porId.values()]
   const embutidos = new Set(TIMES.map((time) => time.id))
   const ajustados = new Set(timesDoUsuario.map((time) => time?.id))
+  // Times cujo escudo veio do usuário — os únicos em que faz sentido oferecer
+  // "tirar", já que os demais usam a imagem pública e voltariam a ela.
+  const comEscudoProprio = new Set(timesDoUsuario.filter((time) => time?.escudo).map((time) => time.id))
 
   // "Meus times" primeiro, para o usuário achar o que criou.
   const ligas = [...new Set(times.map((time) => time.liga))].sort((a, b) => {
@@ -49,6 +52,7 @@ export function criarCatalogo(timesDoUsuario = []) {
     buscarTime: (id) => porId.get(id) ?? TIME_PADRAO,
     ehEmbutido: (id) => embutidos.has(id),
     temAjuste: (id) => ajustados.has(id),
+    temEscudoProprio: (id) => comEscudoProprio.has(id),
   }
 }
 

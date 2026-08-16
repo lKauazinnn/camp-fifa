@@ -107,16 +107,35 @@ reorganiza automaticamente todas as fases seguintes — inclusive quem cai na re
 
 ## Times e escudos
 
-O catálogo traz 40 times prontos (Brasileirão, ligas europeias e seleções) e o Painel Admin permite:
+O catálogo traz 40 times prontos (Brasileirão, ligas europeias e seleções), **todos com o escudo oficial**.
+As imagens são carregadas pelo navegador em três níveis, do melhor para o pior caso:
 
-- **Enviar o escudo de verdade** de qualquer time — inclusive os que já vêm na lista. A imagem é reduzida
-  para 96×96 e guardada como data URL (3 a 6 KB), então nada depende de internet depois.
+1. `wsrv.nl` redimensionando para 96px em WebP — os 40 escudos somam 137 KB (média de 3,4 KB cada)
+2. o PNG original do `media.api-sports.io`, se o redimensionador falhar
+3. o quadrado com iniciais e as cores do clube, se não houver internet
+
+> Nenhum logo é redistribuído neste repositório: os endereços apontam para servidores públicos e as imagens
+> são buscadas em tempo de execução. Cada id de escudo foi conferido visualmente antes de entrar no código,
+> para nenhum time aparecer com o escudo de outro.
+
+No Painel Admin ainda dá para:
+
+- **Trocar o escudo** de qualquer time por uma imagem sua — ela é reduzida para 96×96 e guardada como data
+  URL (3 a 6 KB), funciona offline e entra nos backups.
 - **Colar o link** de uma imagem `https://` em vez de subir arquivo.
 - **Criar times novos**, com nome, liga, duas cores e escudo.
 - **Restaurar** um time embutido ao original, ou excluir um time criado.
 
-> Escudos oficiais de clube são marcas registradas, por isso o projeto **não** embarca nenhum logo: as
-> imagens são as que você mesmo enviar, e ficam apenas no seu navegador e nos seus backups.
+## Verificação
+
+```bash
+npm run verificar
+```
+
+Renderiza as 24 telas em HTML fora do navegador e roda três auditorias sobre o resultado: telas que
+estouram em algum estado, contraste no tema preto (texto sobre cor viva não pode depender do tema) e
+mesclagem do catálogo de times. Foi essa verificação que pegou o bug dos rótulos de pênalti e o do bloco
+que sumia no tema preto.
 
 ## Painel Admin
 

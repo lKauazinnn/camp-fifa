@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTimes } from '../contexto/TimesContexto.jsx'
 
 /* -------------------------------------------------------------------------- */
@@ -110,6 +111,13 @@ export function EscudoTime({ timeId, tamanho = 'md', time: timeDireto }) {
   const { buscarTime } = useTimes()
   const time = timeDireto ?? buscarTime(timeId)
 
+  // Guarda os endereços que falharam (e não apenas "falhou"): assim a queda é
+  // escalonada — miniatura, imagem original e, por fim, as iniciais — e trocar
+  // o escudo faz a nova imagem ser tentada sem precisar de efeito.
+  const [enderecosRuins, setEnderecosRuins] = useState([])
+  const endereco =
+    [time.escudo, time.escudoReserva].find((item) => item && !enderecosRuins.includes(item)) ?? null
+
   const iniciais =
     time.nome
       .split(' ')
@@ -127,8 +135,14 @@ export function EscudoTime({ timeId, tamanho = 'md', time: timeDireto }) {
       title={time.nome}
       aria-hidden="true"
     >
-      {time.escudo ? (
-        <img src={time.escudo} alt="" loading="lazy" className="absolute inset-0 size-full object-contain p-[3px]" />
+      {endereco ? (
+        <img
+          src={endereco}
+          alt=""
+          loading="lazy"
+          onError={() => setEnderecosRuins((atual) => [...atual, endereco])}
+          className="absolute inset-0 size-full object-contain p-[3px]"
+        />
       ) : (
         <>
           <span
