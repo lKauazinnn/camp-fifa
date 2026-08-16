@@ -26,12 +26,22 @@ const BLOCOS = [
   {
     numero: '03',
     cor: 'bg-papel-escuro',
+    titulo: 'Os times',
+    itens: [
+      'Só os times da lista: os melhores do FC 26, e nada de seleção de lendas ou time montado.',
+      'Cada time é de um jogador só. Escolheu, ninguém mais pega aquele.',
+      'Escolheu no cadastro, fica com ele até o fim.',
+      'Time que não está na lista pode ser cadastrado na hora da inscrição — desde que não seja time de lenda.',
+    ],
+  },
+  {
+    numero: '07',
+    cor: 'bg-papel-escuro',
     titulo: 'Os jogos',
     itens: [
       'Seis minutos por tempo, nível Profissional.',
       'Lesão e desgaste desligados, velocidade normal.',
-      'Escolheu o time no cadastro, fica com ele até o fim.',
-      'Pode repetir time — aqui vale a habilidade, não o elenco.',
+      'Sem alterar formação ou escalação de outro jogador.',
     ],
   },
   {

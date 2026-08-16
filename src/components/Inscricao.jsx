@@ -89,7 +89,8 @@ function TimeNovo({ valor, aoMudar, aoCancelar }) {
 
       {erro ? <p className="mt-2 text-[11px] font-bold text-rosa">{erro}</p> : null}
       <p className="mt-2 text-[11px] leading-snug text-tinta-media">
-        Sem escudo o time aparece com as iniciais e as cores que você escolher.
+        Sem escudo o time aparece com as iniciais e as cores que você escolher. Vale time de clube ou seleção —{' '}
+        <strong className="text-tinta">seleção de lendas não entra</strong>.
       </p>
     </div>
   )
