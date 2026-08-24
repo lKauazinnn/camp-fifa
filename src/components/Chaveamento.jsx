@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
 import { useTimes } from '../contexto/TimesContexto.jsx'
+import { tocar } from '../lib/som.js'
 import { ChaveVisual } from './ChaveVisual.jsx'
-import { Botao, Cartao, EscudoTime, EstadoVazio, TituloSecao } from './ui.jsx'
+import { Botao, Cartao, Confete, EscudoTime, EstadoVazio, NumeroAnimado, TituloSecao } from './ui.jsx'
 
 const MEDALHAS = [
   { numero: '1', rotulo: 'Campeão', cor: 'bg-lima text-carvao' },
@@ -26,27 +28,38 @@ function Posicao({ indice, participante }) {
       >
         {medalha.numero}
       </span>
-      {participante ? (
-        <>
-          <EscudoTime timeId={participante.timeId} tamanho="sm" />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[14px] font-bold">{participante.nome}</p>
+      {participante ? <EscudoTime timeId={participante.timeId} tamanho="sm" /> : null}
+
+      {/* Rótulo em cima do nome, e não na ponta da linha: lado a lado, os três
+          degraus são estreitos demais para uma coluna só de texto. */}
+      <div className="min-w-0 flex-1">
+        <p className="rotulo text-[9px] text-tinta-media">{medalha.rotulo}</p>
+        {participante ? (
+          <>
+            <p className="truncate text-[14px] leading-tight font-bold">{participante.nome}</p>
             <p className="truncate text-[11px] text-tinta-fraca">{buscarTime(participante.timeId).nome}</p>
-          </div>
-        </>
-      ) : (
-        <p className="flex-1 text-[13px] text-tinta-fraca">ainda em disputa</p>
-      )}
-      <span className="rotulo shrink-0 text-[9px] text-tinta-media">{medalha.rotulo}</span>
+          </>
+        ) : (
+          <p className="text-[13px] text-tinta-fraca">ainda em disputa</p>
+        )}
+      </div>
     </div>
   )
 }
 
 function Campeao({ campeao }) {
   const { buscarTime } = useTimes()
+
+  // A taça saiu: toca a fanfarra na primeira vez que este campeão aparece.
+  useEffect(() => {
+    tocar('fanfarra')
+  }, [campeao.id])
+
   return (
     <div className="animar-carimbo contorno sombra-g relative overflow-hidden rounded-xl bg-cobalto px-5 py-7 text-white sm:px-10 sm:py-8">
       <div className="listrado absolute inset-0" aria-hidden="true" />
+      <div className="varredura absolute inset-0" aria-hidden="true" />
+      <Confete pecas={22} />
       <span className="brilho-passando" aria-hidden="true" />
       <div className="relative flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
         <span className="animar-tremer">
@@ -56,7 +69,7 @@ function Campeao({ campeao }) {
             limite o `truncate` do nome nunca entra em ação. */}
         <div className="min-w-0 max-w-full">
           <span className="contorno rotulo inline-block rounded-md bg-lima px-2 py-1 text-[10px] text-carvao">
-            Campeão 🏆
+            Campeão <span className="animar-flutuar">🏆</span>
           </span>
           <h2 className="mt-3 truncate text-2xl text-white min-[380px]:text-3xl sm:text-5xl">{campeao.nome}</h2>
           <p className="mt-2 truncate text-[14px] font-medium text-white/80">
@@ -87,46 +100,41 @@ export function Chaveamento({ torneio, aoEditarPartida, aoIrParaAdmin, somenteLe
     <div className="space-y-5">
       {torneio.campeao ? <Campeao campeao={torneio.campeao} /> : null}
 
-      {/*
-        `minmax(0,1fr)` em vez de `1fr`: por padrão o item de um grid tem
-        min-width automático, então a largura mínima do conteúdo (a régua de
-        fases, que já rola sozinha) esticaria a coluna e vazaria a tela.
-      */}
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start">
-        <Cartao className="overflow-hidden">
-          <div className="border-b-2 border-tinta bg-papel-escuro px-4 py-3">
-            <h3 className="text-xl">Pódio</h3>
-            <p className="mt-1 text-[12px] text-tinta-media">O terceiro sai da repescagem.</p>
-          </div>
-          <div className="divide-y-2 divide-papel-escuro">
-            <Posicao indice={0} participante={torneio.campeao} />
-            <Posicao indice={1} participante={torneio.vice} />
-            <Posicao indice={2} participante={torneio.terceiro} />
-          </div>
-        </Cartao>
+      {/* O pódio é uma faixa no topo, e não uma coluna ao lado: a chave precisa
+          da largura inteira para caber sem rolagem. */}
+      <Cartao className="overflow-hidden">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b-2 border-tinta bg-papel-escuro px-4 py-3">
+          <h3 className="text-xl">Pódio</h3>
+          <p className="text-[12px] text-tinta-media">O terceiro sai da repescagem.</p>
+        </div>
+        <div className="grid divide-y-2 divide-papel-escuro sm:grid-cols-3 sm:divide-x-2 sm:divide-y-0">
+          <Posicao indice={0} participante={torneio.campeao} />
+          <Posicao indice={1} participante={torneio.vice} />
+          <Posicao indice={2} participante={torneio.terceiro} />
+        </div>
+      </Cartao>
 
-        <Cartao className="p-4 sm:p-6">
-          <TituloSecao
-            className="mb-6"
-            titulo="Chave principal"
-            descricao={
-              somenteLeitura
-                ? 'Quem perde na primeira fase cai pra repescagem.'
-                : 'Quem perde na primeira fase cai pra repescagem. Toque num jogo pra lançar o placar.'
-            }
-            acao={
-              <div className="contorno shrink-0 rounded-lg bg-lima px-3 py-2 text-center text-carvao">
-                <p className="num font-display text-2xl leading-none">
-                  {torneio.partidasFinalizadas}
-                  <span className="opacity-45">/{torneio.totalPartidas}</span>
-                </p>
-                <p className="rotulo mt-1 text-[9px] opacity-70">Jogos</p>
-              </div>
-            }
-          />
-          <ChaveVisual rodadas={torneio.principal} aoEditar={aoEditarPartida} />
-        </Cartao>
-      </div>
+      <Cartao className="p-4 sm:p-6">
+        <TituloSecao
+          className="mb-6"
+          titulo="Chave principal"
+          descricao={
+            somenteLeitura
+              ? 'Quem perde na primeira fase cai pra repescagem.'
+              : 'Quem perde na primeira fase cai pra repescagem. Toque num jogo pra lançar o placar.'
+          }
+          acao={
+            <div className="contorno shrink-0 rounded-lg bg-lima px-3 py-2 text-center text-carvao">
+              <p className="num font-display text-2xl leading-none">
+                <NumeroAnimado valor={torneio.partidasFinalizadas} />
+                <span className="opacity-45">/{torneio.totalPartidas}</span>
+              </p>
+              <p className="rotulo mt-1 text-[9px] opacity-70">Jogos</p>
+            </div>
+          }
+        />
+        <ChaveVisual rodadas={torneio.principal} aoEditar={aoEditarPartida} />
+      </Cartao>
     </div>
   )
 }

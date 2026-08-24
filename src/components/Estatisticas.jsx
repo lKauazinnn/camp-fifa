@@ -1,6 +1,6 @@
 import { LIMITE_AMARELOS, situacaoDisciplinar } from '../lib/estatisticas.js'
 import { useTimes } from '../contexto/TimesContexto.jsx'
-import { Cartao, EscudoTime, EstadoVazio, Etiqueta, Metrica, TituloSecao } from './ui.jsx'
+import { Cartao, EscudoTime, EstadoVazio, Etiqueta, Metrica, NumeroAnimado, TituloSecao } from './ui.jsx'
 
 const COR_SITUACAO = { vermelho: 'rosa', amarelo: 'rosa', atencao: 'laranja', ok: 'papel' }
 
@@ -97,16 +97,16 @@ export function Estatisticas({ estatisticas, resumo }) {
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Cartao cor="lima" className="p-4">
-          <Metrica valor={resumo.totalGols} rotulo="Gols no campeonato" />
+          <Metrica valor={<NumeroAnimado valor={resumo.totalGols} deZero />} rotulo="Gols no campeonato" />
         </Cartao>
         <Cartao className="p-4">
           <Metrica valor={resumo.mediaGols} rotulo="Média por jogo" />
         </Cartao>
         <Cartao className="p-4">
-          <Metrica valor={resumo.totalAmarelos} rotulo="Cartões amarelos" />
+          <Metrica valor={<NumeroAnimado valor={resumo.totalAmarelos} deZero />} rotulo="Cartões amarelos" />
         </Cartao>
         <Cartao className="p-4">
-          <Metrica valor={resumo.totalVermelhos} rotulo="Cartões vermelhos" />
+          <Metrica valor={<NumeroAnimado valor={resumo.totalVermelhos} deZero />} rotulo="Cartões vermelhos" />
         </Cartao>
       </div>
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Dices, Pencil, QrCode, Trash2, UserPlus } from 'lucide-react'
 import { useTimes } from '../contexto/TimesContexto.jsx'
-import { Botao, BotaoTexto, Cartao, EscudoTime, Etiqueta } from './ui.jsx'
+import { Botao, BotaoTexto, Cartao, EscudoTime, Etiqueta, NumeroAnimado } from './ui.jsx'
 
 const CAMPO =
   'contorno w-full rounded-lg bg-papel-claro px-3 py-2.5 text-[14px] font-medium placeholder:text-tinta-fraca focus:bg-lima/20 focus:outline-none'
@@ -17,6 +17,8 @@ function horaDaInscricao(iso) {
 }
 
 function Linha({ participante, posicao, aoAtualizar, aoRemover, aoSortearTime }) {
+  // Cascata limitada: numa lista de 40 nomes, esperar o último seria tempo demais.
+  const atraso = `${Math.min(posicao, 12) * 35}ms`
   const { times, buscarTime } = useTimes()
   const [editando, setEditando] = useState(false)
   const [nome, setNome] = useState(participante.nome)
@@ -45,7 +47,10 @@ function Linha({ participante, posicao, aoAtualizar, aoRemover, aoSortearTime })
   }
 
   return (
-    <li className="group flex items-center gap-2.5 rounded-lg border-2 border-transparent px-2 py-2 transition-colors hover:border-tinta hover:bg-papel-claro">
+    <li
+      className="animar-surgir group flex items-center gap-2.5 rounded-lg border-2 border-transparent px-2 py-2 transition-colors hover:border-tinta hover:bg-papel-claro"
+      style={{ '--atraso': atraso }}
+    >
       <span className="num w-6 shrink-0 text-right font-display text-[12px] text-tinta-fraca">{posicao}</span>
 
       {temTime ? (
@@ -68,7 +73,7 @@ function Linha({ participante, posicao, aoAtualizar, aoRemover, aoSortearTime })
         <button
           type="button"
           onClick={() => aoSortearTime(participante)}
-          className="contorno rotulo apertar sombra-p inline-flex shrink-0 items-center gap-1.5 rounded-md bg-cobalto px-2 py-1.5 text-[9px] text-white"
+          className="dado contorno rotulo apertar sombra-p inline-flex shrink-0 items-center gap-1.5 rounded-md bg-cobalto px-2 py-1.5 text-[9px] text-white"
           title="Sortear um time só para esta pessoa"
         >
           <Dices className="size-3.5 shrink-0" strokeWidth={2.5} />
@@ -87,7 +92,7 @@ function Linha({ participante, posicao, aoAtualizar, aoRemover, aoSortearTime })
           <button
             type="button"
             onClick={() => aoSortearTime(participante)}
-            className="grid size-8 place-items-center rounded-md border-2 border-transparent transition-colors hover:border-tinta hover:bg-cobalto hover:text-white"
+            className="dado grid size-8 place-items-center rounded-md border-2 border-transparent transition-colors hover:border-tinta hover:bg-cobalto hover:text-white"
             aria-label={`Sortear outro time para ${participante.nome}`}
             title="Sortear outro time só para esta pessoa"
           >
@@ -182,7 +187,9 @@ export function ListaDeInscritos({ participantes, torneio, acoes, aoPedirConfirm
         </div>
 
         <div className="contorno shrink-0 rounded-lg bg-lima px-4 py-2.5 text-center text-carvao">
-          <p className="num font-display text-4xl leading-none">{participantes.length}</p>
+          <p className="num font-display text-4xl leading-none">
+            <NumeroAnimado valor={participantes.length} />
+          </p>
           <p className="rotulo mt-1 text-[9px] opacity-70">inscritos</p>
         </div>
       </div>

@@ -26,6 +26,8 @@ import { PainelAdmin } from '../src/components/PainelAdmin.jsx'
 import { ModalResultado } from '../src/components/ModalResultado.jsx'
 import { ModalConfirmacao } from '../src/components/ModalConfirmacao.jsx'
 import { GerenciadorDeTimes } from '../src/components/GerenciadorDeTimes.jsx'
+import { PalcoSorteio } from '../src/components/PalcoSorteio.jsx'
+import { Abertura } from '../src/components/Abertura.jsx'
 
 let falhas = 0
 const ok = (condicao, mensagem) => {
@@ -93,6 +95,8 @@ const telas = [
   ['GerenciadorDeTimes', comTimes(<GerenciadorDeTimes acoes={acoes} totalDeAjustes={2} />)],
   ['ModalResultado (finalizado)', <ModalResultado partida={torneio.porId.get('main-r0-m1')} aoSalvar={nada} aoLimpar={nada} aoFechar={nada} />],
   ['ModalResultado (a jogar)', <ModalResultado partida={torneio.porId.get('main-r2-m1')} aoSalvar={nada} aoLimpar={nada} aoFechar={nada} />],
+  ['Abertura', <Abertura aoComecar={nada} />],
+  ['PalcoSorteio', comTimes(<PalcoSorteio participantes={ESTADO_EXEMPLO.participantes} elenco={['real-madrid', 'liverpool']} aoFechar={nada} />)],
   ['ModalConfirmacao', <ModalConfirmacao aberto titulo="t" descricao="d" aoConfirmar={nada} aoFechar={nada} />],
 ]
 

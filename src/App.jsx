@@ -12,7 +12,9 @@ import { PainelAdmin } from './components/PainelAdmin.jsx'
 import { ModalResultado } from './components/ModalResultado.jsx'
 import { Inscricao } from './components/Inscricao.jsx'
 import { Botao } from './components/ui.jsx'
+import { Abertura, jaAbriu } from './components/Abertura.jsx'
 import { nuvemConfigurada } from './lib/nuvem.js'
+import { tocar } from './lib/som.js'
 
 const ABAS = [
   { id: 'chaveamento', rotulo: 'Chaveamento', rotuloCurto: 'Chaves' },
@@ -25,7 +27,7 @@ const ABAS = [
 function FaixaSomenteLeitura({ acoes }) {
   return (
     <div className="border-b-2 border-tinta bg-cobalto text-white">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-2.5 sm:px-6">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-2.5 sm:px-6">
         <span className="contorno rotulo rounded-md bg-lima px-2 py-1 text-[9px] text-carvao">Só olhando</span>
         <p className="min-w-0 flex-1 text-[12px] font-medium">
           Este é um placar compartilhado. Nada aqui mexe no campeonato salvo no seu aparelho.
@@ -61,6 +63,15 @@ export default function App() {
   const { tema, alternarTema } = useTema()
   const [abaAtiva, setAbaAtiva] = useState('chaveamento')
   const [partidaEmEdicao, setPartidaEmEdicao] = useState(null)
+  const [abrindo, setAbrindo] = useState(() => !jaAbriu())
+  const [sacudindo, setSacudindo] = useState(false)
+
+  // Placar lançado dá um soco na tela — o tranco do gol entrando.
+  const salvarResultado = (idDaPartida, dados) => {
+    acoes.salvarResultado(idDaPartida, dados)
+    setSacudindo(true)
+    window.setTimeout(() => setSacudindo(false), 340)
+  }
 
   // Tela que o QR code abre. Fica no hash para não exigir rota no servidor.
   const [inscrevendo, setInscrevendo] = useState(
@@ -75,6 +86,28 @@ export default function App() {
   // A aba Admin some no modo visualização (link compartilhado), mas continua
   // acessível quando a nuvem está ligada — é por ela que se informa o PIN.
   const abas = modoVisualizacao ? ABAS.filter((aba) => aba.id !== 'admin') : ABAS
+
+  // Setas do teclado passeiam pelas abas, como o joystick de uma cabine. Fica
+  // de fora quem está digitando num campo ou com um modal aberto.
+  useEffect(() => {
+    const aoTeclar = (evento) => {
+      if (evento.key !== 'ArrowLeft' && evento.key !== 'ArrowRight') return
+      if (evento.ctrlKey || evento.altKey || evento.metaKey) return
+      const alvo = evento.target
+      if (alvo?.closest?.('input, textarea, select, [role="dialog"]')) return
+
+      setAbaAtiva((atual) => {
+        const posicao = abas.findIndex((aba) => aba.id === atual)
+        if (posicao === -1) return atual
+        const passo = evento.key === 'ArrowRight' ? 1 : -1
+        const proxima = abas[(posicao + passo + abas.length) % abas.length]
+        if (proxima.id !== atual) tocar('trocar')
+        return proxima.id
+      })
+    }
+    window.addEventListener('keydown', aoTeclar)
+    return () => window.removeEventListener('keydown', aoTeclar)
+  }, [abas])
 
   // A partida vem sempre do torneio recalculado, para o modal refletir edições recentes.
   const partidaAberta = partidaEmEdicao ? (torneio.porId.get(partidaEmEdicao) ?? null) : null
@@ -97,6 +130,8 @@ export default function App() {
 
   return (
     <ProvedorDeTimes timesDoUsuario={timesDoUsuario}>
+      {abrindo ? <Abertura aoComecar={() => setAbrindo(false)} /> : null}
+
       <div className="min-h-dvh">
         {modoVisualizacao ? <FaixaSomenteLeitura acoes={acoes} /> : null}
 
@@ -111,8 +146,8 @@ export default function App() {
 
         <Navegacao abas={abas} abaAtiva={abaAtiva} aoTrocar={setAbaAtiva} />
 
-        <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-          <div key={abaAtiva} className="animar-entrar">
+        <main className={`mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 ${sacudindo ? 'animar-chacoalhar' : ''}`}>
+          <div key={abaAtiva} className="animar-tela">
             {abaAtiva === 'chaveamento' ? (
               <Chaveamento
                 torneio={torneio}
@@ -148,7 +183,7 @@ export default function App() {
 
         {/* No tema preto o carvão se confunde com o fundo — vira papel-escuro. */}
         <footer className="mt-8 border-t-2 border-tinta bg-carvao text-creme escuro:bg-papel-escuro escuro:text-tinta">
-          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-6">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 sm:px-6">
             <p className="font-display text-lg text-current uppercase">
               Unidos Acamp <span className="text-lima">· FIFA</span>
             </p>
@@ -161,7 +196,7 @@ export default function App() {
         {partidaAberta && !somenteLeitura ? (
           <ModalResultado
             partida={partidaAberta}
-            aoSalvar={acoes.salvarResultado}
+            aoSalvar={salvarResultado}
             aoLimpar={acoes.limparResultado}
             aoFechar={() => setPartidaEmEdicao(null)}
           />

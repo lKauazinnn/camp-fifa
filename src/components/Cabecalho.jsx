@@ -1,5 +1,7 @@
-import { Moon, Sun } from 'lucide-react'
-import { BarraProgresso } from './ui.jsx'
+import { useEffect, useState } from 'react'
+import { Moon, Sun, Volume2, VolumeX } from 'lucide-react'
+import { alternarMudo, estaMudo, ouvirMudo } from '../lib/som.js'
+import { BarraProgresso, NumeroAnimado } from './ui.jsx'
 
 /** Mostra que o placar está chegando do servidor, e não só deste aparelho. */
 function SeloAoVivo({ nuvem }) {
@@ -29,6 +31,28 @@ function Caixa({ valor, rotulo, cor = 'papel' }) {
   )
 }
 
+/** Liga e desliga os efeitos sonoros da máquina. */
+function BotaoSom() {
+  const [mudo, setMudo] = useState(() => estaMudo())
+
+  useEffect(() => ouvirMudo(setMudo), [])
+
+  return (
+    <button
+      type="button"
+      onClick={() => setMudo(alternarMudo())}
+      aria-label={mudo ? 'Ligar os sons' : 'Desligar os sons'}
+      title={mudo ? 'Ligar os sons' : 'Desligar os sons'}
+      className={`contorno sombra-p apertar rotulo inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-[10px] ${
+        mudo ? 'bg-papel-claro text-tinta-media' : 'bg-cobalto text-white'
+      }`}
+    >
+      {mudo ? <VolumeX className="size-3.5" strokeWidth={2.5} /> : <Volume2 className="size-3.5" strokeWidth={2.5} />}
+      {mudo ? 'Mudo' : 'Som'}
+    </button>
+  )
+}
+
 function BotaoTema({ tema, aoAlternar }) {
   const escuro = tema === 'escuro'
   return (
@@ -49,7 +73,7 @@ function BotaoTema({ tema, aoAlternar }) {
 
 export function Cabecalho({ totalParticipantes, totalGols, torneio, tema, aoAlternarTema, nuvem }) {
   return (
-    <header className="mx-auto max-w-6xl px-4 pt-7 pb-5 sm:px-6 sm:pt-10">
+    <header className="mx-auto max-w-7xl px-4 pt-7 pb-5 sm:px-6 sm:pt-10">
       <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -57,6 +81,7 @@ export function Cabecalho({ totalParticipantes, totalGols, torneio, tema, aoAlte
               Unidos Acamp
             </span>
             <SeloAoVivo nuvem={nuvem} />
+            <BotaoSom />
             <BotaoTema tema={tema} aoAlternar={aoAlternarTema} />
           </div>
 
@@ -78,9 +103,12 @@ export function Cabecalho({ totalParticipantes, totalGols, torneio, tema, aoAlte
             passar da borda da tela. */}
         <div className="girar-0 contorno sombra-g relative w-full rounded-xl bg-laranja px-5 py-4 text-white sm:girar-2 lg:w-64">
           <div className="listrado absolute inset-0 rounded-[10px]" aria-hidden="true" />
+          <div className="varredura absolute inset-0 rounded-[10px]" aria-hidden="true" />
           <div className="relative">
             <p className="rotulo text-[10px] text-white/80">Prêmio do campeão</p>
-            <p className="num mt-1.5 font-display text-5xl leading-none">R$100</p>
+            <p className="num mt-1.5 font-display text-5xl leading-none">
+              <span className="animar-flutuar">R$100</span>
+            </p>
             <p className="mt-2 text-[12px] leading-snug font-medium">na mão, na noite de encerramento</p>
           </div>
         </div>
@@ -88,15 +116,24 @@ export function Cabecalho({ totalParticipantes, totalGols, torneio, tema, aoAlte
 
       {/* Placar geral */}
       <div className="mt-7 flex flex-wrap items-stretch gap-3">
-        <Caixa valor={totalParticipantes} rotulo="Jogadores" />
-        <Caixa valor={totalGols} rotulo="Gols" cor="lima" />
-        <Caixa valor={`${torneio.partidasFinalizadas}/${torneio.totalPartidas}`} rotulo="Jogos" />
+        <Caixa valor={<NumeroAnimado valor={totalParticipantes} />} rotulo="Jogadores" />
+        <Caixa valor={<NumeroAnimado valor={totalGols} />} rotulo="Gols" cor="lima" />
+        <Caixa
+          valor={
+            <>
+              <NumeroAnimado valor={torneio.partidasFinalizadas} />/{torneio.totalPartidas}
+            </>
+          }
+          rotulo="Jogos"
+        />
 
         {torneio.ativo ? (
           <div className="contorno sombra-p min-w-52 flex-[2] rounded-lg bg-papel-claro px-3 py-2.5">
             <div className="mb-2 flex items-baseline justify-between">
               <p className="rotulo text-[9px] text-tinta-media">Andamento do campeonato</p>
-              <p className="num font-display text-[13px]">{torneio.progresso}%</p>
+              <p className="num font-display text-[13px]">
+                <NumeroAnimado valor={torneio.progresso} />%
+              </p>
             </div>
             <BarraProgresso valor={torneio.progresso} />
           </div>

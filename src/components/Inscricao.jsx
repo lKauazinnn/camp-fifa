@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Dices } from 'lucide-react'
 import { inscrever, lerSituacaoDaInscricao } from '../lib/nuvem.js'
-import { Botao, Cartao } from './ui.jsx'
+import { Botao, Cartao, Confete, NumeroAnimado } from './ui.jsx'
+import { tocar } from '../lib/som.js'
 
 const CAMPO =
   'contorno w-full rounded-lg bg-papel-claro px-3.5 py-3.5 text-[16px] font-medium placeholder:text-tinta-fraca focus:bg-lima/20 focus:outline-none'
@@ -31,8 +32,10 @@ export function Inscricao({ aoSair }) {
     try {
       const resultado = await inscrever({ nome: nome.trim() })
       setPronto({ nome: nome.trim(), total: resultado.total })
+      tocar('fanfarra')
     } catch (falha) {
       setErro(falha.message)
+      tocar('erro')
     } finally {
       setEnviando(false)
     }
@@ -44,13 +47,20 @@ export function Inscricao({ aoSair }) {
     return (
       <div className="mx-auto max-w-md px-4 py-10">
         <div className="animar-carimbo contorno sombra-g relative overflow-hidden rounded-xl bg-lima px-6 py-9 text-center text-carvao">
+          <div className="varredura absolute inset-0" aria-hidden="true" />
+          <Confete pecas={20} />
           <span className="brilho-passando" aria-hidden="true" />
           <p className="rotulo relative text-[11px]">Você está dentro</p>
           <h2 className="relative mt-4 text-4xl break-words">{pronto.nome}</h2>
-          <p className="num relative mt-5 font-display text-6xl leading-none">#{pronto.total}</p>
+          {/* O número do inscrito sobe do zero: é a hora da ficha caindo. */}
+          <p className="num relative mt-5 font-display text-6xl leading-none">
+            #<NumeroAnimado valor={pronto.total} deZero duracao={900} />
+          </p>
           <p className="rotulo relative mt-2 text-[10px] opacity-70">inscrito número</p>
           <div className="relative mt-6 flex items-center justify-center gap-2 text-[13px] font-bold">
-            <Dices className="size-4" strokeWidth={2.5} />
+            <span className="animar-tremer">
+              <Dices className="size-4" strokeWidth={2.5} />
+            </span>
             <span>Seu time sai no sorteio</span>
           </div>
         </div>
@@ -145,7 +155,16 @@ export function Inscricao({ aoSair }) {
 
       <div className="mt-4 flex items-center justify-between gap-3 px-1">
         <p className="text-[12px] text-tinta-media">
-          {situacao ? `${situacao.inscritos} já se inscreveram` : 'Carregando…'}
+          {situacao ? (
+            <>
+              <span className="num font-bold text-tinta">
+                <NumeroAnimado valor={situacao.inscritos} deZero />
+              </span>{' '}
+              já se inscreveram
+            </>
+          ) : (
+            'Carregando…'
+          )}
         </p>
         <button type="button" onClick={aoSair} className="rotulo text-[10px] text-tinta-media underline">
           Ver o campeonato

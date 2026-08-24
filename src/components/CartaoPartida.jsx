@@ -15,7 +15,9 @@ function Lado({ participante, gols, penaltis, mostrarPenaltis, vencedor, perdedo
 
   return (
     <div className={`flex items-center gap-2.5 px-3 py-2.5 ${perdedor ? 'opacity-45' : ''}`}>
-      <EscudoTime timeId={participante.timeId} tamanho="sm" />
+      <span className="shrink-0 transition-transform duration-200 group-hover:-rotate-6 group-hover:scale-110">
+        <EscudoTime timeId={participante.timeId} tamanho="sm" />
+      </span>
 
       <div className="min-w-0 flex-1">
         <p className={`truncate text-[13px] leading-tight ${vencedor ? 'font-bold text-tinta' : 'text-tinta'}`}>
@@ -38,7 +40,7 @@ function Lado({ participante, gols, penaltis, mostrarPenaltis, vencedor, perdedo
           gols === null
             ? 'text-tinta-fraca'
             : vencedor
-              ? 'border-2 border-tinta bg-lima text-carvao'
+              ? 'animar-placar border-2 border-tinta bg-lima text-carvao'
               : 'border-2 border-transparent text-tinta-media'
         }`}
       >
@@ -62,8 +64,8 @@ function Faixa({ partida, sobreCor = false }) {
   }
   if (status === 'pronta') {
     return (
-      <span className="rotulo flex items-center gap-1 rounded bg-laranja px-1.5 py-0.5 text-[9px] text-white">
-        <span className="animar-piscar size-1 rounded-full bg-white" />
+      <span className="piscar-duro rotulo flex items-center gap-1 rounded bg-laranja px-1.5 py-0.5 text-[9px] text-white">
+        <span className="size-1 rounded-full bg-white" />
         Bora jogar
       </span>
     )
@@ -123,7 +125,7 @@ export function CartaoPartida({ partida, aoEditar, destaque = false }) {
     </>
   )
 
-  const base = 'contorno sombra-p w-full overflow-hidden rounded-lg text-left'
+  const base = 'group contorno sombra-p w-full overflow-hidden rounded-lg text-left'
 
   if (!clicavel) return <div className={base}>{conteudo}</div>
 

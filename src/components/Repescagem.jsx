@@ -1,6 +1,6 @@
 import { useTimes } from '../contexto/TimesContexto.jsx'
 import { ChaveVisual } from './ChaveVisual.jsx'
-import { Cartao, EscudoTime, EstadoVazio, TituloSecao } from './ui.jsx'
+import { Cartao, EscudoTime, EstadoVazio, NumeroAnimado, TituloSecao } from './ui.jsx'
 
 export function Repescagem({ torneio, aoEditarPartida, somenteLeitura }) {
   const { buscarTime } = useTimes()
@@ -72,7 +72,7 @@ export function Repescagem({ torneio, aoEditarPartida, somenteLeitura }) {
           acao={
             <div className="contorno shrink-0 rounded-lg bg-papel-escuro px-3 py-2 text-center">
               <p className="num font-display text-2xl leading-none">
-                {disputados}
+                <NumeroAnimado valor={disputados} />
                 <span className="text-tinta-media">/{totais}</span>
               </p>
               <p className="rotulo mt-1 text-[9px]">Jogos</p>

@@ -1,10 +1,17 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Dices, Eraser, Search } from 'lucide-react'
 import { useTimes } from '../contexto/TimesContexto.jsx'
-import { Botao, BotaoTexto, Cartao, EscudoTime, TituloSecao } from './ui.jsx'
+import { Botao, BotaoTexto, Cartao, EscudoTime, NumeroAnimado, TituloSecao } from './ui.jsx'
+import { PalcoSorteio } from './PalcoSorteio.jsx'
 
 const CAMPO =
   'contorno w-full rounded-lg bg-papel-claro px-3.5 py-2.5 text-[14px] font-medium placeholder:text-tinta-fraca focus:bg-lima/20 focus:outline-none'
+
+/* Quanto tempo os escudos ficam girando antes de parar no time sorteado, e de
+   quanto em quanto tempo trocam. O resultado já está decidido antes da primeira
+   volta — a rolagem é só o suspense da máquina. */
+const TEMPO_ROLANDO = 1100
+const QUADRO_ROLANDO = 90
 
 /**
  * Escolha do elenco e sorteio dos times entre os inscritos.
@@ -21,6 +28,31 @@ export function SorteioDeTimes({ participantes, elenco = [], acoes, aoPedirConfi
   )
   const [busca, setBusca] = useState('')
   const [ligaAberta, setLigaAberta] = useState(null)
+  // Quem está girando na lista: o id de uma pessoa, ou null quando está parado.
+  // O sorteio geral não gira aqui — ele abre o palco em tela cheia.
+  const [rolando, setRolando] = useState(null)
+  const [palco, setPalco] = useState(false)
+  const [quadro, setQuadro] = useState(0)
+
+  useEffect(() => {
+    if (!rolando) return undefined
+    const troca = window.setInterval(() => setQuadro((atual) => atual + 1), QUADRO_ROLANDO)
+    const parada = window.setTimeout(() => setRolando(null), TEMPO_ROLANDO)
+    return () => {
+      window.clearInterval(troca)
+      window.clearTimeout(parada)
+    }
+  }, [rolando])
+
+  /* A rolagem é enfeite: se o aparelho pediu menos movimento, o resultado
+     aparece direto. */
+  const girar = (alvo) => {
+    const parado = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (!parado) setRolando(alvo)
+  }
+
+  const elencoParaRolar = [...selecionados]
+  const escudoDaVez = (indice) => elencoParaRolar[(quadro * 7 + indice * 3) % elencoParaRolar.length] ?? 'sem-time'
 
   const jaSorteado = participantes.some((participante) => participante.timeId !== 'sem-time')
   // Mais gente que time não impede o sorteio: o elenco repete, distribuído por igual.
@@ -59,7 +91,10 @@ export function SorteioDeTimes({ participantes, elenco = [], acoes, aoPedirConfi
    * restringir os times antes de tirar o time de uma pessoa só.
    */
   const sortearUm = (participante) => {
-    const acao = () => acoes.sortearTimeDe(participante.id, [...selecionados])
+    const acao = () => {
+      acoes.sortearTimeDe(participante.id, [...selecionados])
+      girar(participante.id)
+    }
     if (participante.timeId === 'sem-time') return acao()
     aoPedirConfirmacao({
       titulo: `Sortear outro time para ${participante.nome}?`,
@@ -71,7 +106,11 @@ export function SorteioDeTimes({ participantes, elenco = [], acoes, aoPedirConfi
   }
 
   const sortear = () => {
-    const acao = () => acoes.sortearTimes([...selecionados])
+    const acao = () => {
+      acoes.sortearTimes([...selecionados])
+      // Quem pediu menos movimento recebe a lista pronta, sem cerimônia.
+      if (!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) setPalco(true)
+    }
     if (!jaSorteado) return acao()
     aoPedirConfirmacao({
       titulo: 'Sortear os times de novo?',
@@ -83,6 +122,14 @@ export function SorteioDeTimes({ participantes, elenco = [], acoes, aoPedirConfi
 
   return (
     <Cartao className="p-4 sm:p-6">
+      {palco ? (
+        <PalcoSorteio
+          participantes={participantes}
+          elenco={[...selecionados]}
+          aoFechar={() => setPalco(false)}
+        />
+      ) : null}
+
       <TituloSecao
         className="mb-4"
         titulo="Sorteio dos times"
@@ -94,7 +141,7 @@ export function SorteioDeTimes({ participantes, elenco = [], acoes, aoPedirConfi
             }`}
           >
             <p className="num font-display text-2xl leading-none">
-              {selecionados.size}
+              <NumeroAnimado valor={selecionados.size} />
               <span className="opacity-50">/{participantes.length}</span>
             </p>
             <p className="rotulo mt-1 text-[9px] opacity-70">times · jogadores</p>
@@ -213,39 +260,48 @@ export function SorteioDeTimes({ participantes, elenco = [], acoes, aoPedirConfi
             Precisa trocar o time de uma pessoa só? Use o dado da linha dela — o resto do sorteio fica intacto.
           </p>
           <ul className="grid gap-1 sm:grid-cols-2">
-            {participantes.map((participante) => (
-              <li
-                key={participante.id}
-                className="contorno flex items-center gap-2.5 rounded-lg bg-papel-claro px-2.5 py-1.5"
-              >
-                <EscudoTime timeId={participante.timeId} tamanho="sm" />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[13px] font-bold">{participante.nome}</span>
-                  <span className="block truncate text-[11px] text-tinta-fraca">
-                    {buscarTime(participante.timeId).nome}
-                  </span>
-                </span>
-                {buscarTime(participante.timeId).forca ? (
-                  <span className="num shrink-0 font-display text-[12px] text-tinta-media">
-                    {buscarTime(participante.timeId).forca}
-                  </span>
-                ) : null}
-                <button
-                  type="button"
-                  disabled={!selecionados.size}
-                  onClick={() => sortearUm(participante)}
-                  className={`grid size-7 shrink-0 place-items-center rounded-md border-2 border-transparent transition-colors ${
-                    selecionados.size
-                      ? 'hover:border-tinta hover:bg-cobalto hover:text-white'
-                      : 'cursor-not-allowed text-tinta-fraca'
+            {participantes.map((participante, indice) => {
+              const girando = rolando === participante.id
+              const timeMostrado = girando ? escudoDaVez(indice) : participante.timeId
+              const time = buscarTime(timeMostrado)
+              return (
+                <li
+                  // Girando, a chave fica só no id: trocar de chave a cada quadro
+                  // remontaria a linha e cortaria a animação. Parado, o time entra
+                  // na chave para o resultado surgir de novo a cada sorteio.
+                  key={girando ? participante.id : `${participante.id}-${participante.timeId}`}
+                  className={`contorno flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 ${
+                    girando ? 'bg-lima/40' : 'animar-surgir bg-papel-claro'
                   }`}
-                  aria-label={`Sortear outro time para ${participante.nome}`}
-                  title="Sortear outro time só para esta pessoa"
+                  style={{ '--atraso': `${Math.min(indice, 14) * 45}ms` }}
                 >
-                  <Dices className="size-3.5" strokeWidth={2.5} />
-                </button>
-              </li>
-            ))}
+                  <EscudoTime timeId={timeMostrado} tamanho="sm" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[13px] font-bold">{participante.nome}</span>
+                    <span className="block truncate text-[11px] text-tinta-fraca">
+                      {girando ? 'sorteando…' : time.nome}
+                    </span>
+                  </span>
+                  {!girando && time.forca ? (
+                    <span className="num shrink-0 font-display text-[12px] text-tinta-media">{time.forca}</span>
+                  ) : null}
+                  <button
+                    type="button"
+                    disabled={!selecionados.size}
+                    onClick={() => sortearUm(participante)}
+                    className={`dado grid size-7 shrink-0 place-items-center rounded-md border-2 border-transparent transition-colors ${
+                      selecionados.size
+                        ? 'hover:border-tinta hover:bg-cobalto hover:text-white'
+                        : 'cursor-not-allowed text-tinta-fraca'
+                    }`}
+                    aria-label={`Sortear outro time para ${participante.nome}`}
+                    title="Sortear outro time só para esta pessoa"
+                  >
+                    <Dices className="size-3.5" strokeWidth={2.5} />
+                  </button>
+                </li>
+              )
+            })}
           </ul>
         </div>
       ) : null}

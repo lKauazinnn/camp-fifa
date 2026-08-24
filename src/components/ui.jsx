@@ -1,9 +1,60 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTimes } from '../contexto/TimesContexto.jsx'
+import { tocar } from '../lib/som.js'
 
 /* -------------------------------------------------------------------------- */
 /* Peças do sistema: contorno preto, sombra sólida, cor com função             */
 /* -------------------------------------------------------------------------- */
+
+/** Respeita quem pediu menos movimento no sistema. */
+function prefereParado() {
+  return typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+}
+
+/**
+ * Número que sobe girando até o valor novo e dá um salto ao chegar — o placar
+ * da máquina registrando o ponto.
+ *
+ * Por padrão só a mudança é animada: a primeira renderização já mostra o valor
+ * final, senão todo retorno à tela viraria uma contagem do zero. Com `deZero`,
+ * a contagem também toca na entrada — para os números que são a atração da
+ * tela, como o do inscrito recém-chegado.
+ */
+export function NumeroAnimado({ valor, duracao = 550, deZero = false }) {
+  const inicial = deZero && Number.isFinite(valor) ? 0 : valor
+  const [mostrado, setMostrado] = useState(inicial)
+  const anterior = useRef(inicial)
+
+  useEffect(() => {
+    const de = anterior.current
+    anterior.current = valor
+    if (de === valor) return undefined
+    if (!Number.isFinite(de) || !Number.isFinite(valor) || prefereParado()) {
+      setMostrado(valor)
+      return undefined
+    }
+
+    let quadro = 0
+    const inicio = performance.now()
+    const passo = (agora) => {
+      // Desacelera no fim (ease-out): o número chega e assenta.
+      const parte = Math.min(1, (agora - inicio) / duracao)
+      const suave = 1 - (1 - parte) ** 3
+      setMostrado(Math.round(de + (valor - de) * suave))
+      if (parte < 1) quadro = requestAnimationFrame(passo)
+    }
+    quadro = requestAnimationFrame(passo)
+    return () => cancelAnimationFrame(quadro)
+  }, [valor, duracao])
+
+  // A chave é o valor de destino, e não o mostrado: o salto toca uma vez por
+  // mudança, enquanto os dígitos correm dentro do mesmo span.
+  return (
+    <span key={valor} className="animar-placar">
+      {mostrado}
+    </span>
+  )
+}
 
 export function Cartao({ children, cor = 'papel', className = '', ...props }) {
   // Fundos de cor viva fixam o texto em carvão/branco: eles não mudam com o tema.
@@ -60,11 +111,15 @@ const CORES_BOTAO = {
   perigo: 'bg-rosa text-white',
 }
 
-export function Botao({ variante = 'primario', icone: Icone, children, className = '', disabled, ...props }) {
+export function Botao({ variante = 'primario', icone: Icone, children, className = '', disabled, onClick, som = 'clique', ...props }) {
   return (
     <button
       type="button"
       disabled={disabled}
+      onClick={(evento) => {
+        tocar(som)
+        onClick?.(evento)
+      }}
       className={`contorno rotulo apertar inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-[12px] ${
         disabled
           ? 'pointer-events-none border-tinta-fraca bg-papel-escuro text-tinta-fraca shadow-none'
@@ -79,11 +134,15 @@ export function Botao({ variante = 'primario', icone: Icone, children, className
 }
 
 /** Botão sem contorno, para ações secundárias dentro de cards. */
-export function BotaoTexto({ icone: Icone, children, className = '', disabled, ...props }) {
+export function BotaoTexto({ icone: Icone, children, className = '', disabled, onClick, ...props }) {
   return (
     <button
       type="button"
       disabled={disabled}
+      onClick={(evento) => {
+        tocar('clique')
+        onClick?.(evento)
+      }}
       className={`rotulo inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] transition-colors ${
         disabled
           ? 'cursor-not-allowed text-tinta-fraca/60'
@@ -155,6 +214,34 @@ export function EscudoTime({ timeId, tamanho = 'md', time: timeDireto }) {
           <span className="relative">{iniciais}</span>
         </>
       )}
+    </span>
+  )
+}
+
+const CORES_CONFETE = ['bg-lima', 'bg-cobalto', 'bg-laranja', 'bg-rosa', 'bg-papel-claro']
+
+/**
+ * Chuva de quadradinhos de papel picado.
+ *
+ * Fica sempre dentro de um bloco com `relative overflow-hidden` — é enfeite de
+ * cartão de vitória, não de tela inteira. As posições vêm do índice, e não de
+ * sorteio: assim a chuva é sempre a mesma e não pisca a cada renderização.
+ */
+export function Confete({ pecas = 18 }) {
+  return (
+    <span className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      {Array.from({ length: pecas }).map((_, indice) => (
+        <span
+          key={indice}
+          className={`animar-confete absolute top-0 size-2 ${CORES_CONFETE[indice % CORES_CONFETE.length]}`}
+          style={{
+            left: `${(indice * 100) / pecas + (indice % 3) * 2}%`,
+            '--atraso': `${(indice % 6) * 220 + (indice % 4) * 90}ms`,
+            '--giro': `${(indice % 2 ? 1 : -1) * (360 + indice * 40)}deg`,
+            '--tempo': `${2.2 + (indice % 5) * 0.35}s`,
+          }}
+        />
+      ))}
     </span>
   )
 }

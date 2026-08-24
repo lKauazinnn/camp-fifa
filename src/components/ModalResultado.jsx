@@ -3,6 +3,7 @@ import { Minus, Plus, X } from 'lucide-react'
 import { useTimes } from '../contexto/TimesContexto.jsx'
 import { RESULTADO_VAZIO, normalizarResultado, resultadoEhValido } from '../lib/torneio.js'
 import { Botao, EscudoTime } from './ui.jsx'
+import { tocar, vibrar } from '../lib/som.js'
 
 function CampoNumero({ rotulo, valor, aoMudar, maximo = 99, destaque = false, className = '' }) {
   const ajustar = (delta) => aoMudar(Math.min(maximo, Math.max(0, valor + delta)))
@@ -124,6 +125,10 @@ export function ModalResultado({ partida, aoSalvar, aoLimpar, aoFechar }) {
   const salvar = () => {
     if (!valido) return
     aoSalvar(partida.id, formulario)
+    // Jogo com gol sai com grito de gol; 0 a 0 sai com o blip de sempre.
+    const teveGol = formulario.golsA + formulario.golsB > 0
+    tocar(teveGol ? 'gol' : 'clique')
+    if (teveGol) vibrar([25, 40, 25])
     aoFechar()
   }
 
