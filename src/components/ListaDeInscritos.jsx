@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pencil, QrCode, Trash2, UserPlus } from 'lucide-react'
+import { Dices, Pencil, QrCode, Trash2, UserPlus } from 'lucide-react'
 import { useTimes } from '../contexto/TimesContexto.jsx'
 import { Botao, BotaoTexto, Cartao, EscudoTime, Etiqueta } from './ui.jsx'
 
@@ -16,7 +16,7 @@ function horaDaInscricao(iso) {
   return data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 }
 
-function Linha({ participante, posicao, aoAtualizar, aoRemover }) {
+function Linha({ participante, posicao, aoAtualizar, aoRemover, aoSortearTime }) {
   const { times, buscarTime } = useTimes()
   const [editando, setEditando] = useState(false)
   const [nome, setNome] = useState(participante.nome)
@@ -64,6 +64,18 @@ function Linha({ participante, posicao, aoAtualizar, aoRemover }) {
         </p>
       </div>
 
+      {!temTime ? (
+        <button
+          type="button"
+          onClick={() => aoSortearTime(participante)}
+          className="contorno rotulo apertar sombra-p inline-flex shrink-0 items-center gap-1.5 rounded-md bg-cobalto px-2 py-1.5 text-[9px] text-white"
+          title="Sortear um time só para esta pessoa"
+        >
+          <Dices className="size-3.5 shrink-0" strokeWidth={2.5} />
+          <span className="hidden sm:inline">sortear</span>
+        </button>
+      ) : null}
+
       {veioDoQr(participante) ? (
         <span className="contorno hidden shrink-0 rounded-md bg-cobalto p-1 text-white sm:block" title="Inscreveu-se pelo QR">
           <QrCode className="size-3" strokeWidth={2.5} />
@@ -71,6 +83,17 @@ function Linha({ participante, posicao, aoAtualizar, aoRemover }) {
       ) : null}
 
       <div className="acoes-linha flex shrink-0 gap-0.5 transition-opacity">
+        {temTime ? (
+          <button
+            type="button"
+            onClick={() => aoSortearTime(participante)}
+            className="grid size-8 place-items-center rounded-md border-2 border-transparent transition-colors hover:border-tinta hover:bg-cobalto hover:text-white"
+            aria-label={`Sortear outro time para ${participante.nome}`}
+            title="Sortear outro time só para esta pessoa"
+          >
+            <Dices className="size-3.5" strokeWidth={2.5} />
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={() => setEditando(true)}
@@ -149,6 +172,7 @@ export function ListaDeInscritos({ participantes, torneio, acoes, aoPedirConfirm
           <h2 className="text-2xl sm:text-[28px]">Quem está inscrito</h2>
           <p className="mt-2 text-[14px] leading-snug text-tinta-media">
             A lista enche sozinha conforme a galera escaneia o QR — não precisa recarregar.
+            {semTime > 0 ? ' Quem chegou depois do sorteio pega o time no dado do lado do nome.' : ''}
           </p>
           <div className="mt-2.5 flex flex-wrap gap-1.5">
             <Etiqueta cor="cobalto">{doQr} pelo QR</Etiqueta>
@@ -171,6 +195,17 @@ export function ListaDeInscritos({ participantes, torneio, acoes, aoPedirConfirm
               participante={participante}
               posicao={indice + 1}
               aoAtualizar={acoes.atualizarParticipante}
+              aoSortearTime={(alvo) =>
+                alvo.timeId === 'sem-time'
+                  ? acoes.sortearTimeDe(alvo.id)
+                  : aoPedirConfirmacao({
+                      titulo: `Sortear outro time para ${alvo.nome}?`,
+                      descricao: 'Só o time desta pessoa muda — o resto da lista fica como está.',
+                      textoConfirmar: 'Sortear outro',
+                      variante: 'cobalto',
+                      acao: () => acoes.sortearTimeDe(alvo.id),
+                    })
+              }
               aoRemover={(alvo) =>
                 aoPedirConfirmacao({
                   titulo: `Tirar ${alvo.nome}?`,

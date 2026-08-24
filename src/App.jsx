@@ -47,6 +47,7 @@ export default function App() {
   const {
     participantes,
     timesDoUsuario,
+    elenco,
     torneio,
     estatisticas,
     resumo,
@@ -133,6 +134,7 @@ export default function App() {
               <PainelAdmin
                 participantes={participantes}
                 timesDoUsuario={timesDoUsuario}
+                elenco={elenco}
                 torneio={torneio}
                 acoes={acoes}
                 aoEditarPartida={abrirResultado}

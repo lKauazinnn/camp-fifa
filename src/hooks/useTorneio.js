@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ESTADO_EXEMPLO } from '../data/mock.js'
 import { TIMES } from '../data/times.js'
-import { embaralhar, montarTorneio, normalizarResultado, sortearSeeds } from '../lib/torneio.js'
+import { embaralhar, montarTorneio, normalizarResultado, sortearSeeds, sortearTimeAvulso } from '../lib/torneio.js'
 import { calcularEstatisticas, calcularResumo } from '../lib/estatisticas.js'
 import {
   apagarEstadoSalvo,
@@ -28,7 +28,7 @@ import { criarCatalogo } from '../contexto/TimesContexto.jsx'
 const CHAVE_PIN = 'unidos-acamp-pin'
 const ATRASO_ENVIO = 700
 
-const ESTADO_VAZIO = { participantes: [], seeds: [], resultados: {}, timesDoUsuario: [] }
+const ESTADO_VAZIO = { participantes: [], seeds: [], resultados: {}, elenco: [], timesDoUsuario: [] }
 
 function clonarExemplo() {
   return JSON.parse(JSON.stringify(ESTADO_EXEMPLO))
@@ -38,9 +38,9 @@ function novoId() {
   return `p${Math.random().toString(36).slice(2, 9)}`
 }
 
-/** Estados salvos antes da existência de times personalizados não têm o campo. */
+/** Estados salvos antes de times personalizados e do elenco não têm os campos. */
 function comCamposNovos(estado) {
-  return { timesDoUsuario: [], ...estado }
+  return { timesDoUsuario: [], elenco: [], ...estado }
 }
 
 function lerPinGuardado() {
@@ -333,10 +333,45 @@ export function useTorneio() {
         const sorteados = embaralhar(bolo.slice(0, anterior.participantes.length))
         return {
           ...anterior,
+          // Guardado para o sorteio de uma pessoa só usar o mesmo elenco.
+          elenco: [...new Set(idsDisponiveis)],
           participantes: anterior.participantes.map((participante, indice) => ({
             ...participante,
             timeId: sorteados[indice] ?? 'sem-time',
           })),
+        }
+      })
+    },
+    [alterar],
+  )
+
+  /**
+   * Sorteia o time de uma pessoa só, sem mexer em quem já sabe o seu.
+   *
+   * Serve para quem se inscreveu depois do sorteio e para trocar um time
+   * isolado. O elenco é o mesmo marcado no último sorteio geral (ou o catálogo
+   * inteiro, se ainda não houve sorteio), e a escolha cai primeiro nos times
+   * que ninguém pegou — só repete quando o elenco já acabou, e mesmo aí evita
+   * devolver o time que a pessoa já tinha.
+   */
+  const sortearTimeDe = useCallback(
+    (participanteId, idsDisponiveis) => {
+      alterar((anterior) => {
+        // Sem elenco informado vale o do último sorteio; sem sorteio, o catálogo inteiro.
+        const elenco = idsDisponiveis?.length
+          ? idsDisponiveis
+          : anterior.elenco?.length
+            ? anterior.elenco
+            : criarCatalogo(anterior.timesDoUsuario ?? []).times.map((time) => time.id)
+
+        const escolhido = sortearTimeAvulso(anterior.participantes, participanteId, elenco)
+        if (!escolhido) return anterior
+
+        return {
+          ...anterior,
+          participantes: anterior.participantes.map((participante) =>
+            participante.id === participanteId ? { ...participante, timeId: escolhido } : participante,
+          ),
         }
       })
     },
@@ -486,6 +521,7 @@ export function useTorneio() {
   return {
     participantes: estado.participantes,
     timesDoUsuario: estado.timesDoUsuario ?? [],
+    elenco: estado.elenco ?? [],
     estado,
     torneio,
     estatisticas,
@@ -501,6 +537,7 @@ export function useTorneio() {
       removerParticipante,
       sortear,
       sortearTimes,
+      sortearTimeDe,
       limparTimes,
       salvarResultado,
       limparResultado,

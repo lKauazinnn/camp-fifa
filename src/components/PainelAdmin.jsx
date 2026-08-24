@@ -187,6 +187,7 @@ function BlocoDados({ acoes, salvamento, temDados }) {
 
 export function PainelAdmin({
   participantes,
+  elenco = [],
   torneio,
   acoes,
   aoEditarPartida,
@@ -230,7 +231,12 @@ export function PainelAdmin({
       />
 
       {participantes.length ? (
-        <SorteioDeTimes participantes={participantes} acoes={acoes} aoPedirConfirmacao={pedir} />
+        <SorteioDeTimes
+          participantes={participantes}
+          elenco={elenco}
+          acoes={acoes}
+          aoPedirConfirmacao={pedir}
+        />
       ) : null}
 
       <GerenciadorDeTimes acoes={acoes} totalDeAjustes={timesDoUsuario.length} />

@@ -10,7 +10,7 @@
  *   3. Catálogo de times: mesclagem entre a lista embutida e os ajustes do usuário
  */
 import { renderToStaticMarkup } from 'react-dom/server'
-import { montarTorneio } from '../src/lib/torneio.js'
+import { montarTorneio, sortearTimeAvulso } from '../src/lib/torneio.js'
 import { calcularEstatisticas, calcularResumo } from '../src/lib/estatisticas.js'
 import { ESTADO_EXEMPLO } from '../src/data/mock.js'
 import { TIMES } from '../src/data/times.js'
@@ -87,6 +87,7 @@ const telas = [
   ['Regras', <Regras />],
   ['PainelAdmin', <PainelAdmin participantes={ESTADO_EXEMPLO.participantes} torneio={torneio} acoes={acoes} aoEditarPartida={nada} salvamento={salvamento} />],
   ['PainelAdmin (times do usuario)', comTimes(<PainelAdmin participantes={ESTADO_EXEMPLO.participantes} timesDoUsuario={TIMES_DO_USUARIO} torneio={torneio} acoes={acoes} aoEditarPartida={nada} salvamento={salvamento} />)],
+  ['PainelAdmin (alguem sem time)', <PainelAdmin participantes={[...ESTADO_EXEMPLO.participantes, { id: 'novo', nome: 'Chegou depois', timeId: 'sem-time' }]} elenco={['real-madrid', 'liverpool']} torneio={torneio} acoes={acoes} aoEditarPartida={nada} salvamento={salvamento} />],
   ['PainelAdmin (sem inscritos)', <PainelAdmin participantes={[]} torneio={vazio} acoes={acoes} aoEditarPartida={nada} salvamento={salvamento} />],
   ['PainelAdmin (storage bloqueado)', <PainelAdmin participantes={ESTADO_EXEMPLO.participantes} torneio={torneio} acoes={acoes} aoEditarPartida={nada} salvamento={{ em: null, falhou: true }} />],
   ['GerenciadorDeTimes', comTimes(<GerenciadorDeTimes acoes={acoes} totalDeAjustes={2} />)],
@@ -107,6 +108,46 @@ for (const [nome, elemento] of telas) {
     console.log(`FALHA ${nome}: ${erro.message}`)
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/* Sorteio de uma pessoa só                                                    */
+/* -------------------------------------------------------------------------- */
+
+console.log('\n--- sorteio individual ---')
+
+const inscritos = [
+  { id: 'a', nome: 'A', timeId: 'real-madrid' },
+  { id: 'b', nome: 'B', timeId: 'liverpool' },
+  { id: 'c', nome: 'C', timeId: 'sem-time' },
+]
+const ELENCO = ['real-madrid', 'liverpool', 'chelsea']
+
+const repetido = Array.from({ length: 60 }, () => sortearTimeAvulso(inscritos, 'c', ELENCO))
+ok(
+  repetido.every((time) => time === 'chelsea'),
+  'quem está sem time pega o time que ninguém tem',
+)
+
+const trocaDoA = Array.from({ length: 60 }, () => sortearTimeAvulso(inscritos, 'a', ELENCO))
+ok(
+  trocaDoA.every((time) => time === 'chelsea'),
+  'trocar um time isolado também prefere o time livre',
+)
+
+const soDoisTimes = Array.from({ length: 60 }, () =>
+  sortearTimeAvulso(inscritos, 'a', ['real-madrid', 'liverpool']),
+)
+ok(
+  soDoisTimes.every((time) => time === 'liverpool'),
+  'elenco esgotado repete o menos usado, evitando devolver o mesmo time',
+)
+
+ok(
+  sortearTimeAvulso(inscritos, 'a', ['real-madrid']) === 'real-madrid',
+  'com uma única opção, devolve ela mesma',
+)
+ok(sortearTimeAvulso(inscritos, 'z', ELENCO) === null, 'pessoa inexistente não sorteia nada')
+ok(sortearTimeAvulso(inscritos, 'a', []) === null, 'elenco vazio não sorteia nada')
 
 /* -------------------------------------------------------------------------- */
 /* Catálogo de times                                                           */

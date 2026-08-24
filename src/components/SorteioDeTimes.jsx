@@ -12,9 +12,13 @@ const CAMPO =
  * A ordem do acampamento é: todo mundo se inscreve, a organização vê quantos
  * são, marca quais times entram no bolo e sorteia — um time por pessoa.
  */
-export function SorteioDeTimes({ participantes, acoes, aoPedirConfirmacao }) {
+export function SorteioDeTimes({ participantes, elenco = [], acoes, aoPedirConfirmacao }) {
   const { times, buscarTime } = useTimes()
-  const [selecionados, setSelecionados] = useState(() => new Set(times.map((time) => time.id)))
+  // O elenco do último sorteio volta marcado: quem mexeu nos times não precisa
+  // remarcar tudo para sortear de novo — nem para sortear uma pessoa só.
+  const [selecionados, setSelecionados] = useState(
+    () => new Set(elenco.length ? elenco : times.map((time) => time.id)),
+  )
   const [busca, setBusca] = useState('')
   const [ligaAberta, setLigaAberta] = useState(null)
 
@@ -47,6 +51,22 @@ export function SorteioDeTimes({ participantes, acoes, aoPedirConfirmacao }) {
       const proximo = new Set(atual)
       daLiga.forEach((id) => (todosDentro ? proximo.delete(id) : proximo.add(id)))
       return proximo
+    })
+  }
+
+  /**
+   * Sorteio individual: usa o elenco marcado aqui na hora, então dá para
+   * restringir os times antes de tirar o time de uma pessoa só.
+   */
+  const sortearUm = (participante) => {
+    const acao = () => acoes.sortearTimeDe(participante.id, [...selecionados])
+    if (participante.timeId === 'sem-time') return acao()
+    aoPedirConfirmacao({
+      titulo: `Sortear outro time para ${participante.nome}?`,
+      descricao: 'Só o time desta pessoa muda — todos os outros ficam como estão.',
+      textoConfirmar: 'Sortear outro',
+      variante: 'cobalto',
+      acao,
     })
   }
 
@@ -189,6 +209,9 @@ export function SorteioDeTimes({ participantes, acoes, aoPedirConfirmacao }) {
       {jaSorteado ? (
         <div className="mt-4">
           <p className="rotulo mb-2 text-[10px] text-tinta-media">Resultado do sorteio</p>
+          <p className="mb-2 text-[12px] leading-snug text-tinta-media">
+            Precisa trocar o time de uma pessoa só? Use o dado da linha dela — o resto do sorteio fica intacto.
+          </p>
           <ul className="grid gap-1 sm:grid-cols-2">
             {participantes.map((participante) => (
               <li
@@ -207,6 +230,20 @@ export function SorteioDeTimes({ participantes, acoes, aoPedirConfirmacao }) {
                     {buscarTime(participante.timeId).forca}
                   </span>
                 ) : null}
+                <button
+                  type="button"
+                  disabled={!selecionados.size}
+                  onClick={() => sortearUm(participante)}
+                  className={`grid size-7 shrink-0 place-items-center rounded-md border-2 border-transparent transition-colors ${
+                    selecionados.size
+                      ? 'hover:border-tinta hover:bg-cobalto hover:text-white'
+                      : 'cursor-not-allowed text-tinta-fraca'
+                  }`}
+                  aria-label={`Sortear outro time para ${participante.nome}`}
+                  title="Sortear outro time só para esta pessoa"
+                >
+                  <Dices className="size-3.5" strokeWidth={2.5} />
+                </button>
               </li>
             ))}
           </ul>

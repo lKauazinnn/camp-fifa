@@ -13,6 +13,7 @@
 
 export const CHAVE_PRINCIPAL = 'main'
 export const CHAVE_REPESCAGEM = 'rep'
+export const SEM_TIME = 'sem-time'
 
 /* ------------------------------------------------------------------ */
 /* Helpers de estrutura                                                */
@@ -100,6 +101,39 @@ export function sortearSeeds(participantes) {
   })
 
   return seeds
+}
+
+/**
+ * Escolhe o time de uma pessoa só, dentro do elenco, sem mexer nos demais.
+ *
+ * Usado quando alguém se inscreve depois do sorteio geral ou quando um time
+ * isolado precisa ser trocado. Duas regras, nesta ordem:
+ *
+ *   1. Sai um time diferente do que a pessoa já tinha — quem aperta o dado
+ *      espera troca. Só quando o elenco tem um time e é justo o dela é que o
+ *      mesmo volta.
+ *   2. Entre os times possíveis, ganha um que ninguém pegou; repete o menos
+ *      usado apenas quando o elenco já acabou.
+ *
+ * @returns {string|null} o time sorteado, ou null se não houver o que sortear.
+ */
+export function sortearTimeAvulso(participantes, participanteId, elenco) {
+  const alvo = participantes.find((participante) => participante.id === participanteId)
+  const opcoes = [...new Set(elenco ?? [])]
+  if (!alvo || !opcoes.length) return null
+
+  const usos = new Map()
+  for (const participante of participantes) {
+    if (participante.id === participanteId || participante.timeId === SEM_TIME) continue
+    usos.set(participante.timeId, (usos.get(participante.timeId) ?? 0) + 1)
+  }
+
+  const alternativas = opcoes.filter((id) => id !== alvo.timeId)
+  const possiveis = alternativas.length ? alternativas : opcoes
+  const menorUso = Math.min(...possiveis.map((id) => usos.get(id) ?? 0))
+  const candidatos = possiveis.filter((id) => (usos.get(id) ?? 0) === menorUso)
+
+  return candidatos[Math.floor(Math.random() * candidatos.length)]
 }
 
 /* ------------------------------------------------------------------ */

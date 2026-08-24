@@ -90,7 +90,19 @@ export function validarEstado(bruto) {
     }
   }
 
-  return { participantes, seeds, resultados, timesDoUsuario: validarTimesDoUsuario(bruto.timesDoUsuario) }
+  // Elenco escolhido no último sorteio de times — é dele que sai o time de
+  // quem for sorteado sozinho depois.
+  const elenco = Array.isArray(bruto.elenco)
+    ? [...new Set(bruto.elenco.filter((id) => typeof id === 'string' && id && id !== 'sem-time'))]
+    : []
+
+  return {
+    participantes,
+    seeds,
+    resultados,
+    elenco,
+    timesDoUsuario: validarTimesDoUsuario(bruto.timesDoUsuario),
+  }
 }
 
 /* ------------------------------------------------------------------ */
